@@ -1,0 +1,12 @@
+*~
+.cache
+
+
+packages/
+
+
+// Avoid committing generated JavaScript files
+*.dart.js
+*.js_
+*.js.deps
+*.js.map
