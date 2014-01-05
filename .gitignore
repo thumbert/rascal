@@ -3,6 +3,8 @@
 
 
 packages/
+dart/utilio/bin/packages
+dart/utilio/test/packages
 
 
 // Avoid committing generated JavaScript files
