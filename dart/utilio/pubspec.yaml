@@ -3,4 +3,5 @@ version: 0.0.1
 author: Tony Humbert
 description: Various utilities
 dependencies:
+  parsers: any
   unittest: any
