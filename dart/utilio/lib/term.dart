@@ -1,6 +1,15 @@
 library term;
 
-
+/*
+ * Define a Term as a convenience class to represent common time 
+ * periods, for example a year, quarters, a couple of months, a 
+ * range of days. 
+ * 
+ * Allowed formats include: 
+ *   - a calendar year: 'Cal 14', 'CAL14', '2014'
+ *   - a quarter: 'Q1,2014', 'Q1,14'
+ *   - a month: Jan14, F14, 
+ */
 class Term {
 
   DateTime start;
@@ -11,7 +20,8 @@ class Term {
   static final CAL   = new RegExp(r'^CAL\s+\d{2,4}$');  //'CAL 2015', 'CAL15' 
   static final RANGE = new RegExp(r'(.*)-(.*)');        // a range
   
-  _parseSimple(String term) {
+  // one simple term first
+  parseSimple(String term) {
     
   }
   
@@ -19,11 +29,11 @@ class Term {
     String x = term.toUpperCase();
     bool isRange = x.contains("-");
     
-    if ( isRange) {
+    if ( isRange ) {
       List<String> xp = x.split("-");
       assert(xp.length == 2);
-      Term x1 = _parseSimple( xp[0] );
-      Term x2 = _parseSimple( xp[1] );
+      Term x1 = parseSimple( xp[0] );
+      Term x2 = parseSimple( xp[1] );
 
     } 
     
