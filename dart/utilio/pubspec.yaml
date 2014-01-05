@@ -1,4 +1,6 @@
 name: utilio
-description: A sample command-line application
-#dependencies:
-#  unittest: any
+version: 0.0.1
+author: Tony Humbert
+description: Various utilities
+dependencies:
+  unittest: any
