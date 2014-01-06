@@ -3,6 +3,7 @@ library test_datetime;
 import 'package:unittest/unittest.dart';
 import 'package:utilio/datetime.dart';
 import 'package:utilio/seq.dart';
+import 'package:utilio/term.dart';
 
 main(){
   
@@ -45,7 +46,17 @@ main(){
     });
   });
   
- 
+  solo_test('a Cal14', () {
+    expect(new Term(new DateTime(2014), new DateTime(2014)), 
+        new TermParser().start.parse('Cal14'));
+  });
+  test('a Cal 14', () {
+    expect(new Term(new DateTime(2014), new DateTime(2014)), 
+        new TermParser().start.parse('Cal 14'));
+  });
+
+  
+  
   
 //  group("Testing term:", () {
 //  

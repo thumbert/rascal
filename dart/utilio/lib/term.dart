@@ -48,10 +48,14 @@ class TermParser {
   
   simpleTerm() => aYear() | aMonth() ;
   
-  aYear() => D4();
+  aYear() => D4() | Cal() ;
   D4() => digit + digit + digit + digit ^ (a,b,c,d) {
     int year = digits2int([a,b,c,d]);
     return new Term(new DateTime(year), new DateTime(year+1));
+  };
+  Cal() => string("Cal") + char(' ') + D2() ^ (a,b,c) {
+    //print(a + " " + b + " " + c.toString() );
+    return new Term(new DateTime(2014), new DateTime(2014));
   };
   D2() => digit + digit ^ (a,b) => digits2int([a,b]);
   
