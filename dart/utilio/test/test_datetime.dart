@@ -46,13 +46,21 @@ main(){
     });
   });
   
-  solo_test('a Cal14', () {
+  test('Cal14', () {
     expect(new Term(new DateTime(2014), new DateTime(2014)), 
         new TermParser().start.parse('Cal14'));
   });
-  test('a Cal 14', () {
+  test('Cal 14', () {
     expect(new Term(new DateTime(2014), new DateTime(2014)), 
         new TermParser().start.parse('Cal 14'));
+  });
+  test('Q1,14', () {
+    expect(new Term(new DateTime(2014,1), new DateTime(2014,3)), 
+        new TermParser().start.parse('Q1,14'));
+  });
+  test('Q4, 2014', () {
+    expect(new Term(new DateTime(2014,10), new DateTime(2014,12)), 
+        new TermParser().start.parse('Q4, 2014'));
   });
 
   

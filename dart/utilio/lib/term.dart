@@ -11,7 +11,7 @@ import 'package:utilio/datetime.dart';
  * 
  * Allowed formats include: 
  *   - a calendar year: 'Cal 14', 'CAL14', '2014'
- *   - a quarter: 'Q1,2014', 'Q1,14'
+ *   - a quarter: 'Q1,2014', 'Q1,14', 'Q1, 2014'
  *   - a month: Jan14, F14, 
  */
 class Term {
@@ -46,33 +46,41 @@ class TermParser {
   get start => expr() < eof;
   expr() => range(rec(simpleTerm)) | simpleTerm();
   
-  simpleTerm() => aYear() | aMonth() ;
+  simpleTerm() => aYear() | aQuarter() | aMonth() ;
   
-  aYear() => D4() | Cal() ;
+  // parsing years:  
+  aYear() => Cal() | D4();
   D4() => digit + digit + digit + digit ^ (a,b,c,d) {
-    int year = digits2int([a,b,c,d]);
-    return new Term(new DateTime(year), new DateTime(year+1));
+    return digits2int([a,b,c,d]);
   };
-  Cal() => string("Cal") + char(' ') + D2() ^ (a,b,c) {
-    //print(a + " " + b + " " + c.toString() );
-    return new Term(new DateTime(2014), new DateTime(2014));
+  D2() => digit + digit ^ (a,b) {
+    int yy = digits2int([a,b]);
+    return yy < 50 ? 2000+yy : 1900+yy;
   };
-  D2() => digit + digit ^ (a,b) => digits2int([a,b]);
+  D4orD2() => D4() | D2();  
+  Cal() => string("Cal") + char(' ').orElse('') + D4orD2() ^ (a,b,c) {
+    return new Term(new DateTime(c), new DateTime(c));
+  };
   
+  // parsing quarters: 'Q1,12', 'Q1, 12', 'Q1, 2012'
+  final _quarters = "1234";
+  aQuarter() => char("Q") + oneOf(_quarters) + char(",") + char(' ').orElse('') + D4orD2() ^ (a,b,c,d,e) {
+    int quarter = int.parse(b);
+    return new Term(new DateTime(e, (quarter-1)*3+1), new DateTime(e, quarter*3));
+  };
+  
+  // parsing months
   aMonth() => monYY();
   monYY() => (mon() + D2()) ^ (a,b) {
-    int year = b < 50 ? 2000+b : 1900+b;
     int mthIdx = _months[a.toLowerCase()];
-    DateTime start = new DateTime(year, mthIdx);
+    DateTime start = new DateTime(b, mthIdx);
     return new Term(start, nextMonth(asOf: start));
   };
   mon() => string("Jan") | string("Feb") | string("Mar") | string("Apr") |  
       string("May") | string("Jun") | string("Jul") | string("Aug") | 
       string("Sep") | string("Oct") | string("Nov") | 
       string("Dec"); 
-  
-  Parser<String> lowerString(String x) => string(x.toLowerCase());
-
+ 
   digits2int(digits) => int.parse(digits.join());
   
   
