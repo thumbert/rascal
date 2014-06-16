@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<polymer-element name="aad-autocomplete">
+
+  <template>
+    <style>
+    
+    </style>
+  
+    <div>
+      <input type="text" size=25 value={{textvalue}} id="searchbox" 
+        on-click={{onClick}}  
+        on-input={{myOnInput}}
+        on-focus={{myOnFocus}}
+        on-blur ={{myOnBlur}}
+        >
+    </div>
+    
+    <div>{{message}}</div>
+    
+    <div>{{yousaid}}</div>
+    
+  </template>
+
+  <script type="application/dart" src="aad-autocomplete.dart">
+  </script>
+
+</polymer-element>
