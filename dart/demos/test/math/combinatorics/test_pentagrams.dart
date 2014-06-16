@@ -47,10 +47,13 @@ main() {
   solo_test("matrix reshaping", () {
     Matrix m = new Matrix([1,1,1,1,0,0,0,1], 4, 2);
     expect(m.transpose(), new Matrix([1,0,1,0,1,0,1,1], 2, 4));
-    print(m.reflect_y());
+    //print(m.rotate270());
     expect(m.reflect_diagonal(), new Matrix([1,0,0,0,1,1,1,1], 4, 2));
     expect(m.transpose_minor_diagonal(), new Matrix([1,1,0,1,0,1,0,1], 2, 4));
     expect(m.reflect_x(), new Matrix([0,0,0,1,1,1,1,1], 4, 2));
     expect(m.reflect_y(), new Matrix([1,1,1,1,1,0,0,0], 4, 2));
+    expect(m.rotate90(),  new Matrix([1,1,1,0,1,0,1,0], 2, 4));
+    expect(m.rotate270(), new Matrix([0,1,0,1,0,1,1,1], 2, 4));
   });
   
+}

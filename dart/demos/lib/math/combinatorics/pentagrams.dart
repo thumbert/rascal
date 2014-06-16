@@ -240,7 +240,6 @@ class Matrix<A> {
     List dataNew = [];
     for (int j=0; j<ncol; j++) {
       for (int i=(nrow-1); i>=0; i--) {
-        var aux = i+j*nrow;
         dataNew.add(data[i+j*nrow]);
       }
     }
@@ -248,6 +247,28 @@ class Matrix<A> {
     return new Matrix(dataNew, nrow, ncol);
   }
 
+  Matrix rotate90() {
+    List dataNew = [];
+    for (int i=(nrow-1); i>=0; i--) {
+      for (int j=0; j<ncol; j++) {
+        dataNew.add(data[i+j*nrow]);
+      }
+    }
+    
+    return new Matrix(dataNew, ncol, nrow);
+  }
+  
+  Matrix rotate270() {
+    List dataNew = [];
+    for (int i=0; i<nrow; i++) {
+      for (int j=(ncol-1); j>=0; j--) {
+        dataNew.add(data[i+j*nrow]);
+      }
+    }
+    
+    return new Matrix(dataNew, ncol, nrow);
+  }
+  
   
   String makeView() {
     StringBuffer aux = new StringBuffer();
