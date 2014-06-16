@@ -7,6 +7,16 @@ dart/utilio/bin/packages
 dart/utilio/test/packages
 dart/utilio/pubspec.lock
 
+dart/demos/pubspec.lock
+dart/demos/build
+dart/demos/packages
+dart/demos/bin/packages
+dart/demos/test/packages
+dart/demos/pubspec.lock
+dart/demos/web/packages
+dart/demos/web/autocomplete/packages
+
+
 // Avoid committing generated JavaScript files
 *.dart.js
 *.js_
