@@ -42,19 +42,18 @@ class Ngram {
     this.ncol = ncol;
     order = data.fold(0, (a,b) => a + b);  // count the 1's
     
-    // construct all the 4 views
+    // construct all the 8 views
     views = [];
     matrix = new Matrix(data, nrow, ncol);
     views.add(matrix.makeView());
-    
-    Matrix m1 = matrix.transpose();
-    views.add(m1.makeView());
-    
-    Matrix m2 = matrix.reflect_diagonal();
-    views.add(m2.makeView());
-    
-    Matrix m3 = matrix.transpose_minor_diagonal();
-    views.add(m3.makeView());
+    views.add(matrix.transpose().makeView());    
+    views.add(matrix.reflect_diagonal().makeView());    
+    views.add(matrix.transpose_minor_diagonal().makeView());
+    views.add(matrix.reflect_x().makeView());    
+    views.add(matrix.reflect_y().makeView());    
+    views.add(matrix.rotate90().makeView());    
+    views.add(matrix.rotate270().makeView());    
+            
     views.sort();
     
     view = views.first;  
@@ -73,7 +72,7 @@ class Ngram {
    *  Return a List with the coordinates [i,j] of the available neighbors.  
    *  For neighbors outside the matrix, one of the indices will be = -1.
    */ 
-   List<List<int>> availableNeighbors() {
+  List<List<int>> availableNeighbors() {
      List<List<int>> res = [];
      for (int j=0; j<ncol; j++) {
        for (int i=0; i<nrow; i++) {
@@ -104,7 +103,22 @@ class Ngram {
   // Check if an element already exists in the list 
   bool _existsAlready(List<int> element, List<List<int>> list) => 
     list.any((e) => e[0] == element[0] && e[1] == element[1]);
-      
+  
+  /*
+   * Extend this Ngram and create the next higher order Ngrams.  
+   */
+  List<Ngram> extend() {
+    List<Ngram> res = [];
+    
+    List<List<int>> neighbors = availableNeighbors();
+    neighbors.forEach((List e) {
+      // 
+    });
+    
+    
+    return res;
+  }
+  
   
   // construct the string view from a List of integers by column.   
   String viewFromData() {
@@ -151,10 +165,10 @@ generate(int order) {
   } else {
     // generate previous order and extend it 
     generate(order - 1);
-    Set<Ngram> prev = results[order-1];
-    //Set<Ngram> 
+    results[order] = new Set();
+    Set<Ngram> prev = results[order-1]; 
     prev.forEach((Ngram g) {
-      
+      // extend g, add them to results[order] if new ...
     });
   }  
 }
