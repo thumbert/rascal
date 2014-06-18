@@ -53,4 +53,10 @@ main() {
     expect(m.rotate270(), new Matrix([0,1,0,1,0,1,1,1], 2, 4));
   });
   
+  test("matrix from coordinates", () {
+    Matrix m = new Matrix.fromCoordinates([[1,1], [3,2]]);
+    expect(m.data, [0,0,0,0,0,1,0,0,0,0,0,1]);
+  });
+  
+  
 }

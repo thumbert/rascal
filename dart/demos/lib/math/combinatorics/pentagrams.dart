@@ -109,16 +109,33 @@ class Ngram {
    */
   List<Ngram> extend() {
     List<Ngram> res = [];
+    List<List<int>> coords = getCoords();
     
     List<List<int>> neighbors = availableNeighbors();
-    neighbors.forEach((List e) {
-      // 
+    neighbors.forEach((List<int> e) {
+     
+      // do you need to extend?
+      if (e[0] < 0) { 
+        
+      }
+      Matrix m = new Matrix.fromCoordinates(coords..add(e));
+      
     });
     
     
     return res;
   }
   
+  List<List<int>> getCoords() {
+    List<List<int>> coords = [];
+    for (int i=0; i<nrow; i++) {
+      for (int j=0; j<ncol; j++) {
+        if (matrix[[i,j]] == 1) 
+          coords.add([i,j]);
+      }
+    }
+    return coords;
+  }
   
   // construct the string view from a List of integers by column.   
   String viewFromData() {
@@ -195,6 +212,21 @@ class Matrix<A> {
     this.data = data;
     this.nrow = nrow;
     this.ncol = ncol;
+  }
+  
+  Matrix.fromCoordinates(List<List<int>> coords) {
+    // find the dimensions
+    int maxR = 0;
+    int maxC = 0;
+    coords.forEach((List e) {
+      if (e[0] > maxR) maxR = e[0];
+      if (e[1] > maxC) maxC = e[1];        
+    });
+    nrow = maxR+1;
+    ncol = maxC+1;
+    data = new List.filled(nrow*ncol, 0);
+    // set the elements
+    coords.forEach((e) => data[e[0] + nrow*e[1]] = 1);  
   }
   
   operator []=(List<int> coord, value) {
