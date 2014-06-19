@@ -107,19 +107,20 @@ class Ngram {
   /*
    * Extend this Ngram and create the next higher order Ngrams.  
    */
-  List<Ngram> extend() {
-    List<Ngram> res = [];
+  Set<Ngram> extend() {
+    Set<Ngram> res = new Set();
     List<List<int>> coords = getCoords();
     
     List<List<int>> neighbors = availableNeighbors();
     neighbors.forEach((List<int> e) {
-     
-      // do you need to extend?
-      if (e[0] < 0) { 
-        
-      }
-      Matrix m = new Matrix.fromCoordinates(coords..add(e));
-      
+      var lcoords = coords.map((a) => [a[0], a[1]]).toList();  // the new coords
+      lcoords..add([e[0],e[1]]);
+      if (e[0] < 0)        // extend rows
+        lcoords.forEach((a) => a[0] += 1);
+      if (e[1] < 0)        // extend columns
+        lcoords.forEach((a) => a[1] += 1);      
+      Matrix m = new Matrix.fromCoordinates(lcoords);
+      res.add(new Ngram(m.data, m.nrow, m.ncol));
     });
     
     
@@ -185,7 +186,7 @@ generate(int order) {
     results[order] = new Set();
     Set<Ngram> prev = results[order-1]; 
     prev.forEach((Ngram g) {
-      // extend g, add them to results[order] if new ...
+      results[order].union(g.extend());
     });
   }  
 }

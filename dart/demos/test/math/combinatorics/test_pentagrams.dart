@@ -34,6 +34,22 @@ main() {
     
   });
   
+  test("extend Ngrams", () {
+    Ngram g = new Ngram([0,1,0,1,1,1], 2, 3);
+    //g.extend().forEach((g) => print(g.toString() + "\n"));    
+  });
+  
+  test("generate order 3", () {
+    generate(3);
+    results[3].forEach((g) => print(g.toString() + "\n"));
+  });
+
+  solo_test("generate order 4", () {
+    generate(4);
+    results[4].forEach((g) => print(g.toString() + "\n"));
+  });
+
+  
   test("matrix setting", (){
     Matrix m = new Matrix(new List.filled(6, 0), 3, 2);
     m[[1,0]] = 2;
