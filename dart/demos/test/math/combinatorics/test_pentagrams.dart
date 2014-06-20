@@ -40,13 +40,23 @@ main() {
   });
   
   test("generate order 3", () {
-    generate(3);
-    results[3].forEach((g) => print(g.toString() + "\n"));
+    var res = generate(3);
+    res[3].forEach((g) => print(g.toString() + "\n"));
   });
 
   solo_test("generate order 4", () {
-    generate(4);
-    results[4].forEach((g) => print(g.toString() + "\n"));
+    
+    var g1 = new Ngram([1,0,1,0,1,0,1,1], 2, 4);
+    var g2 = new Ngram([1,1,1,1,1,0,0,0], 4, 2);
+    
+    print(g1 == g2);
+    var s1 = new Set.from([g1]);
+    var s2 = s1.add(g2);
+    print(s2);
+    
+    //var res = generate(4);
+    //print("There are ${res[4].length} Ngrams of order 4!");
+    //res[4].forEach((g) => print(g.toString() + "\n"));
   });
 
   

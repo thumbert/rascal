@@ -167,40 +167,41 @@ class Ngram {
 }
 
 
-Map<int, Set<Ngram>> results = { 
-  1 : new Set()..add(new Ngram([1], 1, 1)),            // "X"                              
-  2 : new Set()..add(new Ngram([1,1], 1, 2)),          // "XX"
-  3 : new Set()..addAll([new Ngram([1,1,1], 1, 3),     // "XXX"
-                         new Ngram([1,0,1,1], 2, 2)])  // "XX\nX "
-};                                                            
 
 /*
  * Generate all the Ngrams of a given order 
  */
-generate(int order) {
-  if (results.keys.contains(order)) {
-    return results[order];
-  } else {
-    // generate previous order and extend it 
-    generate(order - 1);
+Map<int, Set<Ngram>> generate(int order) {
+  Map<int, Set<Ngram>> results = { 
+    1 : new Set()..add(new Ngram([1], 1, 1)),            // "X"                              
+    2 : new Set()..add(new Ngram([1,1], 1, 2)),          // "XX"
+    3 : new Set()..addAll([new Ngram([1,1,1], 1, 3),     // "XXX"
+                           new Ngram([1,0,1,1], 2, 2)])  // "XX\nX "
+  };                             
+  
+  for (int i=4; i<= order; i++) {
     results[order] = new Set();
     Set<Ngram> prev = results[order-1]; 
     prev.forEach((Ngram g) {
-      results[order].union(g.extend());
+      var aux = g.extend();
+      var bux = results[order].union(aux);
+      results[order] = results[order].union(aux);
     });
-  }  
-}
-
-
-void show_Ngrams(int order) {
-  if (!results.keys.contains(order)) {
-    generate(order);
   }
-  print("\nThere are ${results[order].length} Ngrams of order $order.\n");
-  results[order].forEach((s) {
-    print(s.view + "\n");
-  });
+  
+  return results;
 }
+
+
+//void show_Ngrams(int order) {
+//  if (!results.keys.contains(order)) {
+//    generate(order);
+//  }
+//  print("\nThere are ${results[order].length} Ngrams of order $order.\n");
+//  results[order].forEach((s) {
+//    print(s.view + "\n");
+//  });
+//}
 
 
 class Matrix<A> {
@@ -372,7 +373,7 @@ class Matrix<A> {
 
 main() {
  
-  show_Ngrams(3);
+  //show_Ngrams(3);
   
 }
 
@@ -380,215 +381,3 @@ main() {
 
 
 
-
-/*
- * Go from a List of links to the coordinate view by traversing the links. 
- * Construct the Map<blockIndex, List<xCoord, yCoord>> that represents 
- * the Ngram in the plane.  
- */
-//  fromLinksToCoordinates() {
-//    // start from block 1 at (0,0)
-//    int block = 1;
-//    coords = [0,0]; 
-//    List<int> nextBlocks = [];  // blocks that need to be explored
-//    
-//    while ( true ) {
-//      print("Working on block $block");
-//      List<List<int>> newLinks = getLinksFromBlock( block )
-//          ..retainWhere((link) => !coords.keys.contains(link[1]));
-//       
-//      newLinks.forEach((List<int> link) {
-//        int toBlock = link[1];
-//        if (!coords.keys.contains(toBlock)) {
-//          print("--Adding block $toBlock");
-//          switch (link[2]) {          // depending on connecting side
-//            case 1: coords[toBlock] = [coords[block][0]+1, coords[block][1]]; break;
-//            case 2: coords[toBlock] = [coords[block][0], coords[block][1]-1]; break;
-//            case 3: coords[toBlock] = [coords[block][0]-1, coords[block][1]]; break;
-//            case 4: coords[toBlock] = [coords[block][0], coords[block][1]+1]; break;
-//          }
-//          nextBlocks.add(toBlock);
-//        }
-//      }); 
-//      
-//      // pick another block that is not yet mapped
-//      Set<int> rest = _allBlocks.difference(coords.keys.toSet());
-//      if (rest.isEmpty) 
-//        break;
-//      block = nextBlocks.first;
-//      nextBlocks.removeAt(0);
-//      print(coords);
-//    }
-//    
-//    // check if the needs to be shifted, such that min x or y coord is 0!
-//    int minX = 0;
-//    int minY = 0;
-//    maxX = 0;
-//    maxY = 0;
-//    coords.values.forEach((e) {
-//      if (e[0] < minX) minX = e[0];
-//      if (e[1] < minY) minY = e[1];
-//      if (e[0] > maxX) maxX = e[0];
-//      if (e[1] > maxY) maxY = e[1];
-//    });
-//    if (minX != 0 || minY != 0) {
-//      coords.forEach((k,v) {
-//        v[0] -= minX;
-//        v[1] -= minY;
-//      });
-//      maxX -= minX;
-//      maxY -= minY;
-//      //print("$maxX, $maxY");
-//    }
-//  }
-
-// put an X at coordinates (i,j) of the view
-//  List<String> setView(List<String> view, int i, int j) {
-//    view[i] = view[i].substring(0,j) + "X" + view[i].substring(j+1);
-//    return view;
-//  }
-
-
-//  Ngram (int order, List<List<int>> links) {
-//    // check that you have enough links
-//    assert(order-1 == links.length);    
-//    this.order = order;
-//    
-//    /* check that all the blocks are connected (each block shows up 
-//     * at least once in the links).  
-//     */
-//    Set<int> blocks = links.expand((e) => [e[0], e[1]]).toSet();
-//    Set<int> allBlocks = new List.generate(order, (i) => i+1).toSet();
-//    assert(allBlocks.difference(blocks).isEmpty);
-//    
-//    // check that all connection sides are in [1,2,3,4]
-//    assert([1,2,3,4].toSet().containsAll( links.map((e) => e[2]).toSet() ));
-//    this.links = links;
-//    
-//    _allBlocks = new List.generate(order, (i) => i+1).toSet();
-//    
-//    // make the coordinates
-//    //fromLinksToCoordinates();
-//  }
-
-
-/*
- * Get all the links starting from block i.  Can be more than one link. 
- * Return them in the direction from block i as a List of links. 
- */  
-//  List<List<int>> getLinksFromBlock(int i) { 
-//    List<List<int>> linksFromThisBlock = [];
-//    links.forEach((e) {
-//      if (e[0] == i) {
-//        linksFromThisBlock.add(e);
-//      } else if (e[1] == i) {
-//        linksFromThisBlock.add([e[1], e[0], reverseSide(e[2])]);      
-//      }
-//    });
-//    
-//    return linksFromThisBlock;
-//  }
-
-//  // calculate the border and return the list of coordinates
-//  List<List<int>> border() {
-//    List<List<int>> res = [];
-//    coords.forEach((List<int> e) {
-//      res.addAll([ [e[0]+1, e[1]],
-//                   [e[0],   e[1]-1],
-//                   [e[0]-1, e[1],
-//                   [e[0],   e[1]+1]] ]);
-//    });
-//    
-//    // need to remove duplicates and the ones in coords
-//    return res;
-//  }
-//      
-//  
-//  int reverseSide(int side) {
-//    int reverseSide;
-//    switch (side) {
-//      case 1 : reverseSide = 3; break;
-//      case 2 : reverseSide = 4; break;
-//      case 3 : reverseSide = 1; break;
-//      case 4 : reverseSide = 2; break;
-//    }
-//    return reverseSide;
-//  }
-//  
-//  List<int> reverseLink(List<int> link) => [link[1], link[0], reverseSide(link[2])];
-
-//
-//class Square {
-//  String name;
-//  List<int> sides = [1, 2, 3, 4];    // bottom, left, top, right
-//  List<int> freeSides = [1, 2, 3, 4];
-//  
-//  Square();  
-//}
-//
-//// not used ...
-//class Link {
-//  int fromBlock;
-//  int toBlock;
-//  int sideConnected;  // from the point of view of fromBlock
-//  
-//  Link(int this.fromBlock, int this.toBlock, int this.sideConnected);
-//}
-
-//  /*
-//   * Costruct the Ngram from a list of coordinates. 
-//   * No check is made if the min of one coordinate is 0.   
-//   */ 
-//  Ngram.fromCoordinates(List<List<int>> coords) {
-//    this.coords = coords;
-//    order = coords.length;
-//    
-//    nrow = 0;
-//    ncol = 0;
-//    coords.forEach((e) {
-//      if (e[0] > nrow) nrow = e[0];
-//      if (e[1] > ncol) ncol = e[1];
-//    });
-//    nrow += 1;
-//    ncol += 1;
-//    
-//    view = viewFromCoords();
-//  }
-// 
-
-
-//    coords =  [];
-//    for (int j=0; j<ncol; j++) {
-//      for (int i=0; i<nrow; i++) {
-//        if (data[i + nrow*j] == 1) {
-//          coords.add([i,j]);
-//        }
-//      }     
-//    }
-
-//  // construct the string view from coords list   
-//  String viewFromCoords() {
-//    List<String> view = new List.filled(nrow, " " * ncol);
-//    coords.forEach((v) {
-//      view[v[0]] = view[v[0]].substring(0,v[1]) + "X" + view[v[0]].substring(v[1]+1);
-//    });
-//    
-//    return view.join("\n");
-//  }
-
-//_expandCoords_x() => coords.forEach((k,v) => v[0]++);
-//_expandCoords_y() => coords.forEach((k,v) => v[1]++);
-
-
-//List<int> shift_left(List<int> s) =>  s.sublist(1)..add(s[0]);
-//
-//bool list_equal(List<int> x, List<int> y) {
-//  bool res = true;
-//  for (int i=0; i<x.length; i++) {
-//    if (x[i] != y[i]) { 
-//      res = false;
-//      break;
-//    }
-//  }
-//  return res;
-//}
