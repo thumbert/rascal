@@ -164,6 +164,9 @@ class Ngram {
   bool operator ==(Ngram that) {
     return view == that.view;
   }
+  
+  int get hashCode => view.hashCode;
+  
 }
 
 
@@ -180,28 +183,18 @@ Map<int, Set<Ngram>> generate(int order) {
   };                             
   
   for (int i=4; i<= order; i++) {
-    results[order] = new Set();
-    Set<Ngram> prev = results[order-1]; 
+    results[i] = new Set();
+    Set<Ngram> prev = results[i-1]; 
     prev.forEach((Ngram g) {
       var aux = g.extend();
-      var bux = results[order].union(aux);
-      results[order] = results[order].union(aux);
+      var bux = results[i].union(aux);
+      results[i] = results[i].union(aux);
     });
   }
   
   return results;
 }
 
-
-//void show_Ngrams(int order) {
-//  if (!results.keys.contains(order)) {
-//    generate(order);
-//  }
-//  print("\nThere are ${results[order].length} Ngrams of order $order.\n");
-//  results[order].forEach((s) {
-//    print(s.view + "\n");
-//  });
-//}
 
 
 class Matrix<A> {
@@ -373,7 +366,7 @@ class Matrix<A> {
 
 main() {
  
-  //show_Ngrams(3);
+  
   
 }
 
