@@ -1,0 +1,4 @@
+name: combinatorics
+description: A sample application
+dependencies:
+  intl: any

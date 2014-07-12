@@ -1,6 +1,6 @@
 *~
 .cache
-
+*.lock
 
 packages/
 dart/utilio/bin/packages
