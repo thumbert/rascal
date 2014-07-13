@@ -1,13 +1,17 @@
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 /*
- * Find the best toilet in a large group of N toilets using the following algorithm. 
- * Decide the number of toilets to inspect beforehand, K.  From K+1, choose the 
- * best toilet better than all previous ones.  If you get to N before you find a 
- * better toilet (which means the best toilet was in the first 1:K), you chose the 
- * last toilet. 
+ * You have a set of N objects, each object has a score ${X_i}$.  You want to find 
+ * the object with the maximum score but you don't want to scan all the objects 
+ * (because they are too many, etc.)  You decide to inspect the first 1 to K 
+ * objects and record their highest score, which you denote with $M_K$.  Then you 
+ * keep inspecting new objects and decide to stop when you find an object with a 
+ * score $X_i > M_K$.  What is the probability that you've found the object with 
+ * the true maximum score $M = \max_{i} X_i$? 
  * 
- * Questions, what is the optimal K?  What's the probability to find the best 
+ * 
+ * Question: What is the optimal K?  What's the probability to find the best 
  * toilet using this algo?  How many toilets you end up visiting? 
  *   
  * https://www.youtube.com/watch?v=ZWib5olGbQ0
@@ -16,19 +20,18 @@ import 'package:intl/intl.dart';
 
 
 int run_algo(List<int> x, K) {
-  Map<String,int> res = {};
   int best;
   
-  if (K == (x.length - 2)) {
+  if (K == (x.length - 1)) {
     // forced to chose the last toilet
     best = x.last;
     
   } else {
-    int maxUpToK = x.take(K).fold(0, (a, b) {
+    int maxUpToK = x.take(K+1).fold(0, (a, b) {
       if (a >= b) return a; else return b;
     });
 
-    best = x.sublist(K).firstWhere((e) => e > maxUpToK, 
+    best = x.sublist(K+1).firstWhere((e) => e > maxUpToK, 
         orElse: (){return x.last;});
   }
 
@@ -38,35 +41,58 @@ int run_algo(List<int> x, K) {
 
 main() {
 
-  int N = 100; // number of toilets
-  int S = 4000; // number of simulations
-
-  var D2 = new NumberFormat("###.##", "en_US");
+  int N = 100;  // number of objects
+  int S = 1000; // number of simulations
+  var rand = new Random(1);
   
   
-  List<int> x = new List.generate(N, (i) => i);
-  List<List<int>> res = new List.generate(S, (e) => new List.filled(N-2, 0)); 
+  var D2 = new NumberFormat("####.###", "en_US");
   
+  // generate the scores, from 1:N
+  List<int> x = new List.generate(N, (i) => i+1);
   
+  List<List<int>> best = new List.generate(S, (e) => new List.filled(N, 0)); 
+  
+  // loop over simulations
   for (int s = 0; s < S; s++) {
-    x.shuffle();
-    for (int K = 1; K < (N - 1); K++) {
-      res[s][K-1] = run_algo(x, K); 
+    x.shuffle(rand);
+    // try different K values
+    for (int K = 0; K < N; K++) {
+      best[s][K] = run_algo(x, K); 
     }
   }
 
-  // calcualate the average over all the simulations
-  List<num> avg = new List.filled(N-2, 0.0);
-  for (int K=0; K < (N-2); K++) {
-    num sum =0;
+  
+  // the average score over all the simulations
+  List<num> avg  = new List.filled(N, 0.0);
+  // the probability to get the Maximum value
+  List<num> pMax = new List.filled(N, 0.0);  
+  
+  for (int K=0; K < N; K++) {
+    num sum = 0;
+    num count = 0;
     for (int s = 0; s < S; s++) {
-      sum += res[s][K];
+      if (best[s][K] == N) 
+        count += 1.0;
+      sum += best[s][K];
     }
-    avg[K] = sum/S;
-    print("${K.toString().padLeft(3)}, ${D2.format(avg[K]).padRight(5,"0")}");
+    pMax[K] = count/S;
+    avg[K] = sum/S/N;
+    //print("${K.toString().padLeft(3)}, ${D2.format(avg[K]).padRight(8,"0")}");
   }
   
-  var D3 = new NumberFormat("###.###", "en_US");
-  print("Test 1.2 is ${D2.format(1.2).padRight(6, "0")}");
+  //////////////////////////////////////////////////////////////////////////
+  // results
+  print("\n\nAverage score: ");
+  for (int K=0; K < N; K++) {
+    print("${(K/N).toString().padLeft(3)},  ${avg[K].toStringAsPrecision(3).padRight(5,"0")}");
+  } 
+  
+  print("\n\n Probability to get the maximum: ");
+  for (int K=0; K < N; K++) {
+    print("${(K/N).toStringAsFixed(3)},  ${pMax[K].toStringAsFixed(4)}");    
+  } 
+  print("Probability check: \sum{pMax}=${pMax.reduce((a,b)=>a+b)}");
+  
   
 }
