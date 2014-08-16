@@ -19,6 +19,8 @@ dart/demos/pubspec.lock
 dart/demos/web/packages
 dart/demos/web/autocomplete/packages
 
+out/
+
 
 // Avoid committing generated JavaScript files
 *.dart.js
