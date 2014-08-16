@@ -19,7 +19,11 @@ dart/demos/pubspec.lock
 dart/demos/web/packages
 dart/demos/web/autocomplete/packages
 
+// all output should be recreated
 out/
+
+// external dependencies should not be added
+R/finance/vix/external/
 
 
 // Avoid committing generated JavaScript files
