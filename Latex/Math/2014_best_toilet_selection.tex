@@ -1,0 +1,159 @@
+%\documentclass{revtex4}
+\documentclass[preprint]{revtex4}
+%\documentclass[12pt]{article}
+
+\usepackage{hyperref}
+\hypersetup{breaklinks=true,  colorlinks=true, 
+  citecolor=black, linkcolor=magenta, urlcolor=magenta}
+\urlstyle{rm} %so it doesn't use a typewriter font for urls.
+
+\begin{document}
+\title{Best toilet selection}
+\author{Adrian A. Dr\u{a}gulescu}
+\date{August 3, 2014}
+\maketitle
+
+
+
+\section{Introduction}
+Consider the following queuing problem.  Suppose you have $N$ objects,
+and each object has a value (score) which we denote by ${X_i}$ with
+$i$ from $1$ to $N$.  We are presented with one object at a time, and
+our goal is to select an object with the highest score possible.
+However, we are not allowed to go back and select one of the objects
+that have been already presented to us and we have rejected already.
+The problem stops when we have made our selection.  If we have not
+made a selection up to the last element, we are forced to take the
+last element.  I've seen this problem in the Numberphile video
+\url{https://www.youtube.com/watch?v=ZWib5olGbQ0&list=UUoxcjq-8xIDTYp3uz647V5A}.
+
+We want an algorithm to optimally select the best element (the element
+with the highest score) but it is prohibitive to scan the entire list
+of objects.  We are looking for an algorithm that ends before although
+it may not guarantee that it finds the absolute maximum score $M =
+\max_{i=1,N} X_i$.
+
+The algorithm is this: Scan the first $1$ to $K$ objects and record
+their highest score which we denote by $M_K$.  Keep inspecting the
+remaining objects and stop when the first element such that $X_i >
+M_K$ for $i>K$ is found.  What is the probability ${\cal P}_M(K)$ to
+find the object with the true maximum score $M$?
+
+\section{Optimal stopping $K$} 
+ There is an optimal $K$ that maximizes the probability ${\cal
+   P}_M(K)$?  For a very small $K$, say $K=1$, you will find the true
+ maximum $M$ with a probability of $1-1/N$, although you may need to
+ scan a lot of elements.  For a large $K$ close to $N$ the probability
+ to find the true maximum is again very small as most likely it was in
+ the first $K$ and you skipped it.  So there is an optimal $K$ which
+ maximizes this probability.
+
+The probability ${\cal P}_M(K)$ to select the maximum element $M$ after
+you skip the first $K$ elements is calculated as the sum of the
+probabilities of a series of disjoint events.  The disjoint events are
+the specific location of the selection.  The selected item can be in
+the spot $K+1$, or $K+2$, or $K+3$,\ldots or the $N$ spot. 
+\begin{equation}
+  \label{prob}
+  {\cal P}_M(K) = \sum_{j=K+1}^{N} P_S(X_j) \times P_M(j)
+\end{equation}
+where $P_S(X_j)$ is the probability that variable $X_j$ is selected and
+$P_M(j)$ is the probability that the true maximum $M$ is at location $j$.
+As the items are distributed randomly, $P_M(j)=1/N$.
+
+If $j=K+1$, that is we select element $X_{K+1}$ the probability to
+select $X_{K+1}$ equals $1$.
+
+If $j=K+2$ spot, the probability to select $X_{K+2}$ is not $1$ as you
+may end up selecting $X_{K+1}$ if $X_{K+1}>M_K$.  So $P_S(X_{K+2})$
+the probability of selecting $X_{K+2}$ is the probability of not
+selecting $X_{K+1}$
+$$P_S(X_{K+2}) = P(X_{K+1} < M_K) = 1-P(X_{K+1}=M_{K+1}) =
+1 - \frac{1}{K+1}$$
+because the probability that the maximum of the first $K+1$ values is
+in the spot $K+1$ is $1/(K+1)$.
+
+If $j=K+3$ the probability $P_S(X_{K+3})$ to select $X_{K+3}$ is the
+probability of not selecting $X_{K+1}$ or $X_{K+2}$ that is, not to have
+the maximum of the first $K+2$ values in the last two spots $K+1$ and
+$K+2$.
+$$P_S(X_{K+3}) = 1-P(\{X_{K+1}, X_{K+2}\}<M_K) = 1 - \frac{2}{K+2}$$ 
+
+From Eq.\ \ref{prob} it follows that
+\begin{equation}
+  {\cal P}_M(K) = \frac{1}{N} + \frac{1}{N}\frac{K}{K+1}
+  + \frac{1}{N}\frac{K}{K+2} 
+  + \frac{1}{N}\frac{K}{K+3} 
+  + \cdots + \frac{1}{N}\frac{K}{N-1} 
+\end{equation}
+
+
+
+\begin{equation}
+\end{equation}
+
+\end{document}
+
+
+
+%% The payout of the auction can then be written as
+%% \begin{equation}
+%%   \pi = (s - c)\sum_{i=1}^N q_i (1 - \theta(c - b_i)) 
+%% \end{equation}
+%% where $\theta$ is the Heaviside step-function.  
+
+%% The problem is to find the probability density of the auction payout
+%% $\Pi$.  This probability density can be written as
+%% \begin{equation}
+%%   {\cal P}(\pi) = \int_{-\infty}^{\infty}ds \int_{-\infty}^{\infty}dc\,
+%%     {\cal P}(s)\,{\cal P}(c)\, 
+%%     \delta(\pi - (s - c)\sum_{i=1}^N q_i (1 - \theta(c-b_i))) 
+%% \end{equation}
+%% where $\delta$ is the Dirac distribution function. 
+
+%% Let's focus first on the case when $N=1$.  You can split the integral
+%% over $c$ into two parts from $(-\infty,b)$ and from $(b,\infty)$ to
+%% get
+%% \begin{eqnarray*}
+%%   \lefteqn{{\cal P}(\pi) = \int_{-\infty}^{\infty}ds \int_{-\infty}^{b}dc
+%%     {\cal P}(s) {\cal P}(c) \delta(\pi - q(s - c)) }\\ 
+%%   && {} + \int_{-\infty}^{\infty}ds \int_{b}^{\infty}dc
+%%     {\cal P}(s) {\cal P}(c) \delta(\pi)
+%% \end{eqnarray*}
+%% The first integral over $s$ in the first term can be taken by
+%% resolving the $\delta$ function to get
+%% \begin{equation}
+%%   {\cal P}(\pi) = \frac{1}{q}\int_{-\infty}^{b}dc
+%%     {\cal P}_S(c+\pi/q) {\cal P}_C(c) + P_0\delta(\pi) 
+%% \end{equation}
+
+%% where $$P_0 = \int_{b}^{\infty}dc\,{\cal P}_C(c) $$ is a constant that
+%% represents the probability of not clearing anything in the auction,
+%% in the case when the clearing price $c$ is greater than the bid
+%% price $b$.
+
+
+
+
+%% What is interesting is that the average payout can be found out to be 
+%% \begin{equation}
+%%   \langle \Pi \rangle = \int_{-\infty}^{\infty}d\pi\,\pi\,{\cal P}(\pi) 
+%%      = q\int_{-\infty}^{b}dc\,{\cal P}_C(c)\,(\langle S \rangle - c) 
+%% \end{equation}
+
+
+%% Similar arguments can be made for the case of multiple bids.  For
+%% example, for two bids we get
+%% \begin{eqnarray*}
+%%   \lefteqn{{\cal P}(\pi) = 
+%%     \frac{1}{q_1+q_2}\int_{-\infty}^{b_2}dc\,{\cal P}_S(c+\pi/(q_1+q_2))\,
+%%        {\cal P}_C(c)} \\ 
+%%   && {} + \frac{1}{q_1}\int_{b_2}^{b_1}dc\,{\cal P}_S(c+\pi/q_1)\, {\cal P}_C(c) \\
+%%   && {} + P_0\delta(\pi) 
+%% \end{eqnarray*}
+
+%% \section{Portfolio considerations}
+%% It is interesting to consider portfolios of tickets corresponding to
+%% different auctions. 
+
+
