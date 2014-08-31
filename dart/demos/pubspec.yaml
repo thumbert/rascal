@@ -11,4 +11,5 @@ dependencies:
   polymer_elements: any
   polymer_expressions: any
   polymer_ui_elements: any
+  stagexl: any
   unittest: any

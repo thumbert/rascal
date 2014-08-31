@@ -1,7 +1,6 @@
 library basic_chart1;
 
 import 'dart:html' as html;
-import 'package:chartxl/src/chart.dart';
 import 'package:stagexl/stagexl.dart';
 
 // an editable text field ...
