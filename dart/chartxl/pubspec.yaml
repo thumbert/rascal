@@ -1,0 +1,8 @@
+name: chartxl
+version: 0.0.1
+author: Adrian A. Dragulescu
+description: A Dart library to create charts
+dependencies:
+  browser: any
+  stagexl: any
+  unittest: any

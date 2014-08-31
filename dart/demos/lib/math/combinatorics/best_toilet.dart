@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'dart:math';
 
 /*
+ * A problem of optimal choice: 
  * You have a set of N objects, each object has a score ${X_i}$.  You want to find 
  * the object with the maximum score but you don't want to scan all the objects 
  * (because they are too many, etc.)  You decide to inspect the first 1 to K 
