@@ -1,0 +1,93 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+\title{Auctions with random payoffs}
+\author{Adrian A. Dr\u{a}gulescu}
+\date{September 30, 2013}
+\maketitle
+
+
+
+\section{Distribution of the payoff}
+Consider an auction where a participant is allowed to bid price,
+quantiy pairs $(b_i, q_i)$ with $i=1\to N$.  We'll assume that the bid
+prices $b_i$ are ordered decreasingly. 
+
+The auction clears at a random clearing price $c$, and the participant
+gets an award of size $\sum_i q_i$ for all bids $i$ such that $b_i
+\geq c$.  We assume that in the case when the clearing price $c$
+exactly equals one of the bids $b_i$, the entire quantity $q_i$ is
+awarded.
+
+The auction payout for each unit quantity is a random variable $S$
+which represents the settlement price.  The values of $S$ denoted $s$
+can be both positive or negative.  The random variable $C$
+corresponding to the clearing price has a probability density ${\cal
+  P}_C(c)$ and the random variable $S$ corresponding to the settlement
+price has a probability density ${\cal P}_S(s)$ considered independent
+of each other.  As in the case of $S$, the clearing prices $c$ can be
+both positive or negative. 
+
+The payout of the auction can then be written as
+\begin{equation}
+  \pi = (s - c)\sum_{i=1}^N q_i (1 - \theta(c - b_i)) 
+\end{equation}
+where $\theta$ is the Heaviside step-function.  
+
+The problem is to find the probability density of the auction payout
+$\Pi$.  This probability density can be written as
+\begin{equation}
+  {\cal P}(\pi) = \int_{-\infty}^{\infty}ds \int_{-\infty}^{\infty}dc\,
+    {\cal P}(s)\,{\cal P}(c)\, 
+    \delta(\pi - (s - c)\sum_{i=1}^N q_i (1 - \theta(c-b_i))) 
+\end{equation}
+where $\delta$ is the Dirac distribution function. 
+
+Let's focus first on the case when $N=1$.  You can split the integral
+over $c$ into two parts from $(-\infty,b)$ and from $(b,\infty)$ to
+get
+\begin{eqnarray*}
+  \lefteqn{{\cal P}(\pi) = \int_{-\infty}^{\infty}ds \int_{-\infty}^{b}dc
+    {\cal P}(s) {\cal P}(c) \delta(\pi - q(s - c)) }\\ 
+  && {} + \int_{-\infty}^{\infty}ds \int_{b}^{\infty}dc
+    {\cal P}(s) {\cal P}(c) \delta(\pi)
+\end{eqnarray*}
+The first integral over $s$ in the first term can be taken by
+resolving the $\delta$ function to get
+\begin{equation}
+  {\cal P}(\pi) = \frac{1}{q}\int_{-\infty}^{b}dc
+    {\cal P}_S(c+\pi/q) {\cal P}_C(c) + P_0\delta(\pi) 
+\end{equation}
+
+where $$P_0 = \int_{b}^{\infty}dc\,{\cal P}_C(c) $$ is a constant that
+represents the probability of not clearing anything in the auction,
+in the case when the clearing price $c$ is greater than the bid
+price $b$.
+
+
+
+
+What is interesting is that the average payout can be found out to be 
+\begin{equation}
+  \langle \Pi \rangle = \int_{-\infty}^{\infty}d\pi\,\pi\,{\cal P}(\pi) 
+     = q\int_{-\infty}^{b}dc\,{\cal P}_C(c)\,(\langle S \rangle - c) 
+\end{equation}
+
+
+Similar arguments can be made for the case of multiple bids.  For
+example, for two bids we get
+\begin{eqnarray*}
+  \lefteqn{{\cal P}(\pi) = 
+    \frac{1}{q_1+q_2}\int_{-\infty}^{b_2}dc\,{\cal P}_S(c+\pi/(q_1+q_2))\,
+       {\cal P}_C(c)} \\ 
+  && {} + \frac{1}{q_1}\int_{b_2}^{b_1}dc\,{\cal P}_S(c+\pi/q_1)\, {\cal P}_C(c) \\
+  && {} + P_0\delta(\pi) 
+\end{eqnarray*}
+
+\section{Portfolio considerations}
+It is interesting to consider portfolios of tickets corresponding to
+different auctions. 
+
+
+
+\end{document}

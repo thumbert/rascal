@@ -52,20 +52,20 @@ main() {
   // generate the scores, from 1:N
   List<int> x = new List.generate(N, (i) => i+1);
   
-  List<List<int>> best = new List.generate(S, (e) => new List.filled(N, 0)); 
+  List<List<int>> pick = new List.generate(S, (e) => new List.filled(N, 0)); 
   
   // loop over simulations
   for (int s = 0; s < S; s++) {
     x.shuffle(rand);
     // try different K values
     for (int K = 0; K < N; K++) {
-      best[s][K] = run_algo(x, K); 
+      pick[s][K] = run_algo(x, K); 
     }
   }
 
   
-  // the average score over all the simulations
-  List<num> avg  = new List.filled(N, 0.0);
+  // the average pick over all the simulations
+  List<num> avgPick  = new List.filled(N, 0.0);
   // the probability to get the Maximum value
   List<num> pMax = new List.filled(N, 0.0);  
   
@@ -73,27 +73,28 @@ main() {
     num sum = 0;
     num count = 0;
     for (int s = 0; s < S; s++) {
-      if (best[s][K] == N) 
+      if (pick[s][K] == N) 
         count += 1.0;
-      sum += best[s][K];
+      sum += pick[s][K];
     }
     pMax[K] = count/S;
-    avg[K] = sum/S/N;
+    avgPick[K] = sum/S/N;
     //print("${K.toString().padLeft(3)}, ${D2.format(avg[K]).padRight(8,"0")}");
   }
   
   //////////////////////////////////////////////////////////////////////////
   // results
-  print("\n\nAverage score: ");
+  print("\n\nAverage order of the selection: ");
   for (int K=0; K < N; K++) {
-    print("${(K/N).toString().padLeft(3)},  ${avg[K].toStringAsPrecision(3).padRight(5,"0")}");
+    print("${(K/N).toString().padLeft(3).padRight(4, "0")},  ${avgPick[K].toStringAsPrecision(3).padRight(5,"0")}");
   } 
   
-  print("\n\n Probability to get the maximum: ");
+  print("\n\nProbability to get the maximum: ");
   for (int K=0; K < N; K++) {
     print("${(K/N).toStringAsFixed(3)},  ${pMax[K].toStringAsFixed(4)}");    
   } 
-  print("Probability check: \sum{pMax}=${pMax.reduce((a,b)=>a+b)}");
+  
+  //print("Probability check: \sum{pMax}=${pMax.reduce((a,b)=>a+b)}");
   
   
 }
