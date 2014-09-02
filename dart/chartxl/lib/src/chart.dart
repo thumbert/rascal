@@ -8,8 +8,10 @@ class Chart extends Theme {
  
   num height;
   num width;
+  List<Map> data;
   
-
+  
+  Chart() {}
   
   
   
