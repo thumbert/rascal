@@ -9,19 +9,31 @@ void main() {
   var stage = new Stage(canvas);
   var renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
+  
+  var textField = new TextField();
+   textField.defaultTextFormat = new TextFormat("Arial", 22, Color.Black, bold:true);
+   textField.text = "test";
+   textField.background = true;
+   textField.backgroundColor = Color.LightGray;
+   textField.width = 700;
+   textField.height = 30;
+   textField.x = 50;
+   textField.y = 100;
 
-  List<Map> data = [
-    {"x" : 1, "y": 1,  "group": "linear"}, 
-    {"x" : 2, "y": 2,  "group": "linear"},
-    {"x" : 3, "y": 3,  "group": "linear"}, 
-    {"x" : 4, "y": 4,  "group": "linear"},
-    {"x" : 1, "y": 1,  "group": "quadratic"}, 
-    {"x" : 2, "y": 4,  "group": "quadratic"},
-    {"x" : 3, "y": 9,  "group": "quadratic"}, 
-    {"x" : 4, "y": 16, "group": "quadratic"}
-    ]; 
-  
-  
+   stage.addChild(textField);
+   stage.focus = textField;
+
+   textField.onKeyDown.listen((KeyboardEvent e) {
+     if (e.keyCode == 8 && textField.text.length > 0) {
+       var len = textField.text.length;
+       textField.text = textField.text.substring(0, len - 1);
+     }
+   });
+
+   textField.onTextInput.listen((TextEvent e) {
+     textField.text = textField.text + e.text;
+   });
+
   
   
 }
