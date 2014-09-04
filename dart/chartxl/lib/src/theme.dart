@@ -8,8 +8,10 @@ abstract class Theme {
   int borderColor;
   int borderWidth;
 
+  int textSize;
+  
   // as multiple of text size
-  List<num> margin;
+  List<num> get margin => [marginBottom, marginLeft, marginLeft, marginRight];
   num marginBottom;
   num marginLeft;
   num marginTop;
@@ -18,6 +20,11 @@ abstract class Theme {
   int plotBackgroundColor;  
   num plotBorderWidth;
   
+  List<num> get spacing => [spacingBottom, spacingLeft, spacingTop, spacingRight];
+  num spacingBottom;
+  num spacingLeft;
+  num spacingTop;
+  num spacingRight;
   
 }
 
@@ -28,9 +35,10 @@ class DefaultTheme extends Theme {
   int borderColor = Color.Black;
   int borderWidth = 0;
 
+  int textSize = 12;
+  
   // Distance between the outer edge of the chart and the plot area, 
   // as multiple of text size
-  List<num> margin = [5, 4, 3, 3];
   num marginBottom = 5;
   num marginLeft   = 4;
   num marginTop    = 3;
@@ -41,7 +49,6 @@ class DefaultTheme extends Theme {
   
   // distance between the chart area and the outside text 
   // as multiple of text size
-  List<num> spacing = [1, 1, 1, 1];
   num spacingBottom = 1;
   num spacingLeft   = 1;
   num spacingTop    = 1;
