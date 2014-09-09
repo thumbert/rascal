@@ -7,7 +7,7 @@ class Marker extends Sprite {
   Shape shape;
   
   Marker(this.x, this.y) {
-    this.graphics.circle(x, y, 60);
+    this.graphics.circle(x, y, 10);
     this.graphics.fillColor(Color.Red);
     this.onMouseOver.listen( _onMouseOver );
     this.onMouseOut.listen( _onMouseOut );
@@ -25,17 +25,25 @@ class Marker extends Sprite {
 main() {
 
   var canvas = html.querySelector('#stage');
-  var stage = new Stage(canvas);
+  var stage = new Stage(canvas, width: 600, height: 600);
+  //stage.scaleMode = StageScaleMode.SHOW_ALL;
+  stage.align = StageAlign.TOP_LEFT;
+  
   var renderLoop = new RenderLoop();
   var juggler = renderLoop.juggler;
   renderLoop.addStage(stage);
   
+  print("stage width = ${stage.width}, height=${stage.height}");
+  print("contentRectange = ${stage.contentRectangle}");
+  stage.addChild(new Bitmap(
+    new BitmapData(stage.contentRectangle.width.toInt(), stage.contentRectangle.height.toInt(), false, Color.Beige)));
+  
   // you need to be a Sprite and NOT a Shape if you want to respond to MouseEvents
-  Marker mark = new Marker(100, 100);
+  Marker mark = new Marker(50, 50);
   stage.addChild(mark); 
        
   var shape2 = new Shape();
-  shape2.graphics.circle(200, 200, 60);
+  shape2.graphics.circle(100, 100, 60);
   shape2.graphics.fillColor(Color.Violet);
   stage.addChild(shape2);
 
@@ -47,12 +55,12 @@ main() {
   
   var txt = new TextField();
   txt.x = 100;
-  txt.y = 500;
+  txt.y = stage.contentRectangle.height-50;
   stage.addChild(txt);
   
   stage.addChild( new TextField()
     ..x = 100
-    ..y = 400
+    ..y = stage.contentRectangle.height-75
     ..width = 700
     ..text = "Move the mouse over the red circle to see its color change!"
     );

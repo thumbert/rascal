@@ -18,9 +18,9 @@ void main() {
     {"x" : 4, "y": 16, "group": "quadratic"}
     ]; 
 
-  Figure fig = new Figure(width: 800, height: 600);
+  Figure fig = new Figure(width: 800, height: 800);
   fig.add(new Shape() 
-    ..graphics.circle(100, 100, 60)
+    ..graphics.circle(400, 100, 60)
     ..graphics.fillColor(Color.Red));
   
   Chart chart = new Chart();
