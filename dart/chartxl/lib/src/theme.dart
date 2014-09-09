@@ -8,6 +8,9 @@ abstract class Theme {
   int borderColor;
   int borderWidth;
 
+  num height;
+  num width;
+  
   int textSize;
   
   // as multiple of text size
@@ -35,6 +38,9 @@ class DefaultTheme extends Theme {
   int borderColor = Color.Black;
   int borderWidth = 0;
 
+  num height = 600;
+  num width  = 800;
+  
   int textSize = 12;
   
   // Distance between the outer edge of the chart and the plot area, 

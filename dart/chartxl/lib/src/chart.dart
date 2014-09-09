@@ -10,12 +10,14 @@ class Chart extends DisplayObjectContainer with Theme {
   num height;
   num width;
   List<Map> data;
-
+  
+  
   num get topleftX => marginTop*textSize;
   num get topleftY => marginLeft*textSize;
   num get bottomrightX => height - marginBottom*textSize;
   num get bottomrightY => width  - marginRight*textSize;
   
+ 
   
   num _scaleX(num x) => 0;
   
@@ -28,13 +30,25 @@ class Chart extends DisplayObjectContainer with Theme {
     // set the default theme.  How to do nice injection?
     setTheme(new DefaultTheme());
     
+    _drawBox();
+    
   }
 
   
   
   void draw() {
+    _drawBox();
     
   }
+  
+  void _drawBox() {
+    Shape box = new Shape();
+    print("topleftX=${topleftX}, topleftY=${topleftY}, width=${width}");
+    box.graphics.rect(topleftX, topleftY, width, height);    
+    box.graphics.strokeColor(Color.Black);
+    addChild(box);
+  }
+  
   
   bool hasGroups() {
     if (data.first.keys.contains("group")) return true; else return false;
@@ -59,29 +73,33 @@ class Chart extends DisplayObjectContainer with Theme {
 
   // set all the properties directly in the chart
   void setTheme(Theme theme) {
-    bool alignTicks = theme.alignTicks;
-    int backgroundColor = theme.backgroundColor;
-    int borderColor = theme.borderColor;
-    int borderWidth = theme.borderWidth;
+    alignTicks = theme.alignTicks;
+    backgroundColor = theme.backgroundColor;
+    borderColor = theme.borderColor;
+    borderWidth = theme.borderWidth;
 
-    int textSize = theme.textSize;
+    height = theme.height;
+    width = theme.width;
+    
+    
+    textSize = theme.textSize;
     
     // Distance between the outer edge of the chart and the plot area, 
     // as multiple of text size
-    num marginBottom = theme.marginBottom;
-    num marginLeft   = theme.marginLeft;
-    num marginTop    = theme.marginTop;
-    num marginRight  = theme.marginRight;
+    marginBottom = theme.marginBottom;
+    marginLeft   = theme.marginLeft;
+    marginTop    = theme.marginTop;
+    marginRight  = theme.marginRight;
         
-    int plotBackgroundColor = theme.plotBackgroundColor;  
-    num plotBorderWidth = theme.plotBorderWidth;
+    plotBackgroundColor = theme.plotBackgroundColor;  
+    plotBorderWidth = theme.plotBorderWidth;
     
     // distance between the chart area and the outside text 
     // as multiple of text size
-    num spacingBottom = theme.spacingBottom;
-    num spacingLeft   = theme.spacingLeft;
-    num spacingTop    = theme.spacingTop;
-    num spacingRight  = theme.spacingRight;
+    spacingBottom = theme.spacingBottom;
+    spacingLeft   = theme.spacingLeft;
+    spacingTop    = theme.spacingTop;
+    spacingRight  = theme.spacingRight;
     
   }
 

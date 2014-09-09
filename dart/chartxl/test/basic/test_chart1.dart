@@ -24,6 +24,7 @@ void main() {
     ..graphics.fillColor(Color.Red));
   
   Chart chart = new Chart();
+  fig.add(chart);
   
   
 }
