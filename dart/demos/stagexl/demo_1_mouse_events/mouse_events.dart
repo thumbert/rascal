@@ -47,6 +47,12 @@ main() {
   shape2.graphics.fillColor(Color.Violet);
   stage.addChild(shape2);
 
+  var shape3 = new Shape();
+  shape3.graphics.moveTo(10, 10);
+  shape3.graphics.lineTo(400, 400);
+  shape3.graphics.strokeColor(Color.Tomato);
+  stage.addChild(shape3);
+  
   // simple animation
   var tween = new Tween(shape2, 2.0, TransitionFunction.linear);
   tween.animate.x.to(100);
