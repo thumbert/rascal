@@ -12,8 +12,8 @@ void main() {
 
   var canvas = html.querySelector('#stage');
   var stage = new Stage(canvas, width: 800, height: 600);
-  stage.scaleMode = StageScaleMode.NO_SCALE;
-  //stage.scaleMode = StageScaleMode.SHOW_ALL;
+  //stage.scaleMode = StageScaleMode.NO_SCALE;
+  stage.scaleMode = StageScaleMode.SHOW_ALL;
   stage.align = StageAlign.TOP_LEFT;
   var renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
@@ -34,5 +34,7 @@ void main() {
   textField.height = 32;
   textField.x = 50;
   textField.y = 200;
+  //textField.autoSize = TextFieldAutoSize.CENTER;
+  textField.cacheAsBitmap = false;
   stage.addChild(textField);  
 }

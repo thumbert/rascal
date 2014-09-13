@@ -7,15 +7,17 @@ import 'package:stagexl/stagexl.dart';
 
 class Chart extends DisplayObjectContainer with Theme {
 
-  num height;
-  num width;
+  //num height;
+  //num width;
   List<Map> data;
-  
+
+  num get height => stage.height;
+  num get width  => stage.width;
   
   num get topleftX => marginTop*textSize;
   num get topleftY => marginLeft*textSize;
-  num get bottomrightX => height - marginBottom*textSize;
-  num get bottomrightY => width  - marginRight*textSize;
+  num get bottomrightX => width  - marginBottom*textSize;
+  num get bottomrightY => height - marginRight*textSize;
   
  
   
@@ -29,8 +31,10 @@ class Chart extends DisplayObjectContainer with Theme {
   Chart() {
     // set the default theme.  How to do nice injection?
     setTheme(new DefaultTheme());
+        
+    //_drawBox();
     
-    _drawBox();
+    
     
   }
 
@@ -42,9 +46,12 @@ class Chart extends DisplayObjectContainer with Theme {
   }
   
   void _drawBox() {
+    // you cannot call this until the Chart is attached 
+    print("width = $width, height = $height");
+    
     Shape box = new Shape();
     print("topleftX=${topleftX}, topleftY=${topleftY}, width=${width}");
-    box.graphics.rect(topleftX, topleftY, width, height);    
+    box.graphics.rect(topleftX, topleftY, width-topleftX-marginRight*textSize, height-topleftY-marginBottom*textSize);    
     box.graphics.strokeColor(Color.Black);
     addChild(box);
   }
@@ -78,8 +85,8 @@ class Chart extends DisplayObjectContainer with Theme {
     borderColor = theme.borderColor;
     borderWidth = theme.borderWidth;
 
-    height = theme.height;
-    width = theme.width;
+    //height = theme.height;
+    //width = theme.width;
     
     
     textSize = theme.textSize;

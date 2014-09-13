@@ -8,8 +8,8 @@ abstract class Theme {
   int borderColor;
   int borderWidth;
 
-  num height;
-  num width;
+  //num height;
+  //num width;
   
   int textSize;
   
@@ -38,8 +38,8 @@ class DefaultTheme extends Theme {
   int borderColor = Color.Black;
   int borderWidth = 0;
 
-  num height = 600;
-  num width  = 800;
+  //num height = 600;
+  //num width  = 800;
   
   int textSize = 12;
   

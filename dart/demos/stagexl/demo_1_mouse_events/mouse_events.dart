@@ -4,7 +4,7 @@ import 'package:stagexl/stagexl.dart';
 class Marker extends Sprite {  
   num x;
   num y;
-  Shape shape;
+  //Shape shape;
   
   Marker(this.x, this.y) {
     this.graphics.circle(x, y, 10);

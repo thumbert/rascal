@@ -18,14 +18,14 @@ void main() {
     {"x" : 4, "y": 16, "group": "quadratic"}
     ]; 
 
-  Figure fig = new Figure(width: 800, height: 800);
+  Figure fig = new Figure(width: 800, height: 600);
   fig.add(new Shape() 
     ..graphics.circle(400, 100, 60)
     ..graphics.fillColor(Color.Red));
   
   Chart chart = new Chart();
   fig.add(chart);
-  
+    
   
 }
 

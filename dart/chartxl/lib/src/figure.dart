@@ -26,11 +26,15 @@ class Figure {
     renderLoop.addStage(stage);
     
     stage.addChild( new Bitmap(
-        new BitmapData(width, height-50, false, Color.Beige)));
+        new BitmapData(width, height, false, Color.Beige)));
   } 
   
   void add(DisplayObject obj) {
     stage.addChild( obj );
+  }
+  
+  void draw() {
+    
   }
   
 }
