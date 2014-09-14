@@ -9,45 +9,38 @@ RenderLoop renderLoop = new RenderLoop();
 
 
 class Stake extends Sprite {
-//  num x;
-//  num y;
-//  num width;
-//  num height;
-
-  //Stake(this.x, this.y, this.width, this.height) {
   Stake(int width, int height) {
     graphics.beginPath();
     graphics.rect(0, 0, width, height);
     graphics.closePath();
     graphics.fillColor(Color.Navy);
   }
-
-
 }
 
 class Timeline extends Sprite {
-  num x; // the x coord
-  num y; // the y coord
-  num width;
-  num height;
 
-  Timeline(this.x, this.y, {num width: 500, num height: 50}) {
-    graphics.beginPath();
-    graphics.rect(x, y, width, height);
-    graphics.fillColor(Color.Gray);
+  Stake stakeLeft;
+  Stake stakeRight;
   
+  Timeline({int width: 500, int height: 20}) {
+    graphics.beginPath();
+    graphics.rect(0, 20, width, height);
+    graphics.fillColor(Color.Gray);
     
-    onMouseOver.listen(_onMouseOver);
-    onMouseOut.listen(_onMouseOut);
+    stakeLeft = new Stake(20, 60)
+      ..x = 100
+      ..y = 30
+      ..useHandCursor = true;
+    
+    stakeLeft.onMouseDown.listen( (me) => stakeLeft.startDrag(true, new Rectangle(70, 0, 100, 0))); 
+    stakeLeft.onMouseUp.listen( (me) => stakeLeft.stopDrag());;
+    stakeLeft.addTo( stage );  
+    
+    
   }
 
-  _onMouseOver(MouseEvent e) {
-    this.graphics.fillColor(Color.Orange);
-  }
-  _onMouseOut(MouseEvent e) {
-    this.graphics.fillColor(Color.Red);
-  }
 
+  
 }
 
 
@@ -80,21 +73,21 @@ main() {
   stage.backgroundColor = Color.Beige;
 
   addGrid();
+
+  stage.addChild( new Timeline() );
   
-  Stake stake = new Stake(50, 50);
-  stake.x = 100;
-  stake.y = 100;
-  stake.useHandCursor = true;
-  stake.addTo( stage );
-  stake.onMouseDown.listen( (me) => stake.startDrag(false)); 
-//  stake.onMouseDown.listen( (me) {
-//    var xpos = me.currentTarget.x;
-//    var ypos = me.currentTarget.y;
-//    print("xpos=$xpos, ypos=$ypos, currentTarget.width=${me.currentTarget.width}");
-//    stake.startDrag(false, 
-//      new Rectangle(125, 50, 100, 0));
-//  });
-  stake.onMouseUp.listen( (me) => stake.stopDrag());
+  
+//  Stake stake = new Stake(50, 50);
+//  stake.x = 100;
+//  stake.y = 100;
+//  stake.useHandCursor = true;
+//  stake.addTo( stage );
+//  stake.onMouseDown.listen( (me) => stake.startDrag(true, new Rectangle(125, 125, 100, 0))); 
+//  stake.onMouseUp.listen( (me) => stake.stopDrag());
+}
+
+
+
 
 //  var sprite = new Sprite();
 //  sprite.graphics.beginPath();
@@ -112,5 +105,3 @@ main() {
 
 
 
-
-}
