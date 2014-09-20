@@ -11,7 +11,7 @@ class AxisType {
   static const int Datetime = 3;
 }
 
-abstract class Axis {
+class Axis {
   Color alternateGridColor;
   AxisType axisType;
   
@@ -38,5 +38,7 @@ abstract class Axis {
   num tickLength;     // the length in pixels of major, minor, and end ticks
   num tickWidth;      // the width in pixels of major, minor, and end ticks
   List<Tick> ticks;    
+  
+  Axis() {}
 }
 

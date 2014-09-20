@@ -17,25 +17,32 @@ class Stake extends Sprite {
   }
 }
 
-class Timeline extends Sprite {
 
-  Stake stakeLeft;
-  Stake stakeRight;
-  
-  Timeline({int width: 500, int height: 20}) {
-    graphics.beginPath();
-    graphics.rect(0, 20, width, height);
-    graphics.fillColor(Color.Gray);
+
+class Timeline extends DisplayObjectContainer {
+
+  Shape bar;
+  Stake handleLeft;
+  Stake handleRight;
     
-    stakeLeft = new Stake(20, 60)
-      ..x = 100
-      ..y = 30
+  Timeline({int width: 500, int height: 20}) {
+    
+    bar = new Shape()
+      ..graphics.beginPath()
+      ..graphics.rect(0, 20, width, height)
+      ..graphics.fillColor(Color.Gray);
+    
+    handleLeft = new Stake(20, 60)
+      ..x = 50
+      ..y = 0
       ..useHandCursor = true;
     
-    stakeLeft.onMouseDown.listen( (me) => stakeLeft.startDrag(true, new Rectangle(70, 0, 100, 0))); 
-    stakeLeft.onMouseUp.listen( (me) => stakeLeft.stopDrag());;
-    stakeLeft.addTo( stage );  
+    handleLeft.onMouseDown.listen( (me) => handleLeft.startDrag(true, new Rectangle(0, 30, width, 0))); 
+    handleLeft.onMouseUp.listen( (me) => handleLeft.stopDrag());;
+    handleLeft.addTo( stage );  
     
+    addChild(bar);
+    addChild(handleLeft);
     
   }
 
@@ -74,7 +81,12 @@ main() {
 
   addGrid();
 
-  stage.addChild( new Timeline() );
+  var tline = new Timeline()
+    ..x = 100
+    ..y = 200;
+   
+  
+  stage.addChild( tline );
   
   
 //  Stake stake = new Stake(50, 50);

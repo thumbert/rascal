@@ -46,7 +46,7 @@ class DefaultTheme extends Theme {
   // Distance between the outer edge of the chart and the plot area, 
   // as multiple of text size
   num marginBottom = 5;
-  num marginLeft   = 4;
+  num marginLeft   = 5;
   num marginTop    = 3;
   num marginRight  = 3;
       

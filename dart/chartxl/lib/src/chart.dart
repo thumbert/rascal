@@ -3,6 +3,7 @@ library chart;
 
 import 'package:chartxl/src/theme.dart';
 import 'package:stagexl/stagexl.dart';
+import 'package:chartxl/src/axis.dart';
 
 
 class Chart extends DisplayObjectContainer with Theme {
@@ -10,12 +11,13 @@ class Chart extends DisplayObjectContainer with Theme {
   //num height;
   //num width;
   List<Map> data;
+  List<Axis> axes; 
 
   num get height => stage.height;
   num get width  => stage.width;
   
-  num get topleftX => marginTop*textSize;
-  num get topleftY => marginLeft*textSize;
+  num get topleftX => marginLeft*textSize;
+  num get topleftY => marginTop*textSize;
   num get bottomrightX => width  - marginBottom*textSize;
   num get bottomrightY => height - marginRight*textSize;
   
@@ -73,7 +75,7 @@ class Chart extends DisplayObjectContainer with Theme {
   addAxes() {
     Map obs = data.first;
     if (obs.keys.contains("x")) {
-
+      Axis xAxis = new Axis();      
     }
 
   }
