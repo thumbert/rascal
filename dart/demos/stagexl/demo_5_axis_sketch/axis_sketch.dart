@@ -39,7 +39,6 @@ class Direction {
   static const int RIGHT = 4;
 }
 
-
 class Tick extends DisplayObjectContainer {
 
   Shape line;
@@ -101,13 +100,6 @@ class Tick extends DisplayObjectContainer {
   }
 
 }
-
-class Axis extends DisplayObjectContainer {
-
-
-
-}
-
 
 main() {
   var renderLoop = new RenderLoop();
