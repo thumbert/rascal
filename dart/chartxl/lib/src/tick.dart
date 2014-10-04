@@ -4,61 +4,69 @@ import 'package:stagexl/stagexl.dart';
 import 'package:chartxl/src/util.dart';
 import 'dart:math';
 
+class TickDefaults {
+  int tickLength = 14;
+  int tickWidth = 1;
+  int tickColor = Color.Black;
+}
 
-class Tick extends DisplayObjectContainer {
+/**
+ * An axis tick mark.  It is constructed from a Shape and a TextField.  
+ */
+class Tick extends DisplayObjectContainer with TickDefaults {
 
   Shape line;
   TextField textField;
+  TextFormat fmt;
 
-  Tick(String text, int length, int padding, int direction) {
+  Tick(String text, int direction, {int tickLength: 14, int tickPadding: 14}) {
     line = new Shape();
     line.graphics.moveTo(0, 0);
-    var fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
+    fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
 
-    print(direction);
     switch (direction) {
       case Direction.DOWN:
-        line.graphics.lineTo(0, length);
+        line.graphics.lineTo(0, tickLength);
         textField = new TextField()
             ..defaultTextFormat = fmt
-            ..y = length + padding
+            ..y = tickLength + tickPadding
             ..autoSize = TextFieldAutoSize.CENTER
             ..text = text;
         textField..x = -textField.width ~/ 2;
         break;
       case Direction.LEFT: 
-        line.graphics.lineTo(-length,0);
+        line.graphics.lineTo(-tickLength,0);
         textField = new TextField()
             ..defaultTextFormat = fmt
             ..autoSize = TextFieldAutoSize.CENTER
             ..rotation = -PI/2
-            ..x = -length - padding
+            ..x = -tickLength - tickPadding
             ..text = text;
         textField..y = textField.width ~/ 2;
         break;       
       case Direction.UP:
-        line.graphics.lineTo(0, -length);
+        line.graphics.lineTo(0, -tickLength);
         textField = new TextField()
             ..defaultTextFormat = fmt
-            ..y = -length -padding - 14
+            ..y = -tickLength -tickPadding - 14
             ..autoSize = TextFieldAutoSize.CENTER
             ..text = text;
         textField..x = -textField.width ~/ 2;        
         break;
       case Direction.RIGHT: 
-        line.graphics.lineTo(length,0);
+        line.graphics.lineTo(tickLength,0);
         textField = new TextField()
             ..defaultTextFormat = fmt
             ..autoSize = TextFieldAutoSize.LEFT
             ..rotation = PI/2
-            ..x = length + padding + 14
+            ..x = tickLength + tickPadding + 14
             ..text = text;
         textField..y = -textField.width ~/ 2;
         break;       
     }
 
 
-    line.graphics.strokeColor(Color.Black, 1);
+    line.graphics.strokeColor(tickColor, tickWidth);
 
     addChild(line);
     addChild(textField);

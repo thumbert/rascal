@@ -32,7 +32,7 @@ void main() {
   Grid grid = new Grid(
       new List.generate(stage.stageWidth~/100, (i) => i*100), 
       new List.generate(stage.stageHeight~/100, (i) => i*100), 
-      yMax: stage.stageHeight)
+      stage.stageWidth, stage.stageHeight)
       ..graphics.strokeColor(Color.YellowGreen, 1);
     
   print("grid width = ${grid.width}");
