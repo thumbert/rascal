@@ -2,6 +2,8 @@ library theme;
 
 import 'package:stagexl/stagexl.dart';
 
+Theme theme = new DefaultTheme();
+
 abstract class Theme {
   bool alignTicks;  
   int backgroundColor;
@@ -12,6 +14,12 @@ abstract class Theme {
   //num width;
   
   int textSize;
+  int textColor;
+  
+  int tickLength;
+  int tickWidth;
+  int tickColor;
+  int tickPadding;           // distance between tick mark and text   
   
   // as multiple of text size
   List<num> get margin => [marginBottom, marginLeft, marginLeft, marginRight];
@@ -38,10 +46,15 @@ class DefaultTheme extends Theme {
   int borderColor = Color.Black;
   int borderWidth = 0;
 
-  //num height = 600;
-  //num width  = 800;
   
   int textSize = 12;
+  int textColor = Color.Black;
+  
+  int tickLength = 14;
+  int tickWidth = 1;
+  int tickColor = Color.Black;
+  int tickPadding = 14;           // distance between tick mark and text   
+
   
   // Distance between the outer edge of the chart and the plot area, 
   // as multiple of text size
