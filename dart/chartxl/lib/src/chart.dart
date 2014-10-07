@@ -6,7 +6,7 @@ import 'package:stagexl/stagexl.dart';
 import 'package:chartxl/src/axis.dart';
 
 
-class Chart extends DisplayObjectContainer with Theme {
+class Chart extends DisplayObjectContainer {
 
   //num height;
   //num width;
@@ -16,10 +16,10 @@ class Chart extends DisplayObjectContainer with Theme {
   num get height => stage.height;
   num get width  => stage.width;
   
-  num get topleftX => marginLeft*textSize;
-  num get topleftY => marginTop*textSize;
-  num get bottomrightX => width  - marginBottom*textSize;
-  num get bottomrightY => height - marginRight*textSize;
+  num get topleftX => theme.marginLeft * theme.textSize;
+  num get topleftY => theme.marginTop * theme.textSize;
+  num get bottomrightX => width  - theme.marginBottom * theme.textSize;
+  num get bottomrightY => height - theme.marginRight * theme.textSize;
   
  
   
@@ -32,10 +32,10 @@ class Chart extends DisplayObjectContainer with Theme {
    */
   Chart() {
     // set the default theme.  How to do nice injection?
-    setTheme(new DefaultTheme());
+    //setTheme(new DefaultTheme());
         
     //_drawBox();
-    
+    draw();
     
     
   }
@@ -53,7 +53,9 @@ class Chart extends DisplayObjectContainer with Theme {
     
     Shape box = new Shape();
     print("topleftX=${topleftX}, topleftY=${topleftY}, width=${width}");
-    box.graphics.rect(topleftX, topleftY, width-topleftX-marginRight*textSize, height-topleftY-marginBottom*textSize);    
+    box.graphics.rect(topleftX, topleftY, 
+        width-topleftX-theme.marginRight*theme.textSize, 
+        height-topleftY-theme.marginBottom*theme.textSize);    
     box.graphics.strokeColor(Color.Black);
     addChild(box);
   }
@@ -81,36 +83,36 @@ class Chart extends DisplayObjectContainer with Theme {
   }
 
   // set all the properties directly in the chart
-  void setTheme(Theme theme) {
-    alignTicks = theme.alignTicks;
-    backgroundColor = theme.backgroundColor;
-    borderColor = theme.borderColor;
-    borderWidth = theme.borderWidth;
-
-    //height = theme.height;
-    //width = theme.width;
-    
-    
-    textSize = theme.textSize;
-    
-    // Distance between the outer edge of the chart and the plot area, 
-    // as multiple of text size
-    marginBottom = theme.marginBottom;
-    marginLeft   = theme.marginLeft;
-    marginTop    = theme.marginTop;
-    marginRight  = theme.marginRight;
-        
-    plotBackgroundColor = theme.plotBackgroundColor;  
-    plotBorderWidth = theme.plotBorderWidth;
-    
-    // distance between the chart area and the outside text 
-    // as multiple of text size
-    spacingBottom = theme.spacingBottom;
-    spacingLeft   = theme.spacingLeft;
-    spacingTop    = theme.spacingTop;
-    spacingRight  = theme.spacingRight;
-    
-  }
+//  void setTheme(Theme theme) {
+//    alignTicks = theme.alignTicks;
+//    backgroundColor = theme.backgroundColor;
+//    borderColor = theme.borderColor;
+//    borderWidth = theme.borderWidth;
+//
+//    //height = theme.height;
+//    //width = theme.width;
+//    
+//    
+//    textSize = theme.textSize;
+//    
+//    // Distance between the outer edge of the chart and the plot area, 
+//    // as multiple of text size
+//    marginBottom = theme.marginBottom;
+//    marginLeft   = theme.marginLeft;
+//    marginTop    = theme.marginTop;
+//    marginRight  = theme.marginRight;
+//        
+//    plotBackgroundColor = theme.plotBackgroundColor;  
+//    plotBorderWidth = theme.plotBorderWidth;
+//    
+//    // distance between the chart area and the outside text 
+//    // as multiple of text size
+//    spacingBottom = theme.spacingBottom;
+//    spacingLeft   = theme.spacingLeft;
+//    spacingTop    = theme.spacingTop;
+//    spacingRight  = theme.spacingRight;
+//    
+//  }
 
 
 }

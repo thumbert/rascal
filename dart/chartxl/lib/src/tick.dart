@@ -6,11 +6,13 @@ import 'dart:math';
 import 'package:chartxl/src/text.dart';
 import 'package:chartxl/src/theme.dart';
 
-class TickDefaults {
-  static const int tickLength = 14;
-  static const int tickWidth = 1;
-  static const int tickColor = Color.Black;
-  static const int tickPadding = 14;           // distance between tick mark and text   
+abstract class TickProperties {
+  int tickLength;
+  int tickWidth;
+  int tickColor;
+  int tickPadding; // distance between tick mark and text
+  bool tickTextSameSide; // if text is on same side of axis as the tick
+  num tickTextShift; // how much to shift the text away from the tick center
 }
 
 /**
@@ -24,45 +26,53 @@ class Tick extends DisplayObjectContainer {
   TextFormat fmt;
   String text;
   int direction;
-  num textRotation;    // in radians
+  int textColor;
+  num textRotation; // in radians
+  int textSize;
+  int tickColor;
   int tickLength;
   int tickPadding;
-  int tickColor;
+  bool tickTextSameSide;
+  num tickTextShift;
   int tickWidth;
-  int textSize;
-  
-  Tick(String this.text, int this.direction, {int this.tickLength, int this.tickPadding, 
-    int this.tickWidth, int this.tickColor, num this.textRotation, int this.textSize}) {
-    
-    tickLength  == null ? theme.tickLength : tickLength;
-    tickPadding == null ? theme.tickPadding : tickPadding;
-    tickColor   == null ? theme.tickColor : tickColor;
-    tickPadding == null ? theme.tickPadding : tickPadding;
-    textSize    == null ? theme.textSize : textSize;
-    
+
+  Tick(String this.text, int this.direction, {int this.tickLength, int this.tickPadding, int
+      this.tickWidth, int this.tickColor, num this.textRotation, int this.textSize, 
+      int this.textColor, bool this.tickTextSameSide, num this.tickTextShift}) {
+
+    if (theme == null) theme = new DefaultTheme();  // for protection
+    if (textSize == null) textSize = theme.textSize;
+    if (textColor == null) textColor = theme.textColor;    
+    if (tickColor == null) tickColor = theme.tickColor;
+    if (tickLength == null) tickLength = theme.tickLength;
+    if (tickPadding == null) tickPadding = theme.tickPadding;
+    if (tickTextSameSide == null) tickTextSameSide = theme.tickTextSameSide;
+    if (tickTextShift == null) tickTextShift = theme.tickTextShift;
+    if (tickWidth == null) tickWidth = theme.tickWidth;
+        
     draw();
   }
-  
+
   void draw() {
     line = new Shape();
     line.graphics.moveTo(0, 0);
-    fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
+    fmt = new TextFormat("Arial", textSize, textColor, align: TextFormatAlign.CENTER);
 
     switch (direction) {
       case Direction.DOWN:
-        textRotation == null ? 0 : textRotation;
-        line.graphics.lineTo(0, theme.tickLength);
+        if (textRotation == null) textRotation = 0;
+        line.graphics.lineTo(0, tickLength);
         textField = new TextField()
             ..defaultTextFormat = fmt
             ..y = tickLength + tickPadding
             ..autoSize = TextFieldAutoSize.CENTER
             ..rotation = textRotation
             ..text = text;
-        textField..x = -textField.width ~/ 2;
+        textField..x = (-textField.width*cos(textRotation) + textField.height*sin(textRotation)) ~/ 2;        
         break;
-      case Direction.LEFT: 
-        textRotation == null ? -PI/2 : textRotation;
-        line.graphics.lineTo(-tickLength,0);
+      case Direction.LEFT:
+        if (textRotation == null) textRotation = -PI/2;
+        line.graphics.lineTo(-tickLength, 0);
         textField = new TextField()
             ..defaultTextFormat = fmt
             ..autoSize = TextFieldAutoSize.CENTER
@@ -70,29 +80,32 @@ class Tick extends DisplayObjectContainer {
             ..x = -tickLength - tickPadding
             ..text = text;
         textField..y = textField.width ~/ 2;
-        break;       
+        print("Label $text");
+        print("textField x=${textField.x}, y=${textField.y}");
+        print("textField height=${textField.height}, width=${textField.width}");
+        break;
       case Direction.UP:
-        textRotation == null ? 0 : textRotation;
+        if (textRotation == null) textRotation=0;
         line.graphics.lineTo(0, -tickLength);
         textField = new TextField()
             ..defaultTextFormat = fmt
-            ..y = -tickLength -tickPadding - 14
+            ..y = -tickLength - tickPadding - textSize
             ..autoSize = TextFieldAutoSize.CENTER
             ..rotation = textRotation
             ..text = text;
-        textField..x = -textField.width ~/ 2;        
+        textField..x = -textField.width ~/ 2;
         break;
-      case Direction.RIGHT: 
-        textRotation == null ? PI/2 : textRotation;
-        line.graphics.lineTo(tickLength,0);
+      case Direction.RIGHT:
+        if (textRotation == null) textRotation = PI/2;
+        line.graphics.lineTo(tickLength, 0);
         textField = new TextField()
             ..defaultTextFormat = fmt
             ..autoSize = TextFieldAutoSize.LEFT
             ..rotation = textRotation
-            ..x = tickLength + tickPadding + 14
+            ..x = tickLength + tickPadding + textSize
             ..text = text;
         textField..y = -textField.width ~/ 2;
-        break;       
+        break;
     }
 
 
