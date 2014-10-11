@@ -19,46 +19,28 @@ void main() {
 //  chart.draw();
 
   // setup the Stage and RenderLoop 
-    html.CanvasElement canvas = html.querySelector('#stage');        
-    var stage = new Stage(canvas, width: canvas.width, height: canvas.height);
-    canvas.width  = 800;
-    canvas.height = 600;
-    stage.scaleMode = StageScaleMode.NO_SCALE;
-    stage.align = StageAlign.TOP_LEFT;
-    stage.backgroundColor = Color.AliceBlue;
-    var renderLoop = new RenderLoop();
-    renderLoop.addStage(stage);
-  
-  Grid grid = new Grid(
-      new List.generate(stage.stageWidth~/100, (i) => i*100), 
-      new List.generate(stage.stageHeight~/100, (i) => i*100), 
-      stage.stageWidth, stage.stageHeight)
-      ..graphics.strokeColor(Color.YellowGreen, 1);
-    
-  print("grid width = ${grid.width}");
+  html.CanvasElement canvas = html.querySelector('#stage');        
+  var stage = new Stage(canvas, width: canvas.width, height: canvas.height);
+  canvas.width  = 1200;
+  canvas.height = 900;
+  stage.scaleMode = StageScaleMode.NO_SCALE;
+  stage.align = StageAlign.TOP_LEFT;
+  stage.backgroundColor = Color.AliceBlue;
+  var renderLoop = new RenderLoop();
+  renderLoop.addStage(stage);
+
+  Chart chart = new Chart(1200, 900);
+  stage.addChild(chart);
   
   
-  grid.addTo(stage);
-  print("done");
+//  Grid grid = new Grid(
+//      new List.generate(stage.stageWidth~/100, (i) => i*100), 
+//      new List.generate(stage.stageHeight~/100, (i) => i*100), 
+//      stage.stageWidth, stage.stageHeight)
+//      ..graphics.strokeColor(Color.YellowGreen, 1);
+//  grid.addTo(stage);
   
 }
 
 
-//main() {
-//  
-//  Chart chart = new Chart();
-//  
-//  // setup the Stage and RenderLoop 
-//    var canvas = html.querySelector('#stage');
-//    var stage = new Stage(canvas);
-//    var renderLoop = new RenderLoop();
-//    renderLoop.addStage(stage);
-//  
-//    // draw a red circle
-//     var shape = new Shape();
-//     shape.graphics.circle(100, 100, 60);
-//     shape.graphics.fillColor(Color.Red);
-//     stage.addChild(shape);
-//  
-//}
 

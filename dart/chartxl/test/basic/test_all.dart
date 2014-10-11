@@ -5,6 +5,7 @@ import 'package:stagexl/stagexl.dart';
 
 import 'test_ticks_position.dart';
 import 'package:chartxl/src/theme.dart';
+import 'package:chartxl/src/interpolator.dart';
 
 html.CanvasElement canvas = html.querySelector('#stage');
 Stage stage = new Stage(canvas, color: Color.Beige);
@@ -17,8 +18,14 @@ main() {
   
   print(theme);
   
-  test_ticks_position();
+  //test_ticks_position();
 
+  var fun = new NumericalInterpolator.fromSlope(1, 0);
+  print(fun(0.5));
+  var fun2 = new NumericalInterpolator.fromPoints(0, 1, 2, 12);
+  print(fun2(0.4));
   
+  num c = 0xf0f8ff;
+  print(c.toString());
   
 }
