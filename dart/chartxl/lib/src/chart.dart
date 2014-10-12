@@ -6,22 +6,42 @@ import 'package:stagexl/stagexl.dart';
 import 'package:chartxl/src/axis.dart';
 
 
+class PlotArea extends DisplayObjectContainer {
+  
+   
+  PlotArea(num width, num height) {
+    Shape background = new Shape()
+      ..width = width
+      ..height = height
+      ..graphics.rect(0, 0, width, height)    
+      ..graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.BUTT)
+      ..graphics.fillColor(Color.AntiqueWhite);
+    
+    
+    addChild(background);   
+  } 
+  
+}
+
+
 class Chart extends DisplayObjectContainer {
 
-  //num height;
-  //num width;
+  num height;
+  num width;
   List<Map> data;
   List<Axis> axes; 
-
-  num get height => stage.height;
-  num get width  => stage.width;
   
-  num get topleftX => theme.marginLeft * theme.textSize;
-  num get topleftY => theme.marginTop * theme.textSize;
-  num get bottomrightX => width  - theme.marginBottom * theme.textSize;
-  num get bottomrightY => height - theme.marginRight * theme.textSize;
+  //num get height => stage.height;
+  //num get width  => stage.width;
   
- 
+  
+  num get plotAreaX => theme.marginLeft * theme.textSize;
+  num get plotAreaY => theme.marginTop * theme.textSize;
+  num get plotAreaWidth => width  - (theme.marginBottom + theme.marginTop)*theme.textSize;
+  num get plotAreaHeight => height - (theme.marginRight + theme.marginLeft)*theme.textSize;
+  
+  
+  PlotArea plotArea;
   
   num _scaleX(num x) => 0;
   
@@ -30,35 +50,26 @@ class Chart extends DisplayObjectContainer {
    * Each element of data contains a Map with keys: "x", "y", "group", "panel".  
    * If "x" is missing, it's assumed to be 1:length(y). 
    */
-  Chart() {
-    // set the default theme.  How to do nice injection?
-    //setTheme(new DefaultTheme());
-        
-    //_drawBox();
-    draw();
+  Chart(num this.width, num this.height) {
+    if (theme == null) theme = new DefaultTheme();     
     
-    
+    plotArea = new PlotArea(plotAreaWidth, plotAreaHeight)
+      ..x = plotAreaX
+      ..y = plotAreaY;
+    print("width=${width}, heigth=${height}");
+    print("plotAreaWidth = ${plotAreaWidth}, plotAreaHeight = ${plotAreaHeight}, plotAreaX =${plotAreaX}");
+    addChild(plotArea); 
   }
 
   
   
   void draw() {
-    _drawBox();
     
+    
+    //addChild(plotArea); 
   }
   
-  void _drawBox() {
-    // you cannot call this until the Chart is attached 
-    print("width = $width, height = $height");
-    
-    Shape box = new Shape();
-    print("topleftX=${topleftX}, topleftY=${topleftY}, width=${width}");
-    box.graphics.rect(topleftX, topleftY, 
-        width-topleftX-theme.marginRight*theme.textSize, 
-        height-topleftY-theme.marginBottom*theme.textSize);    
-    box.graphics.strokeColor(Color.Black);
-    addChild(box);
-  }
+
   
   
   bool hasGroups() {

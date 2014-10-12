@@ -25,16 +25,12 @@ class Figure {
     var renderLoop = new RenderLoop();
     renderLoop.addStage(stage);
     
-    stage.addChild( new Bitmap(
-        new BitmapData(width, height, false, Color.Beige)));
+    stage.backgroundColor = Color.Beige;
   } 
   
   void add(DisplayObject obj) {
     stage.addChild( obj );
   }
   
-  void draw() {
-    
-  }
   
 }

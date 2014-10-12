@@ -10,7 +10,7 @@ class GridDefaults {
 
 
 /**
- * Construct a grid
+ * Construct a grid. 
  */
 class Grid extends Shape with GridDefaults {
   
