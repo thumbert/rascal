@@ -80,9 +80,10 @@ class Tick extends DisplayObjectContainer {
             ..x = -tickLength - tickPadding
             ..text = text;
         textField..y = textField.width ~/ 2;
-        print("Label $text");
-        print("textField x=${textField.x}, y=${textField.y}");
-        print("textField height=${textField.height}, width=${textField.width}");
+        //TODO: make the correct alignment work when labels are rotated ...
+//        print("Label $text");
+//        print("textField x=${textField.x}, y=${textField.y}");
+//        print("textField height=${textField.height}, width=${textField.width}");
         break;
       case Direction.UP:
         if (textRotation == null) textRotation=0;
