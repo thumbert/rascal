@@ -4,7 +4,7 @@ abstract class Interpolator extends Function {
   Function call(x);
 }  
 
-class NumericalInterpolator extends Interpolator{
+class NumericalInterpolator extends Interpolator {
   Function _apply;
   
   /**

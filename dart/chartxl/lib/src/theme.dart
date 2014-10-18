@@ -63,10 +63,10 @@ class DefaultTheme extends Theme {
 
     // Distance between the outer edge of the chart and the plot area,
     // as multiple of text size
-    marginBottom = 5;
-    marginLeft = 5;
-    marginTop = 3;
-    marginRight = 3;
+    marginBottom = 6;
+    marginLeft = 6;
+    marginTop = 4;
+    marginRight = 4;
 
     plotBackgroundColor = Color.White;
     plotBorderWidth = 0;

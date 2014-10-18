@@ -4,21 +4,53 @@ library chart;
 import 'package:chartxl/src/theme.dart';
 import 'package:stagexl/stagexl.dart';
 import 'package:chartxl/src/axis.dart';
+import 'package:chartxl/src/mark.dart' as mark;
+import 'package:chartxl/src/interpolator.dart';
+import 'package:chartxl/src/grid.dart';
+import 'package:chartxl/src/mark.dart';
 
 
 class PlotArea extends DisplayObjectContainer {
   
-   
-  PlotArea(num width, num height) {
+  Chart _chart;
+  Function _interpolatorX;
+  Function _interpolatorY;
+  
+  
+  PlotArea(num width, num height, Chart this._chart) {
     Shape background = new Shape()
       ..width = width
       ..height = height
       ..graphics.rect(0, 0, width, height)    
-      ..graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.BUTT)
+      ..graphics.strokeColor(Color.Black, 1.5, JointStyle.MITER)
       ..graphics.fillColor(Color.AntiqueWhite);
-    
-    
     addChild(background);   
+    
+    _interpolatorX = new NumericalInterpolator.fromPoints(0, 7.5, 0, width); 
+    _interpolatorY = new NumericalInterpolator.fromPoints(0, 2.6, height, 0); 
+        
+    var v = new List.generate(width ~/ 100,  (i) => (i+1) * 100);
+    var h = new List.generate(height ~/ 100, (i) => (i+1) * 100);
+    
+    Grid grid = new Grid( v, h, width, height);
+    addChild(grid);
+    
+    _addMarkers();
+   
+  } 
+  
+  _addMarkers() {
+    
+//    var marker;   
+//    if (_chart.marker == null) 
+//       marker = mark.Mark.makeCircle();  
+    
+    _chart.data.forEach((e) {
+      var m = new mark.Circle()
+        ..x = _interpolatorX( e["x"] ) 
+        ..y = _interpolatorY( e["y"] );
+      addChild( m );
+    });
   } 
   
 }
@@ -30,6 +62,8 @@ class Chart extends DisplayObjectContainer {
   num width;
   List<Map> data;
   List<Axis> axes; 
+  Mark marker;
+  List<String> type;
   
   //num get height => stage.height;
   //num get width  => stage.width;
@@ -43,7 +77,8 @@ class Chart extends DisplayObjectContainer {
   
   PlotArea plotArea;
   
-  num _scaleX(num x) => 0;
+  Function _interpolatorX;  // move from plot coordinate to stage coordinate
+  Function _interpolatorY;
   
   
   /**
@@ -53,20 +88,24 @@ class Chart extends DisplayObjectContainer {
   Chart(num this.width, num this.height) {
     if (theme == null) theme = new DefaultTheme();     
     
-    plotArea = new PlotArea(plotAreaWidth, plotAreaHeight)
-      ..x = plotAreaX
-      ..y = plotAreaY;
-    print("width=${width}, heigth=${height}");
-    print("plotAreaWidth = ${plotAreaWidth}, plotAreaHeight = ${plotAreaHeight}, plotAreaX =${plotAreaX}");
-    addChild(plotArea); 
   }
 
   
   
   void draw() {
     
+    if (type == null) {
+      type = ["p"];
+    }
     
-    //addChild(plotArea); 
+    var plotArea = new PlotArea(plotAreaWidth, plotAreaHeight, this)
+      ..x = plotAreaX
+      ..y = plotAreaY;
+    print("width=${width}, heigth=${height}");
+    print("plotAreaWidth = ${plotAreaWidth}, plotAreaHeight = ${plotAreaHeight}, plotAreaX =${plotAreaX}");
+    
+    addChild(plotArea);
+    
   }
   
 
@@ -85,45 +124,53 @@ class Chart extends DisplayObjectContainer {
     if (data.first.keys.contains("y")) return true; else return false;
   }
 
-  addAxes() {
+  _addAxes() {
     Map obs = data.first;
     if (obs.keys.contains("x")) {
       Axis xAxis = new Axis();      
     }
 
   }
-
-  // set all the properties directly in the chart
-//  void setTheme(Theme theme) {
-//    alignTicks = theme.alignTicks;
-//    backgroundColor = theme.backgroundColor;
-//    borderColor = theme.borderColor;
-//    borderWidth = theme.borderWidth;
-//
-//    //height = theme.height;
-//    //width = theme.width;
-//    
-//    
-//    textSize = theme.textSize;
-//    
-//    // Distance between the outer edge of the chart and the plot area, 
-//    // as multiple of text size
-//    marginBottom = theme.marginBottom;
-//    marginLeft   = theme.marginLeft;
-//    marginTop    = theme.marginTop;
-//    marginRight  = theme.marginRight;
-//        
-//    plotBackgroundColor = theme.plotBackgroundColor;  
-//    plotBorderWidth = theme.plotBorderWidth;
-//    
-//    // distance between the chart area and the outside text 
-//    // as multiple of text size
-//    spacingBottom = theme.spacingBottom;
-//    spacingLeft   = theme.spacingLeft;
-//    spacingTop    = theme.spacingTop;
-//    spacingRight  = theme.spacingRight;
-//    
-//  }
-
-
+  
+  _addPlotArea() {
+        
+    Shape background = new Shape()
+      ..width = width
+      ..height = height
+      ..graphics.rect(0, 0, width, height)    
+      ..graphics.strokeColor(Color.Black, 1.5, JointStyle.MITER)
+      ..graphics.fillColor(Color.AntiqueWhite);    
+    
+    addChild(background);   
+    
+    _interpolatorX = new NumericalInterpolator.fromPoints(0, 7.5, 0, width); 
+    _interpolatorY = new NumericalInterpolator.fromPoints(0, 2.6, height, 0); 
+        
+    var v = new List.generate(width ~/ 100,  (i) => (i+1) * 100);
+    var h = new List.generate(height ~/ 100, (i) => (i+1) * 100);
+    
+    Grid grid = new Grid( v, h, width, height);
+    addChild(grid);
+    
+       
+    
+  }
+  
+  _addGrid() {
+    
+  }
+  
+  _addMarkers() {
+    data.forEach((e) {
+      var m = new mark.Circle()
+        ..x = _interpolatorX( e["x"] ) 
+        ..y = _interpolatorY( e["y"] );
+      addChild( m );
+    });    
+  }
+  
+  
 }
+
+
+

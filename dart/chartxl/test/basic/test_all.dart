@@ -21,8 +21,8 @@ main() {
   print(theme);
   
   //test_ticks_position();
-  test_markers();=======
-
+  test_markers();
+  
   var fun = new NumericalInterpolator.fromSlope(1, 0);
   print(fun(0.5));
   var fun2 = new NumericalInterpolator.fromPoints(0, 1, 2, 12);

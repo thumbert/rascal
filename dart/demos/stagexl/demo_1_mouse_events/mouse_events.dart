@@ -59,6 +59,11 @@ main() {
   tween.animate.y.to(100);
   juggler.add(tween);
   
+  var rect = new Shape()
+    ..graphics.rect(300, 50, 300, 200)
+    ..graphics.strokeColor(Color.Blue, 1, JointStyle.MITER);
+  stage.addChild(rect);
+  
   var txt = new TextField();
   txt.x = 100;
   txt.y = stage.contentRectangle.height-50;

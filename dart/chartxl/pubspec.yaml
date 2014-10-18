@@ -4,5 +4,6 @@ author: Adrian A. Dragulescu
 description: A Dart library to create charts
 dependencies:
   browser: any
+  csv: any
   stagexl: any
   unittest: any

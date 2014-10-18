@@ -19,10 +19,16 @@ export_csv <- function()
 #
 export_json <- function()
 {
+  fname <- "../json/iris.json"
+  writeLines(df2json(iris), con=file(fname))  
+    
   data(Oats, package="MEMSS")  
   fname <- "../json/oats.json"
   writeLines(df2json(Oats), con=file(fname))
 
+
+  fname <- "../json/seatacWeather.json"
+  writeLines(df2json(SeatacWeather), con=file(fname))
 
   
 }
@@ -35,8 +41,10 @@ require(latticeExtra)
 require(MEMSS)  # I had to install again a liblapack dev package
 require(df2json)
 
-setwd("/home/adrian/Documents/findataweb/datasets/scripts/")
+# setwd("/home/adrian/Documents/findataweb/datasets/scripts/")
 
 export_csv()
 
 export_json()
+
+
