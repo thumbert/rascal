@@ -19,8 +19,16 @@ dart/demos/pubspec.lock
 dart/demos/web/packages
 dart/demos/web/autocomplete/packages
 
+// all temporary folders to be ignored
+tmp/
+
 // all output should be recreated
 out/
+
+// all the dart packages folders
+dart/chartxl/test/datasets/packages
+dart/chartxl/build
+
 
 // external dependencies should not be added
 R/finance/vix/external/
