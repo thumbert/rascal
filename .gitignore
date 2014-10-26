@@ -7,6 +7,7 @@ dart/utilio/bin/packages
 dart/utilio/test/packages
 dart/utilio/pubspec.lock
 
+dart/demos/.pub
 dart/demos/pubspec.lock
 dart/demos/build
 dart/demos/packages
