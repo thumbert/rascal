@@ -2,6 +2,12 @@
 .cache
 *.lock
 
+**/packages
+
+*.dart.js
+.pub/
+
+
 packages/
 dart/utilio/bin/packages
 dart/utilio/test/packages
@@ -19,12 +25,16 @@ dart/demos/test/math/packages
 dart/demos/pubspec.lock
 dart/demos/web/packages
 dart/demos/web/autocomplete/packages
+dart/demos/polymer/trex/.pub/
+
 
 // all temporary folders to be ignored
 tmp/
 
 // all output should be recreated
 out/
+
+
 
 // all the dart packages folders
 dart/chartxl/test/datasets/packages
