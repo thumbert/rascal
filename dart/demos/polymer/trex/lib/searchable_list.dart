@@ -13,6 +13,7 @@ class SearchableList extends PolymerElement {
   @published List<String> data = [];
   final List<String> results = toObservable([]);
 
+  
   SearchableList.created() : super.created();
 
   attached() {

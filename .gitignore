@@ -34,7 +34,8 @@ tmp/
 // all output should be recreated
 out/
 
-
+// no build folders
+build/
 
 // all the dart packages folders
 dart/chartxl/test/datasets/packages

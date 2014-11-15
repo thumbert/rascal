@@ -1,4 +1,4 @@
-name: trex
+name: trex_scratch
 description: Trex application
 environment:
   sdk: '>=0.8.10+6 <2.0.0'
