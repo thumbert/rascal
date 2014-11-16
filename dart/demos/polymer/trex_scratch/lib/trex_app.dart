@@ -9,7 +9,7 @@ class DemoApp extends PolymerElement {
     
   static DateFormat fmt = new DateFormat("yyyy-MM-dd");
   
-  String daySelected = "Coo-cook";
+  String daySelected = "";
   
   List<String> reportTimes = new List.generate(
         365 * 3,

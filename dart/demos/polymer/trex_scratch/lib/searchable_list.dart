@@ -8,6 +8,7 @@ class SearchableList extends PolymerElement {
   @observable bool applyAuthorStyles = true;
   @observable String searchParam;                 // what's in the search box
   @published List<String> data = [];              // this is the entire large list, how does it get populated?
+  @observable String daySelected = "";
   final List<String> results = toObservable([]);  // what matches
     
   
@@ -25,8 +26,13 @@ class SearchableList extends PolymerElement {
     results.addAll(data.where((String d) => d.startsWith(lower)).take(10));
   }
   
-  dateSelection(Event e) {
-    print("Selection is" + searchParam);  // i don't get here ..
+  dateSelection(Event e) {   // KeyboardEvent
+//    if (e.keyCode == KeyCode.ENTER) {
+      print("Selection is $searchParam"); // how do I pass it back on the screen??
+      daySelected = searchParam;
+//    } else {
+//      daySelected = "";
+//    }
   }
   
 }
