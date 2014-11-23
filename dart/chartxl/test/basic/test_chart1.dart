@@ -24,11 +24,12 @@ void main() {
   // setup the Stage and RenderLoop
   html.CanvasElement canvas = html.querySelector('#stage');
   var stage = new Stage(canvas, width: canvas.width, height: canvas.height);
-  canvas.width = 800;
-  canvas.height = 600;
-  stage.scaleMode = StageScaleMode.NO_SCALE;
+  //canvas.width  = 800;
+  //canvas.height = 800;
+  //stage.scaleMode = StageScaleMode.SHOW_ALL;
   stage.align = StageAlign.TOP_LEFT;
   stage.backgroundColor = Color.AliceBlue;
+ 
   var renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
 
@@ -38,7 +39,7 @@ void main() {
       ..load().then((result) {
         var iris = JSON.decode(resourceManager.getTextFile("table"));
 
-        Chart chart = new Chart(800, 600)
+        Chart chart = new Chart(600, 600)
             ..data = iris.map((e) =>  
               { "x" : e["Petal.Length"], 
                 "y" : e["Petal.Width"] }).toList()

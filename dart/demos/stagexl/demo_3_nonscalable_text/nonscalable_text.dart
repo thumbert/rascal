@@ -15,11 +15,12 @@ void main() {
   //stage.scaleMode = StageScaleMode.NO_SCALE;
   stage.scaleMode = StageScaleMode.SHOW_ALL;
   stage.align = StageAlign.TOP_LEFT;
+  stage.backgroundColor = Color.AliceBlue;
   var renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
   
-  stage.addChild(new Bitmap(
-     new BitmapData(stage.contentRectangle.width.toInt(), stage.contentRectangle.height.toInt(), false, Color.Beige)));
+  //stage.addChild(new Bitmap(
+  //   new BitmapData(stage.contentRectangle.width.toInt(), stage.contentRectangle.height.toInt(), false, Color.Beige)));
   
   stage.addChild(new Shape()
     ..graphics.circle(100, 100, 50)
