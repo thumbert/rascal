@@ -35,6 +35,13 @@ main() {
   y.removeWhere((p) => p.age < 20);
   print(y);
   
+  // create a mixed type List 
+  var dt = new DateTime(2014);
+  List res = [];
+  res.add([dt]..addAll(new List.generate(4, (i)=> i)));
+  res.add([dt.add(new Duration(hours: 1))]..addAll(new List.generate(4, (i)=> i+1)));  
+  print(res);  // [[2014-01-01 00:00:00.000, 0, 1, 2, 3], [2014-01-01 01:00:00.000, 1, 2, 3, 4]]
+  
   
   
 }

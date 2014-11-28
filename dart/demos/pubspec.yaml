@@ -4,6 +4,7 @@ environment:
 dependencies:
   archive: any
   browser: '>=0.9.0 <0.10.0'
+  charted: any
   crypto: any
   csv: any
   html5lib: any
