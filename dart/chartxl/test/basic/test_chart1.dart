@@ -28,6 +28,7 @@ void main() {
   stage.scaleMode = StageScaleMode.NO_SCALE;
   stage.align = StageAlign.TOP_LEFT;
   stage.backgroundColor = Color.AliceBlue;
+ 
   var renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
 
@@ -36,7 +37,6 @@ void main() {
       ..addTextFile("table", "../datasets/iris.json")
       ..load().then((result) {
         var iris = JSON.decode(resourceManager.getTextFile("table"));
-
         
         Chart chart = new Chart(900, 900)
             ..data = iris

@@ -7,6 +7,7 @@ void main() {
 
   var canvas = html.querySelector('#stage');
   var stage = new Stage(canvas);
+  stage.backgroundColor = Color.AliceBlue;
   var renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
   

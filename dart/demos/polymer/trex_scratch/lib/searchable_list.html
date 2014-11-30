@@ -1,0 +1,20 @@
+
+
+<link rel="import" href="../../packages/polymer/polymer.html">
+<polymer-element name="searchable-list">
+  <template>
+    <div class="container">
+      <input class="form-control" list="datetimes" value="{{searchParam}}" on-input="{{dateSelection}}">
+      
+      <datalist id="datetimes">
+        <template repeat="{{result in results}}">
+            <option value="{{result}}">
+        </template>
+      </datalist>
+    </div>
+    <span hidden?="{{daySelected.isEmpty}}">Selected {{daySelected}}</span>
+    
+  </template>
+
+  <script type="application/dart" src="searchable_list.dart"></script>
+</polymer-element>
