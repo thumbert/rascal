@@ -15,4 +15,7 @@ main() {
   print(fmt.format(dt2));  //1Jan14
   
   
+  var dt3 = DateTime.parse("2014-01-01");
+  print(dt3); // 2014-01-01 00:00:00.000
+  
 }
