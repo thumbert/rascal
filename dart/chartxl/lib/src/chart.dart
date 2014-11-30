@@ -23,7 +23,7 @@ class PlotArea extends DisplayObjectContainer {
       ..height = height
       ..graphics.rect(0, 0, width, height)    
       ..graphics.strokeColor(Color.Black, 1.5, JointStyle.MITER)
-      ..graphics.fillColor(Color.AntiqueWhite);
+      ..graphics.fillColor(Color.White);
     addChild(background);   
     
     _interpolatorX = new NumericalInterpolator.fromPoints(0, 7.5, 0, width); 
@@ -35,20 +35,25 @@ class PlotArea extends DisplayObjectContainer {
     Grid grid = new Grid( v, h, width, height);
     addChild(grid);
     
+    
+    
     _addMarkers();
    
   } 
   
   _addMarkers() {
     
-//    var marker;   
-//    if (_chart.marker == null) 
-//       marker = mark.Mark.makeCircle();  
+    var colors = [Color.Blue, Color.Red, Color.Green];
     
+    if (_chart._uGroups != null) {
+      _chart.marker = (e) => new mark.Circle(color: colors[_chart._uGroups[_chart.groups(e)]]);
+    }
+    
+     
     _chart.data.forEach((e) {
-      var m = new mark.Circle()
-        ..x = _interpolatorX( e["x"] ) 
-        ..y = _interpolatorY( e["y"] );
+      var m = _chart.marker(e)
+        ..x = _interpolatorX( _chart.xData(e) ) 
+        ..y = _interpolatorY( _chart.yData(e) );
       addChild( m );
     });
   } 
@@ -61,9 +66,19 @@ class Chart extends DisplayObjectContainer {
   num height;
   num width;
   List<Map> data;
+  Function xData;
+  Function yData;
+  
   List<Axis> axes; 
-  Mark marker;
+  Function groups;         // from (e) => String
+  Function marker = (e) => new mark.Circle();         
+  Function markerColor = (e) => Color.Blue;
+  
+  Map<String, int> _uGroups;   // unique group names
+  //Function _groupIndex;        // from groupName to groupIndex 
   List<String> type;
+  
+  
   
   //num get height => stage.height;
   //num get width  => stage.width;
@@ -98,11 +113,23 @@ class Chart extends DisplayObjectContainer {
       type = ["p"];
     }
     
+    print("width=${width}, heigth=${height}");
+    print("plotAreaWidth = ${plotAreaWidth}, plotAreaHeight = ${plotAreaHeight}, plotAreaX =${plotAreaX}");
+    
+    
+    
+    if ( groups != null) {
+      var aux = data.map( groups ).toSet(); 
+      print( groups(data.first) );
+      _uGroups = new Map.fromIterables(aux, new List.generate(aux.length, (i) => i));
+      print(_uGroups);
+    }
+        
     var plotArea = new PlotArea(plotAreaWidth, plotAreaHeight, this)
       ..x = plotAreaX
       ..y = plotAreaY;
-    print("width=${width}, heigth=${height}");
-    print("plotAreaWidth = ${plotAreaWidth}, plotAreaHeight = ${plotAreaHeight}, plotAreaX =${plotAreaX}");
+    
+    
     
     addChild(plotArea);
     
@@ -111,12 +138,6 @@ class Chart extends DisplayObjectContainer {
 
   
   
-  bool hasGroups() {
-    if (data.first.keys.contains("group")) return true; else return false;
-  }
-  bool hasPanels() {
-    if (data.first.keys.contains("panel")) return true; else return false;
-  }
   bool hasX() {
     if (data.first.keys.contains("x")) return true; else return false;
   }
@@ -132,42 +153,6 @@ class Chart extends DisplayObjectContainer {
 
   }
   
-  _addPlotArea() {
-        
-    Shape background = new Shape()
-      ..width = width
-      ..height = height
-      ..graphics.rect(0, 0, width, height)    
-      ..graphics.strokeColor(Color.Black, 1.5, JointStyle.MITER)
-      ..graphics.fillColor(Color.AntiqueWhite);    
-    
-    addChild(background);   
-    
-    _interpolatorX = new NumericalInterpolator.fromPoints(0, 7.5, 0, width); 
-    _interpolatorY = new NumericalInterpolator.fromPoints(0, 2.6, height, 0); 
-        
-    var v = new List.generate(width ~/ 100,  (i) => (i+1) * 100);
-    var h = new List.generate(height ~/ 100, (i) => (i+1) * 100);
-    
-    Grid grid = new Grid( v, h, width, height);
-    addChild(grid);
-    
-       
-    
-  }
-  
-  _addGrid() {
-    
-  }
-  
-  _addMarkers() {
-    data.forEach((e) {
-      var m = new mark.Circle()
-        ..x = _interpolatorX( e["x"] ) 
-        ..y = _interpolatorY( e["y"] );
-      addChild( m );
-    });    
-  }
   
   
 }

@@ -4,7 +4,7 @@ import 'package:stagexl/stagexl.dart';
 
 
 class GridDefaults {
-  int color = Color.YellowGreen;  
+  int color = Color.Gainsboro;  
   num lineWidth = 1;
 }
 

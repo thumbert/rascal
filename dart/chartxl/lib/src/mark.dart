@@ -4,10 +4,6 @@ import 'package:stagexl/stagexl.dart';
 
 abstract class Mark extends Sprite {
   
-  static Circle makeCircle() {
-    return new Circle();
-  }
-  
 }
 
 class Circle extends Mark {

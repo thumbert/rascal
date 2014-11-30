@@ -6,7 +6,6 @@ import 'package:chartxl/src/figure.dart';
 import 'package:chartxl/src/chart.dart';
 import 'package:chartxl/src/grid.dart';
 import 'dart:html';
-import 'package:csv/csv.dart';
 
 //import 'package:chartxl/../datasets/seatac_weather.dart';
 import 'dart:convert';
@@ -24,8 +23,8 @@ void main() {
   // setup the Stage and RenderLoop
   html.CanvasElement canvas = html.querySelector('#stage');
   var stage = new Stage(canvas, width: canvas.width, height: canvas.height);
-  canvas.width = 800;
-  canvas.height = 600;
+  canvas.width = 900;
+  canvas.height = 900;
   stage.scaleMode = StageScaleMode.NO_SCALE;
   stage.align = StageAlign.TOP_LEFT;
   stage.backgroundColor = Color.AliceBlue;
@@ -38,10 +37,12 @@ void main() {
       ..load().then((result) {
         var iris = JSON.decode(resourceManager.getTextFile("table"));
 
-        Chart chart = new Chart(800, 600)
-            ..data = iris.map((e) =>  
-              { "x" : e["Petal.Length"], 
-                "y" : e["Petal.Width"] }).toList()
+        
+        Chart chart = new Chart(900, 900)
+            ..data = iris
+            ..xData  = ((e) => e["Petal.Length"])
+            ..yData  = ((e) => e["Petal.Width"])
+            ..groups = ((e) => e["Species"])   
             ..draw();
         stage.addChild(chart);
       });

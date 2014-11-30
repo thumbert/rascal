@@ -1,9 +1,9 @@
-import 'dart:io';
+library demo_map;
 
-/*
- * Play with maps
+
+/**
+ * Group by key
  */
-
 make1(){
   Map<int,int> m1 = {
     1 : 1,
@@ -16,57 +16,9 @@ make1(){
     8 : 64
   };  
   
-  return m1;
-}
-
-make2() {
-  Map<String, List<int>> m2 = new Map();
-  m2['A'] = [1];
-  m2['B'] = [1,1];
-  m2['C'] = [1,1,1];
-  m2['D'] = [1,1,1,1];
-  
-  return m2;
-}
-
-Function interpolateNumber(a, b) {
-  if (a is String) {
-    a = (a.length == 0) ? 0 : double.parse(a);
-  }
-  if (b is String) {
-    b = (b.length == 0) ? 0 : double.parse(b);
-  }
-  b -= a;
-  return (t) { return a + b * t; };
-}
-
-
-main() {
-  
-  var f = interpolateNumber(1, 10) (5);
-  print(f.toString());
-  
-  
-  Map<int,int> m1 = make1();
-  
-  Map<String, List<int>> m2 = make2();
-  
-  // how to aggregate a Map of Lists.  
-  Map<String,int> agg = new Map();
-  for (String key in m2.keys) {
-    print("On key " + key);
-    print("Values: " + m2[key].toString());
-    agg[key] = m2[key].fold(0, (a, b) => a + b);
-  }
-  agg.forEach((String k, int v) => print("(" + k + "," + v.toString() +")"));
-  print("Done aggregating");
-  
-  Map<String,List<int>> res = new Map<String,List<int>>();
-  
+  Map<String,List<int>> res = new Map<String,List<int>>();  
   String key;
-  
-  Function newKey = (key) => {};
-  
+
   m1.forEach((k,v) {
     if (k%2 == 0) {
       key = "even";
@@ -79,12 +31,72 @@ main() {
       res[key] = [v];
     }
   });
-  
+
   res.forEach((k,v) {
     print("Key:" + k + " Values: " + v.join(","));
   });
+}
+
+
+/**
+ * Aggregate a map of lists
+ */
+make2() {
+  Map<String, List<int>> m2 = new Map();
+  m2['A'] = [1];
+  m2['B'] = [1,1];
+  m2['C'] = [1,1,1];
+  m2['D'] = [1,1,1,1];
+  
+  Map<String,int> agg = new Map();
+  for (String key in m2.keys) {
+    print("On key " + key);
+    print("Values: " + m2[key].toString());
+    agg[key] = m2[key].fold(0, (a, b) => a + b);
+  }
+  agg.forEach((String k, int v) => print("(" + k + "," + v.toString() +")"));
+  print("Done aggregating");
+}
+
+
+make3() {
+  List x = ["Jan", "Feb", "Mar"];
+  var y = new Map.fromIterables(x, new List.generate(x.length, (i) => i));
+  print(y);
+}
+
+
+// extract one "column"
+make4() {
+  var m4 = [{"Sepal.Length":5.1,"Sepal.Width":3.5,"Petal.Length":1.4,"Petal.Width":0.2,"Species":"setosa"},
+  {"Sepal.Length":4.9,"Sepal.Width":3,"Petal.Length":1.4,"Petal.Width":0.2,"Species":"setosa"},
+  {"Sepal.Length":4.7,"Sepal.Width":3.2,"Petal.Length":1.3,"Petal.Width":0.2,"Species":"setosa"},
+  {"Sepal.Length":4.6,"Sepal.Width":3.1,"Petal.Length":1.5,"Petal.Width":0.2,"Species":"setosa"},
+  {"Sepal.Length":5,"Sepal.Width":3.6,"Petal.Length":1.4,"Petal.Width":0.2,"Species":"setosa"},
+  {"Sepal.Length":5.4,"Sepal.Width":3.9,"Petal.Length":1.7,"Petal.Width":0.4,"Species":"setosa"}];
+  
+  print(m4.map((e) => e["Species"]));
+  
+  var fun = (e) => e["Species"];
+  print(m4.map( fun ));
   
   
+  
+}
+
+main() {
+  
+  
+  // group by key
+  //make1();
+  
+  // how to aggregate a Map of Lists.  
+  //make2();
+  
+  // make a map from a list, with values the index of the list
+  //make3();  // {Jan: 0, Feb: 1, Mar: 2}
+  
+  make4();
   
   
   
