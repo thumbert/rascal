@@ -1,0 +1,9 @@
+name: timeseries
+version: 0.0.1
+author: Adrian A. Dragulescu
+description: timeseries functionality for Dart
+dependencies:
+  intl: any
+  logging: any
+  logging_handlers: any
+  unittest: any
