@@ -45,29 +45,32 @@ class Obs<V> {
  *   
  */
 class TimeSeries<V> extends ListBase<Obs<V>> {
-  List<Obs<V>> data = [];
+  List<Obs<V>> data = [];  //TODO: do I need this?!  I don't think so!
+  final bool isUtc;
   final Period period;
-  
 
-  TimeSeries({Period this.period});
 
-  TimeSeries.fill(List<DateTime> index, value, {this.period}) {
+  TimeSeries({Period this.period, bool this.isUtc: false});
+
+  TimeSeries.fill(List<DateTime> index, value, {Period this.period, bool this.isUtc: false}) {
     data = new List.generate(index.length, (i) => new Obs(index[i], value), growable: true);
   }
   /**
    * Creates a TimeSeries of size length and fills it with observations observations created by 
    * calling the generator for each index in the range 0 .. length-1 in increasing order. 
    */
-  TimeSeries.generate(int length, Function generator, {Period this.period, bool growable: true}) {
+  TimeSeries.generate(int length, Function generator, {Period this.period, bool this.isUtc: false,
+      bool growable: true}) {
     data = new List.generate(length, generator, growable: growable);
   }
   /**
    * Create a TimeSeries from components.
    */
-  TimeSeries.fromComponents(List<DateTime> index, List<V> value, {Period this.period}) {
+  TimeSeries.fromComponents(List<DateTime> index, List<V> value, {Period this.period, bool
+      this.isUtc: false}) {
     if (value.length !=
         index.length) throw new Exception('TimeSeries value and index must have the same length');
-    
+
     for (int i = 0; i < value.length; i++) {
       data.add(new Obs(index[i], value[i]));
     }
@@ -83,13 +86,24 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
   operator [](int i) => data[i];
   operator []=(int i, Obs obs) => data[i] = obs;
 
+  /**
+   * Only add at the end of a timeseries.  If the timeseries is of a given period, only 
+   * observations that start at the correct period are allowed.
+   */
   void add(Obs obs) {
     if (!data.isEmpty &&
         obs.index.isBefore(
             data.last.index)) throw new StateError("You can only add at the end of the TimeSeries");
+    if (period != null &&
+        period.trunc(obs.index) !=
+            obs.index) throw new StateError("You can only add observations with the same period");
+    if (isUtc != obs.index.isUtc) 
+      throw new StateError("The observation UTC flag does not match the UTC flag for the timeseries");
+    
     data.add(obs);
   }
-  void addAll(Iterable<Obs> all) => data.addAll(all);
+  void addAll(Iterable<Obs> all) => all.forEach((obs) => this.add(obs));
+
 
   Iterable get values => data.map((obs) => obs.value);
 
@@ -112,7 +126,22 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
     return -1;
   }
 
-
+  /**
+   * Expand each observation of this timeseries using a function f. 
+   * For example, can be used to expand a monthly timeseries to a daily series. 
+   */
+  TimeSeries expand(Iterable<Obs> f(Obs obs), {Period period}) {
+    
+    TimeSeries ts = new TimeSeries(period: period, isUtc: this.isUtc);
+    print(data);
+    data.forEach((Obs obs) {
+      ts.addAll( f(obs) );  
+    });
+    
+    return ts;    
+  }
+    
+  
   Obs obsAt(DateTime index) {
     int i = _comparableBinarySearch(index);
     return data[i];
@@ -144,15 +173,23 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
    * aggregation function f.
    */
   toDaily(Function f(List<V> x)) {
-    Map<DateTime, List<V>> grp =
-        groupByIndex((DateTime dt) => new DateTime(dt.year, dt.month, dt.day));
+    Map<DateTime, List<V>> grp = groupByIndex((DateTime dt) {
+      if (isUtc) {
+        return new DateTime.utc(dt.year, dt.month, dt.day);
+      } else {
+        return new DateTime(dt.year, dt.month, dt.day);
+      }
+    });
 
     var valueGrp = [];
     for (DateTime key in grp.keys) {
       valueGrp.add(f(grp[key]));
     }
-    return new TimeSeries.fromComponents(grp.keys.toList(growable: false), valueGrp, 
-        period: Period.DAY);
+    return new TimeSeries.fromComponents(
+        grp.keys.toList(growable: false),
+        valueGrp,
+        period: Period.DAY, 
+        isUtc: this.isUtc);
   }
 
 
@@ -161,30 +198,47 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
    * aggregation function f.
    */
   toMonthly(Function f(List<V> x)) {
-    Map<DateTime, List<V>> grp = groupByIndex((DateTime dt) => new DateTime(dt.year, dt.month));
-
-    var valueGrp = [];
-    for (DateTime key in grp.keys) {
-      valueGrp.add( f(grp[key]) );
-    }
-    return new TimeSeries.fromComponents(grp.keys.toList(growable: false), valueGrp, 
-        period: Period.MONTH);
-  }
-
-  /**
-   * Aggregate this timeseries to a yearly timeseries according to an aggregation function.
-   * The aggregation function operates on a List with all the values in a year.
-   * Use an imperative style for speed.
-   */
-  toYearly(Function f(List<V> x)) {
-    Map<DateTime, List<V>> grp = groupByIndex((DateTime dt) => new DateTime(dt.year));
+    Map<DateTime, List<V>> grp = groupByIndex((DateTime dt) {
+      if (isUtc) {
+        return new DateTime.utc(dt.year, dt.month);
+      } else {
+        return new DateTime(dt.year, dt.month);
+      }
+    });
 
     var valueGrp = [];
     for (DateTime key in grp.keys) {
       valueGrp.add(f(grp[key]));
     }
-    return new TimeSeries.fromComponents(grp.keys.toList(growable: false), valueGrp, 
-        period: Period.YEAR);
+    return new TimeSeries.fromComponents(
+        grp.keys.toList(growable: false),
+        valueGrp,
+        period: Period.MONTH, 
+        isUtc: this.isUtc);
+  }
+
+  /**
+   * Aggregate this timeseries to a yearly timeseries according to an aggregation function.
+   * The aggregation function operates on a List with all the values in a year.
+   */
+  toYearly(Function f(List<V> x)) {
+    Map<DateTime, List<V>> grp = groupByIndex((DateTime dt){
+      if (isUtc) {
+        return new DateTime.utc(dt.year);
+      } else {
+        return new DateTime(dt.year);
+      }     
+    });
+
+    var valueGrp = [];
+    for (DateTime key in grp.keys) {
+      valueGrp.add( f(grp[key]) );
+    }
+    return new TimeSeries.fromComponents(
+        grp.keys.toList(growable: false),
+        valueGrp,
+        period: Period.YEAR, 
+        isUtc: this.isUtc);
   }
 }
 

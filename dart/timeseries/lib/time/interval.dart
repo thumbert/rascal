@@ -55,12 +55,12 @@ class Interval {
    */ 
   List split(Period period, Function f(Interval interval)) {
     var startChunk = start;
-    var endChunk = period.add(start);
+    var endChunk = period.next(start);
     List res = [];
     while (endChunk.isBefore(end) || endChunk == end) {
       res.add( f(new Interval.fromStartEnd(startChunk, endChunk)) );
       startChunk = endChunk;
-      endChunk = period.add(startChunk);
+      endChunk = period.next(startChunk);
     }
     
     return res;

@@ -2,8 +2,6 @@ library test_timeseries;
 
 import 'package:unittest/unittest.dart';
 import 'package:timeseries/timeseries.dart';
-import 'package:timeseries/seq.dart';
-import 'package:timeseries/time/month.dart';
 import 'package:timeseries/time/year.dart';
 import 'package:timeseries/time/period.dart';
 import 'package:timeseries/time/interval.dart';
@@ -74,13 +72,20 @@ main() {
       expect(ts.period, Period.MONTH);
     }); 
     
-    test('adding an existing month throws StateError', () {
+    test('adding an existing index throws StateError', () {
       var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
       var ts = new TimeSeries.fill(index, 1);
       expect(() => ts.add(new Obs(new DateTime(2014,5), 5)), throwsStateError);
     }); 
-        
-    solo_test('adding a middle of the month day to an existing monthly timeseries throws', () {
+    
+    test('adding existing indexes with addAll throws StateError', () {
+      var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
+      var ts = new TimeSeries.fill(index, 1);
+      expect(() => ts.addAll(ts.data.sublist(3,4)), throwsStateError);
+    }); 
+    
+    
+    test('adding a middle of the month day to an existing monthly timeseries throws', () {
       var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
       var ts = new TimeSeries.fill(index, 1, period: Period.MONTH);
       expect(() => ts.add(new Obs(new DateTime(2015, 1, 5), 12)), throws);
@@ -90,24 +95,24 @@ main() {
   
   
   group('Aggregations/Expansion: ', () {
-    
     test('aggregate an hourly timeseries to monthly', () {
       List<DateTime> hrs = new Year(2014).split(Period.HOUR, (x) => x.start);
-      var ts = new TimeSeries.fill(hrs, 1);
-      
-      // FIXME if the timeseries is an interval timeseries, you don't have 
-      // ts.first.index.year as toMonthly wants!  How to fix?
-      //print(ts.first.index.start.year);
-   
+      var ts = new TimeSeries.fill(hrs, 1, period: Period.MONTH);
+         
       TimeSeries res = ts.toMonthly((List obs) => obs.length);
-//      expect(res.join(""),
-//        "{Jan14, 744}{Feb14, 672}{Mar14, 743}{Apr14, 720}{May14, 744}{Jun14, 720}{Jul14, 744}{Aug14, 744}{Sep14, 720}{Oct14, 744}{Nov14, 721}{Dec14, 744}");
+      expect(res.join(""),
+        "{2014-01-01 00:00:00.000, 744}{2014-02-01 00:00:00.000, 672}{2014-03-01 00:00:00.000, 743}{2014-04-01 00:00:00.000, 720}{2014-05-01 00:00:00.000, 744}{2014-06-01 00:00:00.000, 720}{2014-07-01 00:00:00.000, 744}{2014-08-01 00:00:00.000, 744}{2014-09-01 00:00:00.000, 720}{2014-10-01 00:00:00.000, 744}{2014-11-01 00:00:00.000, 721}{2014-12-01 00:00:00.000, 744}");
     });
     
-    test('expand a monthly timeseries to hourly data', () {
-      var ts = new TimeSeries(period: Period.MONTH);
-      ts.addAll([new Obs(new DateTime(2014,3), 1.0),
-                 new Obs(new DateTime(2014,2), 2.0)]);
+    solo_test('expand a monthly timeseries to daily data', () {
+      var ts = new TimeSeries(period: Period.MONTH, isUtc: true);
+      ts.add(new Obs(new DateTime.utc(2014,3), 1.0));
+      
+      var tsDaily = ts.expand((obs) {
+        var days = Period.DAY.seq(obs.index, Period.MONTH.next(obs.index));
+        return new List.generate(days.length, (i) => new Obs(days[i], obs.value));
+      });
+      print(tsDaily);
       //var hrs = new Month(2014, 1).expand(new Duration(hours: 1));
       
       // FIXME make sure that when you addAll you add time-ordered values ony!    
