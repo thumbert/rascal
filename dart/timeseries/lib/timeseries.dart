@@ -45,7 +45,7 @@ class Obs<V> {
  *   
  */
 class TimeSeries<V> extends ListBase<Obs<V>> {
-  List<Obs<V>> data;
+  List<Obs<V>> data = [];
   final Period period;
   
 
@@ -67,7 +67,7 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
   TimeSeries.fromComponents(List<DateTime> index, List<V> value, {Period this.period}) {
     if (value.length !=
         index.length) throw new Exception('TimeSeries value and index must have the same length');
-
+    
     for (int i = 0; i < value.length; i++) {
       data.add(new Obs(index[i], value[i]));
     }
@@ -165,7 +165,7 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
 
     var valueGrp = [];
     for (DateTime key in grp.keys) {
-      valueGrp.add(f(grp[key]));
+      valueGrp.add( f(grp[key]) );
     }
     return new TimeSeries.fromComponents(grp.keys.toList(growable: false), valueGrp, 
         period: Period.MONTH);

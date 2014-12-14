@@ -22,10 +22,9 @@ main() {
       var index = new Year(2014).split(Period.HOUR, (x) => x.start);
       var ts = new TimeSeries.fill(index, 1, period: Period.HOUR);
       Obs a1 = ts[0];
-      expect(a1.index, index[0].start);
+      expect(a1.index, index[0]);
       expect(a1.value, 1);
      }); 
-    
     
     test('calculate the number of hours in some months', () {
       var index = new Year(2014).split(Period.HOUR, (x) => x.start);
@@ -36,19 +35,24 @@ main() {
     });
  
     test('add observations', () {
-      var months = new Interval(new DateTime(2014,1,1), new DateTime(2014,3,1)).split(Period.MONTH, 
-          (x) => x.start);
+      var months = new Interval.fromStartEnd(new DateTime(2014,1,1), new DateTime(2014,4,1))
+        .split(Period.MONTH, (x) => x.start);
       var ts = new TimeSeries.generate(3, (i) => new Obs(months[i], i));
       ts.add(new Obs(new DateTime(2014,4,1), 4));
       expect(ts.length, 4);
     });
     
-    solo_test('filter observations', () {
-      var months = new Interval(new DateTime(2014,1,1), new DateTime(2014,6,1)).split(Period.MONTH, 
-          (x) => x.start);
-      print(months);
+    test('adding to the middle of the tseries throws', () {
+      var months = new Year(2014).split(Period.MONTH, (x) => x.start);
+      var ts = new TimeSeries.generate(12, (i) => new Obs(months[i], i));
+      expect(() => ts.add(new Obs(new DateTime(2014,4,1), 4)), throwsStateError);
+      
+    });
+    
+    test('filter observations', () {
+      var months = new Interval.fromStartEnd(new DateTime(2014,1,1), new DateTime(2014,7,1))
+        .split(Period.MONTH, (x) => x.start);
       var ts = new TimeSeries.generate(6, (i) => new Obs(months[i], i));
-      print(ts);
       ts.add(new Obs(new DateTime(2014,7,1), 7));
       ts.retainWhere((obs) => obs.value > 2);
       expect(ts.values.toList()[0], 3);
@@ -67,6 +71,7 @@ main() {
       var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
       var ts = new TimeSeries.fill(index, 1, period: Period.MONTH);
       expect(ts.length, 12);
+      expect(ts.period, Period.MONTH);
     }); 
     
     test('adding an existing month throws StateError', () {
@@ -75,9 +80,9 @@ main() {
       expect(() => ts.add(new Obs(new DateTime(2014,5), 5)), throwsStateError);
     }); 
         
-    test('adding a DateTime obs to an existing monthly timeseries throws', () {
+    solo_test('adding a middle of the month day to an existing monthly timeseries throws', () {
       var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
-      var ts = new TimeSeries.fill(index, 1);
+      var ts = new TimeSeries.fill(index, 1, period: Period.MONTH);
       expect(() => ts.add(new Obs(new DateTime(2015, 1, 5), 12)), throws);
     }); 
     

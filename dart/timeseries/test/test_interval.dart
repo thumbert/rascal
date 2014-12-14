@@ -13,8 +13,8 @@ test_interval () {
   group("Test Interval: ", () {
     
     test("Basic interval methods", () {
-      Interval i1 = new Interval(new DateTime(2014,1), new DateTime(2014,2)); 
-      Interval i2 = new Interval(new DateTime(2014,2), new DateTime(2014,3));
+      Interval i1 = new Interval.fromStartEnd(new DateTime(2014,1), new DateTime(2014,2)); 
+      Interval i2 = new Interval.fromStartEnd(new DateTime(2014,2), new DateTime(2014,3));
       expect(i1.isBefore(i2), true);
       expect(i2.isAfter(i1),  true);
       expect(i2.isBefore(i1), false);
@@ -22,10 +22,22 @@ test_interval () {
     });
     
     test("General interval of 3 hours", () {
-      Interval i = new Interval(new DateTime(2014,1),
-          new DateTime(2014,1,1,4));
+      Interval i = new Interval.fromStartEnd(new DateTime(2014,1), new DateTime(2014,1,1,4));
       expect(i.toString(), "2014-01-01 00:00:00.000/2014-01-01 04:00:00.000");
     });
+    
+    test("Split a year into months", () {
+      Interval i = new Year(2014);
+      var months = i.split(Period.MONTH, (x) => x);
+      expect(months.length, 12);
+    });
+    
+    test("Split interval Jan14-Apr14 into months", () {
+      Interval i = new Interval.fromStartEnd(new DateTime(2014,1), new DateTime(2014,4));
+      var months = i.split(Period.MONTH, (x) => x);
+      expect(months.length, 3);
+    });
+    
     
     test("Date", () {
       Date d1 = new Date(2014,1,1);
@@ -60,7 +72,7 @@ test_interval () {
       expect(m.month,1);
       
       Month m1 = new Month(2015,11);
-      Month m3 = m1.add(1);                // used to be a bug ... 
+      Month m3 = m1.add(1);                
       expect(m3.toString(), 'Dec15');
       expect(m3.year, 2015);
       expect(m3.toString(), 'Dec15');
@@ -80,7 +92,9 @@ test_interval () {
       Year y3 = new Year.fromDateTime(new DateTime(2015));
       expect(y1.toString(), "2013");
       var months2 = y1.splitMonths();
-      var months = y1.split(Period.MONTH, (x) => x);
+      var months = y1
+          .split(Period.MONTH, (x) => x)
+          .map((x) => new Month.fromDateTime(x.start));
       expect(months.map((m)=> m.toString()).join(','), 
         "Jan13,Feb13,Mar13,Apr13,May13,Jun13,Jul13,Aug13,Sep13,Oct13,Nov13,Dec13");
       expect(y1.next(), y2);
@@ -91,8 +105,4 @@ test_interval () {
   
 }
 
-main() {
-  
-  test_interval();
-  
-}
+main() =>  test_interval();

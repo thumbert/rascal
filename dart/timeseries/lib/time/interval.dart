@@ -21,7 +21,7 @@ abstract class RegularInterval {
 }
 
 /**
- * An Interval class.  
+ * An Interval class to represent the time interval between [[start] and [end]).  
  * Start and end DateTimes need to be different.
  */
 class Interval {
@@ -36,9 +36,9 @@ class Interval {
     this.end = end;
   }
   
-  bool operator ==(Interval other) {
-    return (other.start == start) && (other.end == end);
-  }
+  bool operator ==(Interval other) =>
+    other != null && other.start == start && other.end == end;
+  
   
   bool isAfter(Interval other) {
     return start.isAfter(other.end) || start.isAtSameMomentAs(other.end);
@@ -50,12 +50,9 @@ class Interval {
    
   /**
    * Split this interval into subintervals given the Period period. 
-   * Retuns an empty list if start + duration > end. 
-   */
-//  List<Interval> split(Period period) {
-//    return splitFun(period, (x) => x);
-//  }
-  
+   * Retuns an empty list if start + duration > end.
+   * TODO:  How to make this return an iterable?!  That would be nice.  
+   */ 
   List split(Period period, Function f(Interval interval)) {
     var startChunk = start;
     var endChunk = period.add(start);

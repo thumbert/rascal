@@ -3,6 +3,7 @@
 *.lock
 
 **/packages
+packages
 
 *.dart.js
 .pub/

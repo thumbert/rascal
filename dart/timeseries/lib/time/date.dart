@@ -17,14 +17,11 @@ class Date extends Interval implements RegularInterval {
   Date(int year, int month, int day) {
     this.start = new DateTime(year, month, day);
     this.end = start.add(_1day);
-    new Interval.fromStartEnd(this.start, this.end);
   }
   
   Date.fromDateTime(DateTime start) {
-    this.start = start;
-    assert(start == new DateTime(start.year, start.month, start.day));
+    this.start = new DateTime(start.year, start.month, start.day);
     this.end = start.add(_1day);
-    new Interval.fromStartEnd(this.start, this.end);
   }
   
   Date previous() => new Date.fromDateTime(this.start.subtract(_1day));
