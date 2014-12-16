@@ -46,28 +46,33 @@ class Obs<V> {
  */
 class TimeSeries<V> extends ListBase<Obs<V>> {
   List<Obs<V>> data = [];  //TODO: do I need this?!  I don't think so!
-  final bool isUtc;
   final Period period;
+  bool _isUtc;
 
+  TimeSeries({Period this.period, bool isUtc: false}){
+    _isUtc = isUtc;
+  }
 
-  TimeSeries({Period this.period, bool this.isUtc: false});
-
-  TimeSeries.fill(List<DateTime> index, value, {Period this.period, bool this.isUtc: false}) {
+  /**
+   * Create a TimeSeries given a List of DateTimes.  All DateTimes need to be in the same timezone. 
+   */
+  TimeSeries.fill(List<DateTime> index, value, {Period this.period}) {
     data = new List.generate(index.length, (i) => new Obs(index[i], value), growable: true);
+    _isUtc = index.first.isUtc;
   }
   /**
    * Creates a TimeSeries of size length and fills it with observations observations created by 
    * calling the generator for each index in the range 0 .. length-1 in increasing order. 
    */
-  TimeSeries.generate(int length, Function generator, {Period this.period, bool this.isUtc: false,
+  TimeSeries.generate(int length, Function generator, {Period this.period,
       bool growable: true}) {
     data = new List.generate(length, generator, growable: growable);
+    _isUtc = data.first.index.isUtc;
   }
   /**
    * Create a TimeSeries from components.
    */
-  TimeSeries.fromComponents(List<DateTime> index, List<V> value, {Period this.period, bool
-      this.isUtc: false}) {
+  TimeSeries.fromComponents(List<DateTime> index, List<V> value, {Period this.period}) {
     if (value.length !=
         index.length) throw new Exception('TimeSeries value and index must have the same length');
 

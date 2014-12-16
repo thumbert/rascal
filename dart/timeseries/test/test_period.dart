@@ -21,6 +21,7 @@ test_period() {
       Period month = Period.MONTH;
       expect(month.next(new DateTime(2014,3)), new DateTime(2014,4));
       expect(Period.DAY.next(new DateTime(2014,3,10)), new DateTime(2014,3,11));
+      expect(month.next(new DateTime.utc(2014,3)), new DateTime.utc(2014,4));
     });  
   });
   
@@ -39,6 +40,11 @@ test_period() {
       Period day = Period.DAY;
       var days = day.seq(new Year(2014).start, new Year(2014).end);
       expect(days.length, 365);
+    });  
+    test("Daily sequences (utc)", () {
+      Period day = Period.DAY;
+      var days = day.seq(new DateTime.utc(2014,3), new DateTime.utc(2014,4));
+      expect(days.length, 31);
     });  
     
     

@@ -105,19 +105,14 @@ main() {
     });
     
     solo_test('expand a monthly timeseries to daily data', () {
-      var ts = new TimeSeries(period: Period.MONTH, isUtc: true);
+      var ts = new TimeSeries(period: Period.MONTH);
       ts.add(new Obs(new DateTime.utc(2014,3), 1.0));
       
       var tsDaily = ts.expand((obs) {
         var days = Period.DAY.seq(obs.index, Period.MONTH.next(obs.index));
         return new List.generate(days.length, (i) => new Obs(days[i], obs.value));
       });
-      print(tsDaily);
-      //var hrs = new Month(2014, 1).expand(new Duration(hours: 1));
-      
-      // FIXME make sure that when you addAll you add time-ordered values ony!    
-      //var res = ts.expand((Obs e) => new TimeSeries.fill(Period.HOUR.se.index, e.value));
-      //res.forEach((e) => print(e));      
+      expect(tsDaily.length, 31);
     });
     
   });

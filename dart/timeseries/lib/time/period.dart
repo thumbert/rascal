@@ -42,8 +42,19 @@ class Period {
   DateTime next(DateTime x) {
     DateTime res = x.add(_duration);
     if (years != 0 ||
-        months !=
-            0) res = new DateTime(
+        months != 0) {
+      if (res.isUtc)  {
+        res = new DateTime.utc(
+                      res.year + years,
+                      res.month + months,
+                      res.day,
+                      res.hour,
+                      res.minute,
+                      res.hour,
+                      res.millisecond);
+              
+      } else {
+        res = new DateTime(
                 res.year + years,
                 res.month + months,
                 res.day,
@@ -51,8 +62,8 @@ class Period {
                 res.minute,
                 res.hour,
                 res.millisecond);
-
-
+      }
+    }
     return res;
   }
 

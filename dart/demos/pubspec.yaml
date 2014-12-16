@@ -15,4 +15,5 @@ dependencies:
   polymer_expressions: any
   polymer_ui_elements: any
   stagexl: any
+  timezone: any
   unittest: any
