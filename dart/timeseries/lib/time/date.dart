@@ -3,42 +3,109 @@ import 'package:intl/intl.dart';
 import 'package:timeseries/time/interval.dart';
 import 'package:timeseries/time/month.dart';
 
-/*
+/**
  * A Date class.  
- * Should try to remove the dependence on DateTime ...
  */
-class Date extends Interval implements RegularInterval {
+class Date {
+  
+  int _year;
+  int _month;
+  int _day;
+  int _value;  // number of days since origin 1970-01-01
   
   static final DateFormat DEFAULT_FMT = new DateFormat('yyyy-MM-dd');
   static final Duration _1day = new Duration(days: 1);
-
+  static final int _ORIGIN = 2440588; // 1970-01-01 is day zero
   static DateFormat fmt = DEFAULT_FMT;
   
   Date(int year, int month, int day) {
-    this.start = new DateTime(year, month, day);
-    this.end = start.add(_1day);
+    _year = year;
+    _month = month;
+    _day = day;
+    _calcValue();
   }
   
   Date.fromDateTime(DateTime start) {
-    this.start = new DateTime(start.year, start.month, start.day);
-    this.end = start.add(_1day);
+    _year = start.year;
+    _month = start.month;
+    _day = start.day;
+    _calcValue();
   }
   
-  Date previous() => new Date.fromDateTime(this.start.subtract(_1day));
-  Date next() => new Date.fromDateTime(end);
-  Date add(int step) => new Date.fromDateTime(start.add(new Duration(days: step)));
-  Date subtract(int step) => new Date.fromDateTime(start.subtract(new Duration(days: step)));
+  /**
+   * Construct a date given the number of days since the origin 1970-01-01.
+   */
+  Date.fromJulianDay(int value) {
+    _value = value;
+    _calcYearMonthDay();
+  }
   
-  Month currentMonth() => new Month(start.year, start.month);
+  int get year => _year;
+  int get month => _month;
+  int get day => _day;
+  int get value => _value;
+  
+  // calculate year, month, day when you know the _value
+  void _calcYearMonthDay() {
+    var j = value + _ORIGIN - 1721119;
+    _year = (4 * j - 1) ~/ 146097;
+    j = 4 * j - 1 - 146097 * _year;
+    _day = j ~/ 4;
+    j = (4 * _day + 3) ~/ 1461;
+    _day = (4 * _day + 3) - 1461 * j;
+    _day = (_day + 4) ~/ 4;
+    _month = (5 * _day - 3) ~/ 153;
+    _day = (5 * _day - 3) - 153 * _month;
+    _day = (_day + 5) ~/ 5;
+    _year = 100 * _year + j;
+    _year = _year + (_month < 10 ? 0 : 1);
+    _month = _month + (_month < 10 ? 3 : -9);
+  }
+  
+  void _calcValue() {
+    // code from julian date in the S book (p.269)
+    var y = _year + (_month > 2 ? 0 : -1);
+    var m = _month + (_month > 2 ? -3 : 9);
+    var c = y ~/ 100;
+    var ya = y - 100*c;
+    
+    _value = (146097*c) ~/ 4 + (1461*ya) ~/ 4 + (153 * m + 2) ~/ 5 + _day + 1721119 - _ORIGIN;
+  }
+  
+  Date previous() => new Date.fromJulianDay(_value - 1);
+  Date next() => new Date.fromJulianDay( value + 1);
+  Date add(int step) => new Date.fromJulianDay(_value + step);
+  Date subtract(int step) => new Date.fromJulianDay(value - step);
+  
+  Month currentMonth() => new Month(_year, _month);
   Month nextMonth() => currentMonth().add(1);
   Month previousMonth() => currentMonth().subtract(1);
   
-  bool operator <(Date other)  => this.start.isBefore(other.start);
-  bool operator <=(Date other) => this.start.isBefore(other.start) || this.start == other.start;
-  bool operator >(Date other)  => this.start.isAfter(other.start);
-  bool operator >=(Date other) => this.start.isAfter(other.start) || this.start == other.start;
-  int compareTo(Date other)    => this.start.compareTo(other.start);
+  bool operator <(Date other)  => this.value < other.value;
+  bool operator <=(Date other) => this.value <= other.value;
+  bool operator >(Date other)  => this.value > other.value;
+  bool operator >=(Date other) => this.value >= other.value;
+  bool operator ==(Date other) => other != null && other._value == _value;
+  int compareTo(Date other)    => this.value.compareTo(other.value);
   
+  /**
+   * Calculate the day of the week.  Mon=1, ... Sat=6, Sun=7.
+   */
+  int dayOfWeek() {
+    var ix = _year + ((_month-14)/12).truncate();
+    var jx = ((13 * (_month + 10 - (_month + 10) ~/ 13 * 12) - 1)/5).truncate()
+        + _day + 77 + (5 * (ix - (ix ~/ 100) * 100)) ~/ 4
+        + ix ~/ 400 - (ix ~/ 100) * 2;
+    jx = jx % 7;
+    if (jx == 0) jx = 7;  // Make Sun = 7
+    
+    return jx;
+  }
+
+  int dayOfYear() => value - new Date(_year, 1, 1).value + 1;
+    
+    
+  bool isWeekend() => [0,6].contains(dayOfWeek());    
   
   List<Date> seqTo(Date other, {int step: 1}) {
     assert(other >= this);
@@ -60,12 +127,13 @@ class Date extends Interval implements RegularInterval {
     }
     return res;
   }
-  
-  //set format(DateFormat fmt) =>  fmt = fmt;
-  //DateFormat get format => fmt;
-  
-  String toString() => fmt.format(start); 
-  DateTime toDateTime() => start;
+    
+  Interval toInterval() {
+    var start = new DateTime(_year, _month, _day);
+    return new Interval.fromStartEnd(start, start.add(_1day));
+  }
+  String toString() => fmt.format(new DateTime(_year, _month, _day)); 
+  DateTime toDateTime() => new DateTime(_year, _month, _day);
 }
 
 

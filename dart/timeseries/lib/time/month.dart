@@ -10,11 +10,11 @@ import 'package:timeseries/time/period.dart';
  *  
  * 
  */
-class Month extends Interval implements RegularInterval {
+class Month {
   
   int _value;
   int _year;
-  int _month;
+  int _month;  // between Jan=1 to Dec=12
   
   static final DateFormat fmt = new DateFormat('MMMyy');
   static final Duration H1 = new Duration(hours: 1);
@@ -26,44 +26,32 @@ class Month extends Interval implements RegularInterval {
   }
     
 
-  /*
+  /**
    * Creates a new Month object.
    */
   Month(int year, int month) {
-    this.start = new DateTime(year, month);
-    if (month == 12) {
-      end = new DateTime(year+1);
-    } else {
-      end = new DateTime(year, month+1);       
-    }
     _value = year*12 + month;
     _year  = year;
     _month = month;
-    new Interval.fromStartEnd(start, end);
   }
   
-  /*
-   * Creates a new Month object from a DateTime.  The [start] needs to 
-   * be a beginning of the month DateTime.  
+  /**
+   * Creates a new Month object from a DateTime.  The Month will contain the [datetime].
    */
-  Month.fromDateTime(DateTime start) {
-    this.start = start;
-     assert(start == new DateTime(start.year, start.month));
-     if (start.month == 12) {
-       end = new DateTime(start.year+1);
-     } else {
-       end = new DateTime(start.year, start.month+1);       
-     }
-     _value = start.year*12 + start.month;
+  Month.fromDateTime(DateTime datetime) {
+     _value = datetime.year*12 + datetime.month;
      _year  = year;
      _month = month;
-     new Interval.fromStartEnd(start, end);   
   }
   
-  Month previous() => new Month((_value-1)~/12, (_value-1)%12);
-  Month next() => new Month.fromDateTime(end);
-  Month add(int months) => new Month((_value -1 +months)~/12, (_value -1 + months)%12 + 1);
-  Month subtract(int months) => new Month((_value -1 - months)~/12, (_value -1 - months)%12 + 1);
+  int _calcYear(int x)  => x ~/ 12;
+  int _calcMonth(int x) => x % 12 + 1;
+  
+  
+  Month previous() => new Month(_calcYear(_value-1), _calcMonth(_value-1));
+  Month next() => new Month(_calcYear(_value+1), _calcMonth(_value+1));
+  Month add(int months) => new Month(_calcYear(_value+months), _calcMonth(_value+months));
+  Month subtract(int months) => new Month(_calcYear(_value-months), _calcMonth(_value-months));
   
   bool operator <(Month other)  => _value < other._value;
   bool operator <=(Month other) => _value <= other._value;
@@ -77,9 +65,9 @@ class Month extends Interval implements RegularInterval {
   
   int compareTo(Month other) {
     int res;
-    if (this.start.isBefore(other.start)) {
+    if (this._value < other._value) {
       res = -1;
-    } else if (this.start == other.start){
+    } else if (this._value == other._value){
       res = 0;
     } else {
       res = 1;
@@ -116,22 +104,31 @@ class Month extends Interval implements RegularInterval {
     return res;
   }
   
-  /**
-   * Return all the hours in this month.
-   * TODO: how to generate the hours in different time zones ...
-   */
-  List<DateTime> expandHours() {
-    List res = [];
-    var hour = start;
-    while (hour.isBefore(end)) {
-      res.add(hour);
-      hour = hour.add(H1);
+  Interval toInterval() {
+    DateTime start = new DateTime(year, month);
+    DateTime end;
+    if (month == 12) {
+       end = new DateTime(year+1);
+    } else {
+       end = new DateTime(year, month+1);       
     }
-    
-    return res;
+    return new Interval.fromStartEnd(start, end);
   }
-  
-  String toString() => fmt.format(start);
-  DateTime toDateTime() => start;
-  
+  String toString() => fmt.format(new DateTime(year, month));
+  DateTime toDateTime() => new DateTime(year, month); 
 }
+
+/**
+ * Return all the hours in this month.
+ * TODO: how to generate the hours in different time zones ...
+ */
+//  List<DateTime> expandHours() {
+//    List res = [];
+//    var hour = start;
+//    while (hour.isBefore(end)) {
+//      res.add(hour);
+//      hour = hour.add(H1);
+//    }
+//    
+//    return res;
+//  }

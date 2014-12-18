@@ -27,7 +27,7 @@ test_interval () {
     });
     
     test("Split a year into months", () {
-      Interval i = new Year(2014);
+      Interval i = new Year(2014).toInterval();
       var months = i.split(Period.MONTH, (x) => x);
       expect(months.length, 12);
     });
@@ -39,24 +39,13 @@ test_interval () {
     });
     
     
-    test("Date", () {
-      Date d1 = new Date(2014,1,1);
-      expect(d1.toString(), "2014-01-01");
-      expect(d1.next(), new Date(2014,1,2));
-      expect(new Date(2014,1,31).next(), new Date(2014,2,1));
-      expect(d1.seqTo(new Date(2014,1,10), step: 4).map((e)=>e.toString()).join(','), "2014-01-01,2014-01-05,2014-01-09");
-      expect(d1.seqLength(3, step: 4).map((e)=>e.toString()).join(','), "2014-01-01,2014-01-05,2014-01-09");     
-      // change the format
-      Date.fmt = new DateFormat("dMMMyy");
-      expect(d1.toString(), "1Jan14");
-    });
-    
+   
      
     test("Month", () {
       Month m  = new Month(2014,1);
       Month m2 = new Month(2014,1);
       expect(m, m2);
-      expect(m.end, new DateTime(2014,2));
+      expect(m.toInterval().end, new DateTime(2014,2));
       expect(m.toString(), "Jan14");
       expect(m.next().toString(), "Feb14");
       expect(m.previous().toString(), "Dec13");
@@ -93,6 +82,7 @@ test_interval () {
       expect(y1.toString(), "2013");
       var months2 = y1.splitMonths();
       var months = y1
+          .toInterval()
           .split(Period.MONTH, (x) => x)
           .map((x) => new Month.fromDateTime(x.start));
       expect(months.map((m)=> m.toString()).join(','), 

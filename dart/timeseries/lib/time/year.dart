@@ -1,17 +1,15 @@
 library year;
-import 'package:intl/intl.dart';
+
 import 'package:timeseries/time/interval.dart';
 import 'package:timeseries/time/month.dart';
 
 /**
  * Class representing a calendar year.
  */
-class Year extends Interval implements RegularInterval {
-  
+class Year {  
+
   int _value;
-  
-  static final DateFormat fmt = new DateFormat('yyyy');
-  
+    
   static Year current({DateTime datetime}) {
     if (datetime == null) 
        datetime = new DateTime.now();
@@ -20,22 +18,21 @@ class Year extends Interval implements RegularInterval {
   
   Year(int year) {
     _value = year;
-    this.start = new DateTime(year);
-    this.end = new DateTime(year+1);
-    new Interval.fromStartEnd(this.start, this.end);
   }
   
-  Year.fromDateTime(DateTime start) {
-    assert(start == new DateTime(start.year));
-    _value = start.year;
-    this.start = new DateTime(_value);
-    this.end = new DateTime(_value+1);
-    new Interval.fromStartEnd(this.start, this.end);
+  /**
+   * Get the year that contains this datetime.  The datetime does not need to be the 
+   * beginning of the year. 
+   */
+  Year.fromDateTime(DateTime datetime) {
+    _value = datetime.year;
   }
+  
+  int get value => _value;
   
   List<Month> splitMonths() {
     List<Month> res = new List(12);
-    res[0] = new Month.fromDateTime(start);
+    res[0] = new Month.fromDateTime(new DateTime(_value));
     for (int m=1; m<=11; m++) {
       res[m] = res[m-1].next();
     }
@@ -43,16 +40,16 @@ class Year extends Interval implements RegularInterval {
     return res;
   }
   
-  Year previous() => new Year(start.year-1);
-  Year next() => new Year(start.year+1);
-  Year add(int years) => new Year(start.year + years);
-  Year subtract(int years) => new Year(start.year - years);
+  Year previous() => new Year(_value-1);
+  Year next() => new Year(_value+1);
+  Year add(int years) => new Year(_value + years);
+  Year subtract(int years) => new Year(_value - years);
   
   bool operator <(Year other)  => _value < other._value;
   bool operator <=(Year other) => _value <= other._value;
   bool operator >(Year other)  => _value > other._value;
   bool operator >=(Year other) => _value >= other._value;
-  bool operator ==(Year other) => _value == other._value;
+  bool operator ==(Year other) => (other != null) &&_value == other._value;
   
   int compareTo(Year other) {
     int res;
@@ -67,6 +64,8 @@ class Year extends Interval implements RegularInterval {
     return res;
   }
 
+  bool isLeapYear() => _value % 4 == 0 && (_value % 100 != 0 || _value % 400 == 0);  
+  
   List<Year> seqTo(Year other, {int step: 1}) {
     assert(other >= this);
     List res = [];
@@ -90,7 +89,7 @@ class Year extends Interval implements RegularInterval {
  
   
   int toInt() => _value;
+  Interval toInterval() => new Interval.fromStartEnd(new DateTime(_value), new DateTime(_value+1));
   
-  
-  String toString() => fmt.format(start);
+  String toString() => _value.toString();
 }
