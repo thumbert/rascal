@@ -41,38 +41,6 @@ test_interval () {
     
    
      
-    test("Month", () {
-      Month m  = new Month(2014,1);
-      Month m2 = new Month(2014,1);
-      expect(m, m2);
-      expect(m.toInterval().end, new DateTime(2014,2));
-      expect(m.toString(), "Jan14");
-      expect(m.next().toString(), "Feb14");
-      expect(m.previous().toString(), "Dec13");
-      expect(m.add(6), new Month(2014,7));
-      expect(m.seqTo(new Month(2014,5), step: 2).map((e)=>e.toString()).join(','), "Jan14,Mar14,May14");
-      expect(m.seqLength(3, step: 2).map((e)=>e.toString()).join(','), "Jan14,Mar14,May14");
-            
-      List<Month> x = [new Month(2014,3),
-                       new Month(2014,1)];
-      x.sort((a,b)=>a.compareTo(b));
-      expect(x.map((e)=>e.toString()).join(','), "Jan14,Mar14");
-      expect(m.year,2014);
-      expect(m.month,1);
-      
-      Month m1 = new Month(2015,11);
-      Month m3 = m1.add(1);                
-      expect(m3.toString(), 'Dec15');
-      expect(m3.year, 2015);
-      expect(m3.toString(), 'Dec15');
-      expect("Dec15: (${m3.year}, ${m3.month})", "Dec15: (2015, 12)");
-      expect(m3.year, 2015);
-      Month m4 = m3.add(1).subtract(1);
-      expect("Dec15: (${m4.year}, ${m4.month})", "Dec15: (2015, 12)"); 
-      
-      List<Month> mths = m.seqLength(12);
-      expect(mths.last.year, 2014);
-    });
     
     
     test("Year", () {

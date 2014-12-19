@@ -10,13 +10,14 @@ import 'package:timeseries/time/period.dart';
  *  
  * 
  */
-class Month {
+class Month extends Comparable<Month> {
   
   int _value;
   int _year;
   int _month;  // between Jan=1 to Dec=12
   
-  static final DateFormat fmt = new DateFormat('MMMyy');
+  static final DateFormat DEFAULT_FMT = new DateFormat('MMMyy');
+  static final DateFormat fmt = DEFAULT_FMT;
   static final Duration H1 = new Duration(hours: 1);
   
   static Month current( {DateTime datetime} ) {
@@ -40,12 +41,12 @@ class Month {
    */
   Month.fromDateTime(DateTime datetime) {
      _value = datetime.year*12 + datetime.month;
-     _year  = year;
-     _month = month;
+     _year  = datetime.year;
+     _month = datetime.month;
   }
   
-  int _calcYear(int x)  => x ~/ 12;
-  int _calcMonth(int x) => x % 12 + 1;
+  int _calcYear(int x)  => (x-1) ~/ 12;
+  int _calcMonth(int x) => (x-1) % 12 + 1;
   
   
   Month previous() => new Month(_calcYear(_value-1), _calcMonth(_value-1));
@@ -76,7 +77,7 @@ class Month {
     return res;
   }
  
-  /*
+  /**
    * Create a Month sequence starting with this month and ending at 
    * [other].  The [step] can be used to skip months if needed. 
    */

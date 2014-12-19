@@ -6,7 +6,7 @@ import 'package:timeseries/time/month.dart';
 /**
  * Class representing a calendar year.
  */
-class Year {  
+class Year extends Comparable<Year> {  
 
   int _value;
     

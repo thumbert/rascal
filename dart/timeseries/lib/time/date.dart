@@ -6,7 +6,7 @@ import 'package:timeseries/time/month.dart';
 /**
  * A Date class.  
  */
-class Date {
+class Date extends Comparable<Date>{
   
   int _year;
   int _month;
@@ -89,9 +89,11 @@ class Date {
   int compareTo(Date other)    => this.value.compareTo(other.value);
   
   /**
-   * Calculate the day of the week.  Mon=1, ... Sat=6, Sun=7.
+   * Return the day of the week.  Mon=1, ... Sat=6, Sun=7.
    */
-  int dayOfWeek() {
+  int get weekday => _dayOfWeek();
+  
+  int _dayOfWeek() {
     var ix = _year + ((_month-14)/12).truncate();
     var jx = ((13 * (_month + 10 - (_month + 10) ~/ 13 * 12) - 1)/5).truncate()
         + _day + 77 + (5 * (ix - (ix ~/ 100) * 100)) ~/ 4
@@ -102,10 +104,9 @@ class Date {
     return jx;
   }
 
-  int dayOfYear() => value - new Date(_year, 1, 1).value + 1;
+  int dayOfYear() => value - new Date(_year, 1, 1).value + 1;    
     
-    
-  bool isWeekend() => [0,6].contains(dayOfWeek());    
+  bool isWeekend() => [0,6].contains(weekday);    
   
   List<Date> seqTo(Date other, {int step: 1}) {
     assert(other >= this);

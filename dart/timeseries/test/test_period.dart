@@ -28,17 +28,17 @@ test_period() {
   group("Test Period: ", (){
     test("Monthly sequences", () {
       Period month = Period.MONTH;
-      var months = month.seq(new Year(2014).start, new Year(2014).end);
+      var months = month.seq(new DateTime(2014), new DateTime(2015));
       expect(months.length, 12);
     });  
     test("Daily sequences", () {
       Period day = Period.DAY;
-      var days = day.seq(new Month(2014,1).start, new Month(2014,1).end);
+      var days = day.seq(new DateTime(2014,1), new DateTime(2014,2));
       expect(days.length, 31);
     });  
     test("Daily sequences (more)", () {
       Period day = Period.DAY;
-      var days = day.seq(new Year(2014).start, new Year(2014).end);
+      var days = day.seq(new DateTime(2014), new DateTime(2015));
       expect(days.length, 365);
     });  
     test("Daily sequences (utc)", () {

@@ -22,13 +22,13 @@ test_date() {
     });
 
     test("Day of week (Mon=1, ... Sat=6, Sun=7)", () {
-      expect(new Date(2014, 12, 19).dayOfWeek(), 5);
-      expect(new Date(2014, 1, 1).dayOfWeek(), 3);
-      expect(new Date(2014, 2, 1).dayOfWeek(), 6);
-      expect(new Date(2014, 3, 3).dayOfWeek(), 1);
-      expect(new Date(2014, 4, 15).dayOfWeek(), 2);
-      expect(new Date(2014, 6, 15).dayOfWeek(), 7);
-      expect(new Date(2014, 8, 14).dayOfWeek(), 4);
+      expect(new Date(2014, 12, 19).weekday, 5);
+      expect(new Date(2014, 1, 1).weekday, 3);
+      expect(new Date(2014, 2, 1).weekday, 6);
+      expect(new Date(2014, 3, 3).weekday, 1);
+      expect(new Date(2014, 4, 15).weekday, 2);
+      expect(new Date(2014, 6, 15).weekday, 7);
+      expect(new Date(2014, 8, 14).weekday, 4);
     });
 
     test("Day of the year", () {
@@ -56,6 +56,14 @@ test_date() {
       expect(new Date(2014, 1, 1).toString(), "1Jan14");
     });
 
+    test("Sort dates", (){
+      var x = [new Date(2014,8,1), new Date(2014,12,1), 
+               new Date(2014,2,1)];
+      x.sort();
+      Date.fmt = Date.DEFAULT_FMT;
+      expect(x.map((d) => d.toString()).join(","), 
+          "2014-02-01,2014-08-01,2014-12-01");
+    });
 
   });
 }
