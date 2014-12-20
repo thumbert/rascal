@@ -1,0 +1,11 @@
+name: dartice
+version: 0.0.1
+author: Tony Humbert
+description: A minimal command-line application.
+environment:
+  sdk: '>=1.0.0 <2.0.0'
+dependencies:
+  charted: any
+  stagexl: any
+dev_dependencies:
+  unittest: any
