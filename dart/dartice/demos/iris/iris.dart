@@ -30,8 +30,8 @@ iris_from_scratch( data ) {
       ..attrWithCallback('cx', (d, i, e) => xValues[i])
       ..attrWithCallback('cy', (d, i, e) => yValues[i])
       ..styleWithCallback('stroke', (d, i, e) => "#31698A")
-      ..styleWithCallback('fill', (d, i, e) => "#ffffff")
-      ..style('opacity', '1');
+      ..styleWithCallback('fill', (d, i, e) => "#31698A")
+      ..style('opacity', '0.5');
   
   
 }

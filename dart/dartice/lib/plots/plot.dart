@@ -8,4 +8,15 @@ import 'package:dartice/theme/theme.dart';
  */
 class Plot {
   Theme theme;
+  List data;
+  
+  Plot(){}
+  
+  void draw() {
+    
+    
+  }
+  
+  
+  
 }
