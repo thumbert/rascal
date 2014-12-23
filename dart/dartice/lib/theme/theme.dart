@@ -13,6 +13,7 @@ abstract class Theme extends Object with TickProperties, TextProperties {
   Color borderColor;
   int borderWidth;
 
+  List COLORS;
   //num height;
   //num width;
 
@@ -78,6 +79,7 @@ class DefaultTheme extends Theme {
     spacingTop = 1;
     spacingRight = 1;
 
+    List COLORS = ['#C5D9FB', '#4184F3', '#2955C5'];
   }
 
 }

@@ -3,7 +3,11 @@
 
 library all_tests;
 
+import 'test_interpolator.dart';
+
 
 void main() {
+  
+  test_interpolator();
   
 }

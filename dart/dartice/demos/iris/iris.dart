@@ -4,6 +4,7 @@ import 'package:charted/charted.dart';
 import 'dart:convert';
 import 'package:stagexl/src/resources.dart';
 import 'package:dartice/scale/interpolator.dart';
+import 'package:dartice/theme/theme.dart';
 
 
 iris_from_scratch(data) {
@@ -39,6 +40,10 @@ iris_from_scratch(data) {
   var scaleY = new NumericalInterpolator.fromPoints(minY, maxY, 10, 290);
   List yValues = y.map((e) => scaleY(e)).toList();
 
+  Theme theme = new DefaultTheme();
+  var groups = data.map((e) => e["Species"]).toSet();
+  var scaleColor = new OrdinalInterpolator(groups);
+  
   var points = svg.selectAll('point').data(data);
   points.enter.append('circle')
       ..classed('point', true)

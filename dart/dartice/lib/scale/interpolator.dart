@@ -1,4 +1,5 @@
 library scale.interpolator;
+import 'dart:collection';
 
 abstract class Interpolator extends Function {
   Function call(x);
@@ -23,3 +24,28 @@ class NumericalInterpolator extends Interpolator {
   
   call(x) { return _apply(x);}
 }
+
+/**
+ * Works like a Partial Function by mapping a list of levels to another list of values. 
+ * If the values list is shorter than the levels, the values will get recycled.  This 
+ * is useful for color recycling if the number of levels is greater than the number of 
+ * colors (values).  
+ * 
+ */
+class OrdinalInterpolator extends Interpolator {
+  Map _data;
+  Function _apply;
+
+  OrdinalInterpolator(List levels, {List values}) {
+    if (values == null) {
+      _data = new Map.fromIterables(levels, new List.generate(levels.length, (i)=>i));
+    } else {
+      int N = values.length;
+      _data = new Map.fromIterables(levels, new List.generate(levels.length, (i) => values[i%N]));
+    }
+    _apply = (x) => _data[x]; 
+  }
+  
+  call(x) { return _apply(x);}
+}
+
