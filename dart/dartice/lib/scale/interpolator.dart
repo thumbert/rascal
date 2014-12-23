@@ -1,5 +1,6 @@
 library scale.interpolator;
-import 'dart:collection';
+
+//import 'dart:collection';
 
 abstract class Interpolator extends Function {
   Function call(x);

@@ -18,7 +18,13 @@ test_interpolator() {
       OrdinalInterpolator oi = new OrdinalInterpolator(groups, values: [1, 2, 3]);
       expect(groups.map((g) => oi(g)).toList(), [1, 2, 3, 1, 2]);
     });
+    test("ordinal interpolator with more levels", () {
+      List groups = ["A", "B", "C"];
+      OrdinalInterpolator oi = new OrdinalInterpolator(groups, values: [1, 2, 3, 4, 5]);
+      expect(groups.map((g) => oi(g)).toList(), [1, 2, 3]);
+    });
 
+    
 
   });
 

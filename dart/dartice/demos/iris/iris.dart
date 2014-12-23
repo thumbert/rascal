@@ -26,8 +26,6 @@ iris_from_scratch(data) {
       ..style('stroke', "#000000");
   border.exit.remove();
 
-
-  Function color = (int i) => "#31698A";
   var x = data.map((e) => e["Sepal.Length"]);
   var minX = min(x);
   var maxX = max(x);
@@ -41,8 +39,8 @@ iris_from_scratch(data) {
   List yValues = y.map((e) => scaleY(e)).toList();
 
   Theme theme = new DefaultTheme();
-  var groups = data.map((e) => e["Species"]).toSet();
-  var scaleColor = new OrdinalInterpolator(groups);
+  List groups = data.map((e) => e["Species"]).toSet().toList();
+  var groupScale = new OrdinalInterpolator(groups, values: theme.COLORS);
   
   var points = svg.selectAll('point').data(data);
   points.enter.append('circle')
@@ -51,9 +49,7 @@ iris_from_scratch(data) {
       ..attrWithCallback('data-row', (d, i, e) => i)
       ..attrWithCallback('cx', (d, i, e) => xValues[i])
       ..attrWithCallback('cy', (d, i, e) => yValues[i])
-      ..styleWithCallback('stroke', (d, i, e) {
-        return color(i);
-      })
+      ..styleWithCallback('stroke', (d, i, e) => groupScale(d["Species"]))
       ..styleWithCallback('fill', (d, i, e) => "#ffffff")
       ..style('fill-opacity', '0')
       ..style('opacity', '1');
