@@ -11,17 +11,24 @@ abstract class Theme extends Object with TickProperties, TextProperties {
   
   bool alignTicks;
   Color backgroundColor;
-  Color borderColor;
-  int borderWidth;
-
-  List COLORS;
-  List STRIP_COLORS;
   
-  //num height;
-  //num width;
+  /**
+   * The border is the rectangle around the plot area.  Some plots don't need it, 
+   * so I disable it for now. 
+   */
+  //Color borderColor;
+  //int borderWidth;
+
+  
+  int height;          // figure height
+  int width;           // figure width
 
 
-  // as multiple of text size
+  /**
+   * Margin controls the space between the edges of the plot area and the figure area. 
+   * It is given as a multiple of text size. 
+   * 
+   */ 
   List<num> get margin => [marginBottom, marginLeft, marginLeft, marginRight];
   num marginBottom;
   num marginLeft;
@@ -37,6 +44,8 @@ abstract class Theme extends Object with TickProperties, TextProperties {
   num spacingTop;
   num spacingRight;
 
+  List COLORS;         // list of colors to cycle through for lines, symbols, etc. 
+  List STRIP_COLORS;   // list of colors to cycle through the panel strips
 }
 
 
@@ -49,13 +58,19 @@ class DefaultTheme extends Theme {
   }
 
   DefaultTheme._internal() {
+    width = 500;    // figure width
+    height = 500;   // figure height
+    
     alignTicks = true;
     backgroundColor = new Color.fromRgb(255, 255, 255);
-    borderColor = new Color.fromRgb(0, 0, 0);
-    borderWidth = 0;
+    //borderColor = new Color.fromRgb(0, 0, 0);
+    //borderWidth = 0;
 
-    // Text Properties
-    textSize = 14;
+    /**
+     * Text Properties.  Many other relative dimensions get set relative to 
+     * textSize, for example cex. 
+     */
+    textSize = 14;                          
     textColor = new Color.fromRgb(0, 0, 0);
 
     // Tick Properties
@@ -74,7 +89,7 @@ class DefaultTheme extends Theme {
     marginRight = 4;
 
     plotBackgroundColor = new Color.fromRgb(255, 255, 255);
-    plotBorderWidth = 0;
+    //plotBorderWidth = 0;
 
     // distance between the chart area and the outside text as multiple of text size
     spacingBottom = 1;
@@ -95,6 +110,9 @@ class DefaultTheme extends Theme {
         "#ffcccc",
         "#ffffcc"];
 
+    /**
+     * Grid lines are reference lines. 
+     */
     Map REFERENCE_LINE = {
       "alpha": 1,
       "color": "#e6e6e6",
@@ -102,6 +120,9 @@ class DefaultTheme extends Theme {
       "lwd": 1
     };
 
+    /**
+     * Default symbol is an open circle
+     */
     Map PLOT_SYMBOL = {
       "alpha": 1,
       "cex": 0.8,

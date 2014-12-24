@@ -6,6 +6,7 @@ import 'package:stagexl/src/resources.dart';
 import 'package:dartice/scale/interpolator.dart';
 import 'package:dartice/theme/theme.dart';
 import 'package:dartice/plots/plot.dart';
+import 'dart:html' as html;
 
 
 from_scratch(data) {
@@ -21,7 +22,7 @@ from_scratch(data) {
       ..attr('y', 2)
       ..attr('width', 295)
       ..attr('height', 295)
-      ..style('shape-rendering', 'crispEdges')
+      ..style('shape-rendering', 'crispEdges')   // how to pass this in the style sheet!
       ..style('fill', "#ffffff")
       ..style('stroke-width', "1")
       ..style('stroke', "#000000");
@@ -60,7 +61,7 @@ from_scratch(data) {
 
 high_level( iris ) {
   
-  Plot p = new Plot()
+  Plot p = new Plot( html.querySelector('.iris_highlevel') )
     ..data = iris
     ..x = ((e) => e["Sepal.Length"])
     ..y = ((e) => e["Sepal.Width"])
