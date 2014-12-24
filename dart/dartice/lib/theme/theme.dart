@@ -6,6 +6,9 @@ import 'package:dartice/annotations/text.dart';
 
 
 abstract class Theme extends Object with TickProperties, TextProperties {
+  
+  static Theme currentTheme = new DefaultTheme();
+  
   bool alignTicks;
   Color backgroundColor;
   Color borderColor;

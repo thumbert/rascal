@@ -5,9 +5,10 @@ import 'dart:convert';
 import 'package:stagexl/src/resources.dart';
 import 'package:dartice/scale/interpolator.dart';
 import 'package:dartice/theme/theme.dart';
+import 'package:dartice/plots/plot.dart';
 
 
-iris_from_scratch(data) {
+from_scratch(data) {
   SelectionScope scope = new SelectionScope.selector('.iris_scratch');
   Selection svg = scope.append('svg:svg')
       ..attr('width', 300)
@@ -38,7 +39,7 @@ iris_from_scratch(data) {
   var scaleY = new NumericalInterpolator.fromPoints(minY, maxY, 10, 290);
   List yValues = y.map((e) => scaleY(e)).toList();
 
-  Theme theme = new DefaultTheme();
+  Theme theme = Theme.currentTheme;
   List groups = data.map((e) => e["Species"]).toSet().toList();
   var groupScale = new OrdinalInterpolator(groups, values: theme.COLORS);
   
@@ -57,13 +58,30 @@ iris_from_scratch(data) {
 
 }
 
+high_level( iris ) {
+  
+  Plot p = new Plot()
+    ..data = iris
+    ..x = ((e) => e["Sepal.Length"])
+    ..y = ((e) => e["Sepal.Width"])
+    ..group = ((e) => e["Species"])
+    ..type = ["g", "p"]
+    ..draw();
+
+  
+  
+}
+
+
 main() {
   ResourceManager rm = new ResourceManager()..addTextFile("table", "iris.json");
 
   rm.load().then((_) {
-    List data = JSON.decode(rm.getTextFile("table"));
+    List iris = JSON.decode(rm.getTextFile("table"));
 
-    iris_from_scratch(data);
+    from_scratch( iris );
+    
+    high_level( iris );
 
   });
 
