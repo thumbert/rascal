@@ -5,6 +5,10 @@ import 'package:dartice/theme/theme.dart';
 import 'dart:html' as html;
 import 'package:charted/selection/selection.dart';
 import 'package:dartice/core/aspect.dart';
+import 'package:dartice/renderers/points_renderer.dart';
+import 'package:dartice/renderers/renderer.dart';
+import 'package:charted/charted.dart' as charted;
+import 'package:dartice/scale/interpolator.dart';
 
 /**
  * The standard xyplot in lattice 
@@ -49,6 +53,13 @@ class Plot {
    */  
   List ylim;
   
+  List _xValues;        // in screen coordinates
+  List _yValues;        // in screen coordinates
+  List _groupValues;
+  List _panelValues;   
+  Interpolator scaleX;  
+  Interpolator scaleY;
+  Interpolator scaleGroup;
   
   html.Element host;
   SelectionScope _scope;
@@ -72,11 +83,38 @@ class Plot {
 
     
     
+    List<Renderer> renderers = type.map((e) {
+      switch (e) {
+        case "p" : 
+          return new PointsRenderer();
+      }
+    });    
     
+    renderers.forEach((renderer) => renderer.draw());
     
   }
   
-  
+  void prepareData() {
+    var _x = data.map( x );
+    var minX = charted.min(_x);
+    var maxX = charted.max(_x);
+    scaleX = new NumericalInterpolator.fromPoints(minX, maxX, 10, 290);
+    _xValues = _x.map((e) => scaleX(e)).toList();
+
+    var _y = data.map( y );
+    var minY = charted.min(_y);
+    var maxY = charted.max(_y);
+    scaleY = new NumericalInterpolator.fromPoints(minY, maxY, 10, 290);
+    _yValues = _y.map((e) => scaleY(e)).toList();
+    
+    List _groups = [0];
+    if (group != null) {
+      _groups = data.map( group ).toSet().toList();
+    } 
+    scaleGroup = new OrdinalInterpolator(_groups, values: theme.COLORS);
+
+    
+  }
   
 }
 

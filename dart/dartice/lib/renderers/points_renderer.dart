@@ -1,12 +1,8 @@
-library panel.panel_points;
-
+library renderers.points_renderer;
 import 'package:charted/selection/selection.dart';
+import 'package:dartice/renderers/renderer.dart';
 
-abstract class Panel {
-  
-}
-
-class PanelPoints extends Panel {
+class PointsRenderer extends Renderer {
   
   Selection _group;
   Selection _host;  
@@ -14,7 +10,7 @@ class PanelPoints extends Panel {
   List xValues;
   List yValues;
   
-  PanelPoints();
+  PointsRenderer();
   
   void draw() {
     _group = _host.append('g')..classed('panel-points');
@@ -31,6 +27,6 @@ class PanelPoints extends Panel {
          ..style('opacity', '0.5');
      
     
-  }
+  }  
   
 }
