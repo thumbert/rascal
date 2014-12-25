@@ -14,7 +14,7 @@ from_scratch(data) {
   Selection svg = scope.append('svg:svg')
       ..attr('width', 300)
       ..attr('height', 300);
-
+  
   DataSelection border = svg.selectAll('.border').data([0]);
   border.enter.append('rect');
   border
@@ -61,12 +61,12 @@ from_scratch(data) {
 
 high_level( iris ) {
   
-  Plot p = new Plot( html.querySelector('.iris_highlevel') )
+  new Plot( html.querySelector('.iris_highlevel') )
     ..data = iris
     ..x = ((e) => e["Sepal.Length"])
     ..y = ((e) => e["Sepal.Width"])
     ..group = ((e) => e["Species"])
-    ..type = ["g", "p"]
+    ..type = ["p"]
     ..draw();
 
   
