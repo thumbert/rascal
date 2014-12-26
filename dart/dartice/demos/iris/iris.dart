@@ -47,7 +47,7 @@ from_scratch(data) {
   var points = svg.selectAll('point').data(data);
   points.enter.append('circle')
       ..classed('point', true)
-      ..attr('r', 5)
+      ..attr('r', 6)
       ..attrWithCallback('data-row', (d, i, e) => i)
       ..attrWithCallback('cx', (d, i, e) => xValues[i])
       ..attrWithCallback('cy', (d, i, e) => yValues[i])

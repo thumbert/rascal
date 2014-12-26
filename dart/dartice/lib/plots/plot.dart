@@ -110,15 +110,23 @@ class Plot {
       } else {
         _groupValues = data.map(group).toSet().toList();
         scaleGroup = new OrdinalInterpolator(_groupValues, values: theme.COLORS);
-        col = (d, i, e) => scaleGroup( group(d) );
+        col = (d, i, e) => scaleGroup( group(data[i]) );
       }
     }
 
+    num panelHeight;
+    num panelWidth;
+    
+    if (_panelValues.length < 2) {
+      panelHeight = height;
+      panelWidth  = width;
+    } 
+    
     // map the renderers to use
     if (type != null) {
       renderers = type.map((String e) {
         if (e == "p") {
-          return new PointsRenderer(_x, _y, subscripts, col, _svggroup);
+          return new PointsRenderer(_x, _y, subscripts, theme, _svggroup, panelWidth, panelHeight, col: col);
         }
 //        switch (e) {
 //          case "p":

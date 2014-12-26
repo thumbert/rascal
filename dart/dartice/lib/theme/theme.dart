@@ -10,7 +10,7 @@ abstract class Theme extends Object with TickProperties, TextProperties {
   static Theme currentTheme = new DefaultTheme();
   
   bool alignTicks;
-  Color backgroundColor;
+  String backgroundColor;
   
   /**
    * The border is the rectangle around the plot area.  Some plots don't need it, 
@@ -62,7 +62,7 @@ class DefaultTheme extends Theme {
     height = 500;   // figure height
     
     alignTicks = true;
-    backgroundColor = new Color.fromRgb(255, 255, 255);
+    backgroundColor = "#ffffff"; //new Color.fromRgb(255, 255, 255);
     //borderColor = new Color.fromRgb(0, 0, 0);
     //borderWidth = 0;
 
@@ -113,6 +113,7 @@ class DefaultTheme extends Theme {
     /**
      * Grid lines are reference lines. 
      */
+    String gridLineColor = "#e6e6e6";
     Map REFERENCE_LINE = {
       "alpha": 1,
       "color": "#e6e6e6",
