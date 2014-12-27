@@ -26,7 +26,9 @@ export_json <- function()
   fname <- "../json/oats.json"
   writeLines(df2json(Oats), con=file(fname))
 
-
+  fname <- "../json/quakes.json"
+  writeLines(df2json(quakes), con=file(fname))
+  
   fname <- "../json/seatacWeather.json"
   writeLines(df2json(SeatacWeather), con=file(fname))
 

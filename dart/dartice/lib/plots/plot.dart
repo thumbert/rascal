@@ -2,12 +2,15 @@ library plot.plot;
 
 import 'package:dartice/theme/theme.dart';
 import 'dart:html' as html;
+import 'dart:math' as math;
 import 'package:charted/selection/selection.dart';
 import 'package:dartice/core/aspect.dart';
 import 'package:dartice/renderers/points_renderer.dart';
 import 'package:dartice/renderers/renderer.dart';
 import 'package:charted/charted.dart' as charted;
 import 'package:dartice/scale/interpolator.dart';
+import 'package:dartice/panel/panel.dart';
+import 'package:dartice/plots/layout.dart';
 
 /**
  * The standard xyplot in lattice 
@@ -52,19 +55,28 @@ class Plot {
    * scales are free. 
    */
   List ylim;
+  Layout layout;
+  
+  
   List<Renderer> renderers;
   int height; // svg height in px
   int width; // svg width in px
 
 
-  List _xValues; // in screen coordinates
-  List _yValues; // in screen coordinates
-  List _groupValues = [];
-  List _panelValues = [];
+  List xValues; 
+  List yValues; 
+  List groupValues = [];
+  List panelValues = [];
   Interpolator scaleX;
   Interpolator scaleY;
   Interpolator scaleGroup;
-
+  List<Panel> panels; 
+  
+  num plotAreaX; 
+  num plotAreaY;
+  num plotAreaHeight;
+  num plotAreaWidth;
+  
   html.Element host;
   SelectionScope _scope;
   Selection _svg, _svggroup;
@@ -76,7 +88,8 @@ class Plot {
 
     prepareData();
     
-    renderers.forEach((renderer) => renderer.draw());
+    panels.forEach((panel) => panel.draw());
+    
 
   }
 
@@ -95,48 +108,24 @@ class Plot {
       _svggroup = _svg.append('g')..classed('plot-wrapper');
     }
 
-    if (panel != null) {
-      _panelValues = data.map(panel).toSet().toList();
-    }
+    if (panel != null) 
+      panelValues = data.map(panel).toSet().toList();
     
-
-    var _x = data.map( x ).toList();
-    var _y = data.map( y ).toList();
-    var subscripts = null;
+    layout = Layout.defaultLayout( math.max(panelValues.length,1) );
+    
+    xValues = data.map( x ).toList();  // all the x values 
+    yValues = data.map( y ).toList();  // all the y values
     
     if (col == null) {
       if (group == null) {
         col = (d, i, e) => theme.COLORS.first;
       } else {
-        _groupValues = data.map(group).toSet().toList();
-        scaleGroup = new OrdinalInterpolator(_groupValues, values: theme.COLORS);
+        groupValues = data.map(group).toSet().toList();
+        scaleGroup = new OrdinalInterpolator(groupValues, values: theme.COLORS);
         col = (d, i, e) => scaleGroup( group(data[i]) );
       }
-    }
-
-    num panelHeight;
-    num panelWidth;
-    
-    if (_panelValues.length < 2) {
-      panelHeight = height;
-      panelWidth  = width;
-    } 
-    
-    // map the renderers to use
-    if (type != null) {
-      renderers = type.map((String e) {
-        if (e == "p") {
-          return new PointsRenderer(_x, _y, subscripts, theme, _svggroup, panelWidth, panelHeight, col: col);
-        }
-//        switch (e) {
-//          case "p":
-//            return new PointsRenderer(_x, _y, subscripts, col, _svggroup);
-//          default:
-//            throw new StateError("renderer type ${e} not implemented");
-//        }
-      }).toList();
-    }
-    
+    }    
+   
   }
 
 }

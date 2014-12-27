@@ -67,6 +67,8 @@ high_level( iris ) {
     ..y = ((e) => e["Sepal.Width"])
     ..group = ((e) => e["Species"])
     ..type = ["p"]
+    ..height = 300
+    ..width = 300
     ..draw();
 
   

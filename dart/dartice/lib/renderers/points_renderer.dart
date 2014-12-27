@@ -4,28 +4,29 @@ import 'package:dartice/renderers/renderer.dart';
 import 'package:charted/charted.dart' as charted;
 import 'package:dartice/scale/interpolator.dart';
 import 'package:dartice/theme/theme.dart';
+import 'package:dartice/plots/plot.dart';
 
 
 class PointsRenderer extends Renderer {
 
   String classed;
-  List x;                     // data for the x variable for all panels 
-  List y;                     // data for the y variable for all panels
-  List<int> subscripts;       // index of the elements that correspond to this panel
-  Theme theme;
+  List x;                     // data for the x variable for this panel 
+  List y;                     // data for the y variable for this panel
+  Plot plot;                  // the parent plot
   Selection _host;
-  int panelWidth;
-  int panelHeight;
+  int panelWidth;             // this panel width
+  int panelHeight;            // this panel height
   
   Function col;               // a function (d,i,e) => string color
   Function cex;               // a function (d,i,e) => percent of plotting text
   
+  Theme theme;
   num minX, maxX, minY, maxY;
   Interpolator scaleX, scaleY;
   
   
-  PointsRenderer(List this.x, List this.y, List<int> this.subscripts, 
-      Theme this.theme, 
+  PointsRenderer(List this.x, List this.y, 
+      Plot this.plot, 
       Selection this._host,
       int this.panelWidth, 
       int this.panelHeight, 
@@ -39,15 +40,19 @@ class PointsRenderer extends Renderer {
     maxY = charted.max(y);
     scaleY = new NumericalInterpolator.fromPoints(minY, maxY, 10, panelHeight - 10);
 
+    theme = plot.theme;
     
+    if (col == null)
+      col = (d,i,e) => theme.COLORS.first;
+    
+    if (cex == null) 
+      cex = (d,i,e) => 0.8;
   }
 
   void draw() {
     Selection _group;
     _group = _host.append('g')..classed(classed);
 
-    if (cex == null) 
-      cex = (d,i,e) => 0.8;
     
     var points = _group.selectAll(classed).data( y );
     points.enter.append('circle')
