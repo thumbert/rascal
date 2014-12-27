@@ -5,6 +5,7 @@ import 'package:charted/charted.dart' as charted;
 import 'package:dartice/scale/interpolator.dart';
 import 'package:dartice/theme/theme.dart';
 import 'package:dartice/plots/plot.dart';
+import 'package:dartice/panel/panel.dart';
 
 
 class PointsRenderer extends Renderer {
@@ -12,8 +13,10 @@ class PointsRenderer extends Renderer {
   String classed;
   List x;                     // data for the x variable for this panel 
   List y;                     // data for the y variable for this panel
+  int panelNumber;            // the number of the panel this corresponds to  
   Plot plot;                  // the parent plot
   Selection _host;
+  Panel panel;
   int panelWidth;             // this panel width
   int panelHeight;            // this panel height
   
@@ -26,15 +29,15 @@ class PointsRenderer extends Renderer {
   
   
   PointsRenderer(List this.x, List this.y, 
+                 int this.panelNumber, 
       Plot this.plot, 
       Selection this._host,
-      int this.panelWidth, 
-      int this.panelHeight, 
       {Function this.col, Function this.cex, String this.classed: "panel-points"}) {
     
+    panel = plot.panels[panelNumber];
     minX = charted.min(x);
     maxX = charted.max(x);
-    scaleX = new NumericalInterpolator.fromPoints(minX, maxX, 10, panelWidth - 10); //TODO 
+    scaleX = new NumericalInterpolator.fromPoints(minX, maxX, 10, panel.width - 10); //TODO 
     
     minY = charted.min(y);
     maxY = charted.max(y);

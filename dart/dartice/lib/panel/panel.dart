@@ -9,12 +9,12 @@ class Panel {
   int panelNumber;
   Plot plot;
   List<Renderer> renderers;
-  Selection _host;
+  Selection _host;               // the parent of this panel (the plotArea)
   
-  num panelX;           
-  num panelY;
-  num panelHeight;
-  num panelWidth;
+  num x;       // the screen x coordinate for the top-left corner of this panel           
+  num y;       // the screen y coordinate for the top-left corner of this panel
+  num width;   // the width of this panel in px
+  num height;  // the heigth of this panel in px
   
   bool _doStrip;
   
@@ -25,11 +25,11 @@ class Panel {
     
     
     if (plot.panelValues.length == 0) {
-      panelHeight = plot.plotAreaHeight;
-      panelWidth  = plot.plotAreaWidth;
+      height = plot.plotAreaHeight;
+      width  = plot.plotAreaWidth;
     } else {
-      panelHeight = plot.plotAreaHeight/plot.layout.nRows;
-      panelWidth  = plot.plotAreaWidth/plot.layout.nCols;
+      height = plot.plotAreaHeight/plot.layout.nRows;
+      width  = plot.plotAreaWidth/plot.layout.nCols;
     }
 
     if (panelName != null)
@@ -39,16 +39,17 @@ class Panel {
     if (plot.type != null) {
       renderers = plot.type.map((String e) {
         if (e == "p") {
-          return new PointsRenderer(_x, _y, subscripts, theme, _svggroup, panelWidth, panelHeight, col: col);
+          return new PointsRenderer(xValues, yValues, panelNumber, plot, _svggroup, col: plot.col);
         }
       }).toList();
     }
-  
     
     
-    int _panelI = plot.layout.rowIndex(panelNumber);
-    
-    panelX = 
+    int i = plot.layout.rowIndex(panelNumber);
+    int j = plot.layout.colIndex(panelNumber);
+    panelX = i*panelWidth;
+    panelY = j*panelHeight;
+        
   }
   
   

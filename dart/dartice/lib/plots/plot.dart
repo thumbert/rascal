@@ -56,6 +56,8 @@ class Plot {
    */
   List ylim;
   Layout layout;
+  Function groupOrder;    // to control the order of the groups
+  Function panelOrder;    // to control the order of the panels
   
   
   List<Renderer> renderers;
@@ -108,9 +110,11 @@ class Plot {
       _svggroup = _svg.append('g')..classed('plot-wrapper');
     }
 
-    if (panel != null) 
-      panelValues = data.map(panel).toSet().toList();
-    
+    if (panel != null) {
+      //Map pdata = 
+      panelValues = data.map( panel ).toSet().toList();
+    }
+      
     layout = Layout.defaultLayout( math.max(panelValues.length,1) );
     
     xValues = data.map( x ).toList();  // all the x values 
