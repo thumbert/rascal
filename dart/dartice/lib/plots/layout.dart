@@ -63,7 +63,7 @@ class Layout {
    * are no labels for the interior panels.
    * 
    */
-  Set<int> axesWithTickLabels(int panelNumber, Set<int> exteriorSides) {
+  Set<int> axesWithTicks(int panelNumber, Set<int> exteriorSides) {
     Set<int> res = new Set<int>();
     if (exteriorSides.isNotEmpty) {
       int i = rowIndex(panelNumber);
@@ -78,7 +78,8 @@ class Layout {
     return res;
   }
 
-  /* Find the exterior sides of a panel in a panel layout.
+  /**
+   * Find the exterior sides of a panel in a panel layout.
    * Useful for showing tick marks.  By default, 
    * tick marks are showed on exterior sides only. 
    * You may have somebody request a layout that results in some  
@@ -110,7 +111,7 @@ class Layout {
       // there is an external side 4 on the last panel
       if (i == lastRow && j == lastCol) extSides.add(4);
       // and the second to last row gets sides 3 on the unfilled panels
-      if (i == lastRow - 1 & j > lastCol) extSides.add(3);
+      if (i == lastRow - 1 && j > lastCol) extSides.add(3);
     }
 
 
