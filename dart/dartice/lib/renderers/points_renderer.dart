@@ -35,13 +35,13 @@ class PointsRenderer extends Renderer {
       {Function this.col, Function this.cex, String this.classed: "panel-points"}) {
     
     panel = plot.panels[panelNumber];
-    minX = charted.min(x);
-    maxX = charted.max(x);
+    minX = plot.xlim[0];
+    maxX = plot.xlim[1];
     scaleX = new NumericalInterpolator.fromPoints(minX, maxX, 10, panel.width - 10); //TODO 
     
-    minY = charted.min(y);
-    maxY = charted.max(y);
-    scaleY = new NumericalInterpolator.fromPoints(minY, maxY, 10, panelHeight - 10);
+    minY = plot.ylim[0];
+    maxY = plot.ylim[1];
+    scaleY = new NumericalInterpolator.fromPoints(minY, maxY, 10, panel.height - 10);
 
     theme = plot.theme;
     

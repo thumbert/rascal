@@ -96,8 +96,12 @@ main() {
   // make a map from a list, with values the index of the list
   //make3();  // {Jan: 0, Feb: 1, Mar: 2}
   
-  make4();
+  //make4();
   
-  
+  // can I have a map with a null key? -- YES
+  Map x = {"A": [1,2], null: [2,3], "C": [4,5,6]};
+  print(x);       // {A: [1, 2], null: [2, 3], C: [4, 5, 6]}  
+  print(x.keys);  // (A, null, C)
+  print(x[null]); // [2,3]
   
 }

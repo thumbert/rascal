@@ -55,20 +55,38 @@ class Plot {
    * scales are free. 
    */
   List ylim;
-  Layout layout;
-  Function groupOrder;    // to control the order of the groups
-  Function panelOrder;    // to control the order of the panels
+  /**
+   * A two element List<int> for manually specifiying the arrangement of the panels in number 
+   * of rows and columns, [nRows, nCols].  Number of panels in the layout to be larger than the 
+   * actual number of panels to plot.       
+   */
+  List<int> layout;
+  /**
+   * The order of the groupValues.  An optional List<String>. 
+   */
+  List<String> groupOrder;     
+  /**
+   * The order of the panelValues.  An optional List<String>. 
+   */
+  List<String> panelOrder;  
   
   
   List<Renderer> renderers;
-  int height; // svg height in px
-  int width; // svg width in px
+  /**
+   * Specify the height in pixels of the svg that contains the plot.
+   */
+  int height; 
+  /**
+   * Specify the width in pixels of the svg that contains the plot.
+   */  
+  int width; 
 
 
   List xValues; 
   List yValues; 
-  List groupValues = [];
-  List panelValues = [];
+  List<String> groupValues = [];
+  List<String> panelValues = [];
+  Map<String, List<int>> subscripts;   // from panelName to a List of indices for that panel 
   Interpolator scaleX;
   Interpolator scaleY;
   Interpolator scaleGroup;
@@ -81,8 +99,8 @@ class Plot {
   
   html.Element host;
   SelectionScope _scope;
-  Selection _svg, _svggroup;
-
+  Selection _svg, _svggroup;  
+  
   Plot(html.Element this.host);
 
   void draw() {
@@ -111,15 +129,32 @@ class Plot {
     }
 
     if (panel != null) {
-      //Map pdata = 
-      panelValues = data.map( panel ).toSet().toList();
+      data.asMap().forEach((idx,obs) => subscripts.putIfAbsent(panel(obs), () => []).add(idx));
+      panelValues = subscripts.keys.toList(growable: false);
+    } else {
+      subscripts = {null: new List.generate(data.length, (i) => i, growable: false)};
+    }
+    
+    if (layout == null) {
+      // if the layout is not set by hand, get the default one 
+      Layout _layout = Layout.defaultLayout( math.max(panelValues.length,1) );
+      layout = [_layout.nRows, _layout.nCols]; 
+    } else {
+      assert(layout.length == 2);      
+      assert(layout[0] * layout[1] >= subscripts.length);
     }
       
-    layout = Layout.defaultLayout( math.max(panelValues.length,1) );
+    // TODO:  be ugly and consider traversing the data only once instead of 8 times!!!
     
-    xValues = data.map( x ).toList();  // all the x values 
-    yValues = data.map( y ).toList();  // all the y values
+    xValues = data.map( x ).toList(growable: false);  // all the x values 
+    yValues = data.map( y ).toList(growable: false);  // all the y values
     
+    if (xlim == null) 
+      xlim = [charted.min(xValues), charted.max(xValues)];
+    if (ylim == null) 
+      ylim = [charted.min(yValues), charted.max(yValues)];
+    
+    // if the color function has not been specified, specify it here
     if (col == null) {
       if (group == null) {
         col = (d, i, e) => theme.COLORS.first;
@@ -130,6 +165,8 @@ class Plot {
       }
     }    
    
+    
+    
   }
 
 }
