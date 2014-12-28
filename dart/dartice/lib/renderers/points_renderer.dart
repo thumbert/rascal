@@ -5,7 +5,7 @@ import 'package:charted/charted.dart' as charted;
 import 'package:dartice/scale/interpolator.dart';
 import 'package:dartice/theme/theme.dart';
 import 'package:dartice/plots/plot.dart';
-import 'package:dartice/panel/panel.dart';
+import 'package:dartice/plots/panel.dart';
 
 
 class PointsRenderer extends Renderer {

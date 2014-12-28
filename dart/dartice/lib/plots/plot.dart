@@ -9,7 +9,7 @@ import 'package:dartice/renderers/points_renderer.dart';
 import 'package:dartice/renderers/renderer.dart';
 import 'package:charted/charted.dart' as charted;
 import 'package:dartice/scale/interpolator.dart';
-import 'package:dartice/panel/panel.dart';
+import 'package:dartice/plots/panel.dart';
 import 'package:dartice/plots/layout.dart';
 
 /**
@@ -97,6 +97,9 @@ class Plot {
   num plotAreaHeight;
   num plotAreaWidth;
   
+  /**
+   * The top html Element that contains the plot.
+   */
   html.Element host;
   SelectionScope _scope;
   Selection _svg, _svggroup;  
