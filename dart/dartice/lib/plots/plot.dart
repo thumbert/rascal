@@ -5,12 +5,12 @@ import 'dart:html' as html;
 import 'dart:math' as math;
 import 'package:charted/selection/selection.dart';
 import 'package:dartice/core/aspect.dart';
-import 'package:dartice/renderers/points_renderer.dart';
 import 'package:dartice/renderers/renderer.dart';
 import 'package:charted/charted.dart' as charted;
 import 'package:dartice/scale/interpolator.dart';
 import 'package:dartice/plots/panel.dart';
 import 'package:dartice/plots/layout.dart';
+import 'package:charted/core/core.dart';
 
 /**
  * The standard xyplot in lattice 
@@ -84,18 +84,15 @@ class Plot {
 
   List xValues; 
   List yValues; 
-  List<String> groupValues = [];
-  List<String> panelValues = [];
-  Map<String, List<int>> subscripts;   // from panelName to a List of indices for that panel 
+  List<String> groupNames = [];
+  List<String> panelNames = [];         
+  Map<String, List<int>> subscripts = new Map();   // from panelName to a List of indices for that panel 
   Interpolator scaleX;
   Interpolator scaleY;
   Interpolator scaleGroup;
   List<Panel> panels; 
   
-  num plotAreaX; 
-  num plotAreaY;
-  num plotAreaHeight;
-  num plotAreaWidth;
+  Rect plotArea;  // screen coordinates of the plot area
   
   /**
    * The top html Element that contains the plot.
@@ -131,16 +128,21 @@ class Plot {
       _svggroup = _svg.append('g')..classed('plot-wrapper');
     }
 
+    
     if (panel != null) {
-      data.asMap().forEach((idx,obs) => subscripts.putIfAbsent(panel(obs), () => []).add(idx));
-      panelValues = subscripts.keys.toList(growable: false);
+      var aux = data.asMap();
+      aux.forEach((idx,obs) {
+        //print("idx=${idx}, obs=${obs}");
+        subscripts.putIfAbsent(panel(obs), () => []).add(idx);
+      });
+      panelNames = subscripts.keys.toList(growable: false);
     } else {
       subscripts = {null: new List.generate(data.length, (i) => i, growable: false)};
     }
     
     if (layout == null) {
       // if the layout is not set by hand, get the default one 
-      Layout _layout = Layout.defaultLayout( math.max(panelValues.length,1) );
+      Layout _layout = Layout.defaultLayout( math.max(panelNames.length,1) );
       layout = [_layout.nRows, _layout.nCols]; 
     } else {
       assert(layout.length == 2);      
@@ -162,12 +164,20 @@ class Plot {
       if (group == null) {
         col = (d, i, e) => theme.COLORS.first;
       } else {
-        groupValues = data.map(group).toSet().toList();
-        scaleGroup = new OrdinalInterpolator(groupValues, values: theme.COLORS);
+        groupNames = data.map(group).toSet().toList();
+        scaleGroup = new OrdinalInterpolator(groupNames, values: theme.COLORS);
         col = (d, i, e) => scaleGroup( group(data[i]) );
       }
     }    
    
+    plotArea = new Rect(50, 50, 500, 250);  // TODO: fix me!!!
+    
+    // construct the panels 
+    if (panelNames.isEmpty) {
+      panels = [new Panel(null, this, _svggroup)];
+    } else {
+      panels = panelNames.map((String panelName) => new Panel(panelName, this, _svggroup)).toList();
+    }
     
     
   }

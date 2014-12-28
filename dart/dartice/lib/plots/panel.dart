@@ -5,25 +5,23 @@ import 'package:charted/selection/selection.dart';
 import 'package:dartice/renderers/renderer.dart';
 import 'package:dartice/plots/plot.dart';
 import 'package:dartice/plots/layout.dart';
+import 'package:dartice/renderers/points_renderer.dart';
+import 'package:charted/core/core.dart';
 
 class Panel {
   String panelName;
-  int panelNumber;
+  int panelNumber = 0;
   Plot plot;
   List<Renderer> renderers;
-  Selection _host; // selection for the html Element of this panel
+  Selection _host;   // selection for the html Element of this panel
 
-  num x; // the screen x coordinate for the top-left corner of this panel
-  num y; // the screen y coordinate for the top-left corner of this panel
-  num width; // the width of this panel in px
-  num height; // the heigth of this panel in px
-
+  Rect position;     // the screen coordinates of this panel
   List xValues = []; // the xValues associated with this panel
   List yValues = []; // the yValues associated with this panel
 
   bool _doStrip = true; // draw the strip
 
-  Panel(int this.panelNumber, String this.panelName, Plot this.plot, Selection this._host) {
+  Panel(String this.panelName, Plot this.plot, Selection this._host) {
 
     if (plot.panel != null) {
       // if you have panels
@@ -33,34 +31,34 @@ class Panel {
         yValues.add(plot.yValues[i]);
       });
 
+      panelNumber = plot.panelNames.indexOf(panelName);
       Layout layout = new Layout(plot.layout[0], plot.layout[1]);
+      num height = plot.plotArea.height / plot.layout[0];
+      num width = plot.plotArea.width / plot.layout[1];
       int i = layout.rowIndex(panelNumber);
       int j = layout.colIndex(panelNumber);
-      x = i * width;
-      y = j * height;
-      height = plot.plotAreaHeight / plot.layout[0];
-      width = plot.plotAreaWidth / plot.layout[1];
+      num x = i * width;
+      num y = j * height;
+      position = new Rect(x, y, width, height);
 
     } else {
       // if you don't have panels
       xValues = plot.xValues;
       yValues = plot.yValues;
-      x=0;
-      y=0;
-      height = plot.plotAreaHeight;
-      width = plot.plotAreaWidth;
+      position = new Rect(0, 0, plot.plotArea.width, plot.plotArea.height);
       _doStrip = false;
     }
-
+    
+    
     Selection _group;
-     _group = _host.append('g')..classed("panel-${panelName}");
-    // TODO:  do I need to do a translate()?  
+     _group = _host.append('g')..classed("panel-${panelNumber}");
+    // TODO:  do I need to do a translate()?  Yes I do!
     
     // map the renderers to use
     if (plot.type != null) {
       renderers = plot.type.map((String e) {
         if (e == "p") {
-          return new PointsRenderer(xValues, yValues, panelNumber, plot, _group, col: plot.col);
+          return new PointsRenderer(xValues, yValues, this, _group, col: plot.col);
         }
       }).toList();
     }
