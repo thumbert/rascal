@@ -29,6 +29,7 @@ class Plot {
   Function group; // an extractor for the group
   Function panel; // an extractor for the panel
   Function col; // a function to specify color (d,i,e) => Color String
+  Function markerSize;  // a function to control the size of the marker
 
   Aspect aspect = Aspect.current;
   /**
@@ -64,60 +65,61 @@ class Plot {
   /**
    * The order of the groupValues.  An optional List<String>. 
    */
-  List<String> groupOrder;     
+  List<String> groupOrder;
   /**
    * The order of the panelValues.  An optional List<String>. 
    */
-  List<String> panelOrder;  
-  
-  
+  List<String> panelOrder;
+
+
   List<Renderer> renderers;
   /**
    * Specify the height in pixels of the svg that contains the plot.
    */
-  int height; 
+  int height;
   /**
    * Specify the width in pixels of the svg that contains the plot.
-   */  
-  int width; 
+   */
+  int width;
 
 
-  List xValues; 
-  List yValues; 
+  List xValues;
+  List yValues;
   List<String> groupNames = [];
-  List<String> panelNames = [];         
-  Map<String, List<int>> subscripts = new Map();   // from panelName to a List of indices for that panel 
+  List<String> panelNames = [];
+  Map<String, List<int>> subscripts =
+      new Map(); // from panelName to a List of indices for that panel
   Interpolator scaleX;
   Interpolator scaleY;
   Interpolator scaleGroup;
-  List<Panel> panels; 
-  
-  Rect plotArea;  // screen coordinates of the plot area
-  
+  List<Panel> panels;
+
+  Rect plotArea; // screen coordinates of the plot area
+
   /**
    * The top html Element that contains the plot.
    */
   html.Element host;
   SelectionScope _scope;
-  Selection _svg, _svggroup;  
-  
+  Selection _svg, _svggroup;
+
   Plot(html.Element this.host);
 
   void draw() {
     assert(data != null);
 
     prepareData();
-    
+
     panels.forEach((panel) => panel.draw());
-    
+
 
   }
 
   void prepareData() {
-    
+
     if (width == null) width = theme.width;
     if (height == null) height = theme.height;
-    
+
     /* Create SVG element and other one-time initializations. */
     if (_scope == null) {
       _scope = new SelectionScope.element(host);
@@ -128,37 +130,37 @@ class Plot {
       _svggroup = _svg.append('g')..classed('plot-wrapper');
     }
 
-    
+
     if (panel != null) {
       var aux = data.asMap();
-      aux.forEach((idx,obs) {
+      aux.forEach((idx, obs) {
         //print("idx=${idx}, obs=${obs}");
         subscripts.putIfAbsent(panel(obs), () => []).add(idx);
       });
       panelNames = subscripts.keys.toList(growable: false);
     } else {
-      subscripts = {null: new List.generate(data.length, (i) => i, growable: false)};
+      subscripts = {
+        null: new List.generate(data.length, (i) => i, growable: false)
+      };
     }
-    
+
     if (layout == null) {
-      // if the layout is not set by hand, get the default one 
-      Layout _layout = Layout.defaultLayout( math.max(panelNames.length,1) );
-      layout = [_layout.nRows, _layout.nCols]; 
+      // if the layout is not set by hand, get the default one
+      Layout _layout = Layout.defaultLayout(math.max(panelNames.length, 1));
+      layout = [_layout.nRows, _layout.nCols];
     } else {
-      assert(layout.length == 2);      
+      assert(layout.length == 2);
       assert(layout[0] * layout[1] >= subscripts.length);
     }
-      
+
     // TODO:  be ugly and consider traversing the data only once instead of 8 times!!!
-    
-    xValues = data.map( x ).toList(growable: false);  // all the x values 
-    yValues = data.map( y ).toList(growable: false);  // all the y values
-    
-    if (xlim == null) 
-      xlim = [charted.min(xValues), charted.max(xValues)];
-    if (ylim == null) 
-      ylim = [charted.min(yValues), charted.max(yValues)];
-    
+
+    xValues = data.map(x).toList(growable: false); // all the x values
+    yValues = data.map(y).toList(growable: false); // all the y values
+
+    if (xlim == null) xlim = [charted.min(xValues), charted.max(xValues)];
+    if (ylim == null) ylim = [charted.min(yValues), charted.max(yValues)];
+
     // if the color function has not been specified, specify it here
     if (col == null) {
       if (group == null) {
@@ -166,20 +168,24 @@ class Plot {
       } else {
         groupNames = data.map(group).toSet().toList();
         scaleGroup = new OrdinalInterpolator(groupNames, values: theme.COLORS);
-        col = (d, i, e) => scaleGroup( group(data[i]) );
+        col = (d, i, e) => scaleGroup(group(data[i]));
       }
-    }    
-   
-    plotArea = new Rect(50, 50, 500, 250);  // TODO: fix me!!!
+    }
+
+    plotArea = new Rect(50, 50, 500, 250); // TODO: fix me!!!
+
+    if (markerSize == null) 
+      markerSize = (d) => (0.35*theme.textSize).round();
     
-    // construct the panels 
+    
+    // construct the panels
     if (panelNames.isEmpty) {
       panels = [new Panel(null, this, _svggroup)];
     } else {
       panels = panelNames.map((String panelName) => new Panel(panelName, this, _svggroup)).toList();
     }
-    
-    
+
+
   }
 
 }

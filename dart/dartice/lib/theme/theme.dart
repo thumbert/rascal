@@ -70,7 +70,7 @@ class DefaultTheme extends Theme {
      * Text Properties.  Many other relative dimensions get set relative to 
      * textSize, for example cex. 
      */
-    textSize = 14;                          
+    textSize = 12;                          
     textColor = new Color.fromRgb(0, 0, 0);
 
     // Tick Properties

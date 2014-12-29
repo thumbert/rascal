@@ -37,8 +37,8 @@ class Panel {
       num width = plot.plotArea.width / plot.layout[1];
       int i = layout.rowIndex(panelNumber);
       int j = layout.colIndex(panelNumber);
-      num x = i * width;
-      num y = j * height;
+      num x = j * width + plot.plotArea.x;
+      num y = i * height + plot.plotArea.y;
       position = new Rect(x, y, width, height);
 
     } else {
@@ -48,11 +48,14 @@ class Panel {
       position = new Rect(0, 0, plot.plotArea.width, plot.plotArea.height);
       _doStrip = false;
     }
-    
+    print("Panel number ${panelNumber}, position = $position");
     
     Selection _group;
-     _group = _host.append('g')..classed("panel-${panelNumber}");
-    // TODO:  do I need to do a translate()?  Yes I do!
+     _group = _host.append('g')
+        ..classed("panel-${panelNumber}")
+        ..attrWithCallback('transform', (d, i, c) =>
+                   'translate(${position.x}, ${position.y})');
+    
     
     // map the renderers to use
     if (plot.type != null) {

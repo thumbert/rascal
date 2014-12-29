@@ -39,13 +39,13 @@ class PointsRenderer extends Renderer {
 
     minY = plot.ylim[0];
     maxY = plot.ylim[1];
-    scaleY = new NumericalInterpolator.fromPoints(minY, maxY, 10, panel.position.height - 10);
+    scaleY = new NumericalInterpolator.fromPoints(minY, maxY, panel.position.height - 10, 10);
 
     theme = plot.theme;
 
     if (col == null) col = (d, i, e) => theme.COLORS.first;
 
-    if (cex == null) cex = (d, i, e) => 0.8;
+  //  if (cex == null) cex = (d, i, e) => 0.8;
   }
 
   void draw() {
@@ -56,7 +56,7 @@ class PointsRenderer extends Renderer {
     var points = _group.selectAll(classed).data(y);
     points.enter.append('circle')
         ..classed(classed, true)
-        ..attrWithCallback('r', (d, i, e) => (0.5 * cex(d, i, e) * theme.textSize).round())
+        ..attrWithCallback('r', (d, i, e) => panel.plot.markerSize(d))
         ..attrWithCallback('data-row', (d, i, e) => i)
         ..attrWithCallback('cx', (d, i, e) => scaleX(x[i]))
         ..attrWithCallback('cy', (d, i, e) => scaleY(y[i]))
