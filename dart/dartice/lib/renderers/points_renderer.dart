@@ -39,7 +39,7 @@ class PointsRenderer extends Renderer {
 
     minY = plot.ylim[0];
     maxY = plot.ylim[1];
-    scaleY = new NumericalInterpolator.fromPoints(minY, maxY, panel.position.height - 10, 10);
+    scaleY = new NumericalInterpolator.fromPoints(minY, maxY, panel.position.height - 10, 10 + panel.stripHeight);
 
     theme = plot.theme;
 

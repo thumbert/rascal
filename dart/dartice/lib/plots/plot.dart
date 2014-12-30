@@ -172,7 +172,7 @@ class Plot {
       }
     }
 
-    plotArea = new Rect(50, 50, 500, 250); // TODO: fix me!!!
+    plotArea = new Rect(50, 50, width-50-1, height-50-1); // TODO: fix me!!!
 
     if (markerSize == null) 
       markerSize = (d) => (0.35*theme.textSize).round();

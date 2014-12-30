@@ -13,14 +13,15 @@ class Panel {
   int panelNumber = 0;
   Plot plot;
   List<Renderer> renderers;
-  Selection _host;   // selection for the html Element of this panel
+  Selection _host; // selection for the html Element of this panel
 
-  Rect position;     // the screen coordinates of this panel
+  Rect position; // the screen coordinates of this panel
   List xValues = []; // the xValues associated with this panel
   List yValues = []; // the yValues associated with this panel
 
   bool _doStrip = true; // draw the strip
-
+  num stripHeight = 0;  // in pixels
+  
   Panel(String this.panelName, Plot this.plot, Selection this._host) {
 
     if (plot.panel != null) {
@@ -40,6 +41,8 @@ class Panel {
       num x = j * width + plot.plotArea.x;
       num y = i * height + plot.plotArea.y;
       position = new Rect(x, y, width, height);
+      stripHeight = (plot.theme.textSize*2);
+
 
     } else {
       // if you don't have panels
@@ -49,14 +52,46 @@ class Panel {
       _doStrip = false;
     }
     print("Panel number ${panelNumber}, position = $position");
-    
+
     Selection _group;
-     _group = _host.append('g')
+    _group = _host.append('g')
         ..classed("panel-${panelNumber}")
-        ..attrWithCallback('transform', (d, i, c) =>
-                   'translate(${position.x}, ${position.y})');
+        ..attrWithCallback('transform', (d, i, c) => 'translate(${position.x}, ${position.y})');
     
-    
+    if (_doStrip) {
+      DataSelection border = _group.selectAll('.border').data([0]);
+      border.enter.append('rect');
+      border
+          ..attr('width', position.width)
+          ..attr('height', position.height)
+          ..style('shape-rendering', 'crispEdges') // how to pass this in the style sheet!
+          ..style('fill', "#ffffff")
+          ..style('stroke-width', "1")
+          ..style('stroke', "#000000");
+      border.exit.remove();
+      DataSelection strip = _group.selectAll('.strip').data([0]);
+      strip.enter.append('rect');
+      strip
+          ..attr('width', position.width)
+          ..attr('height', stripHeight)
+          ..style('shape-rendering', 'crispEdges') // how to pass this in the style sheet!
+          ..style('fill', plot.theme.STRIP_COLORS.first)
+          ..style('stroke-width', "1")
+          ..style('stroke', "#000000");
+      strip.exit.remove();
+
+      DataSelection stripText = _group.selectAll('.stripTxt').data([0]);
+      stripText.enter.append('text');
+      stripText
+          ..text(panelName)
+          ..attr('x', position.width / 2)
+          ..attr('y', 0.5*(plot.theme.textSize + stripHeight))
+          ..attr('text-anchor', 'middle')
+          ..style('fill', "#000000");
+      stripText.exit.remove();
+    }
+
+
     // map the renderers to use
     if (plot.type != null) {
       renderers = plot.type.map((String e) {
