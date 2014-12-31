@@ -38,11 +38,11 @@ abstract class Theme extends Object with TickProperties, TextProperties {
   Color plotBackgroundColor;
   num plotBorderWidth;
 
-  List<num> get spacing => [spacingBottom, spacingLeft, spacingTop, spacingRight];
-  num spacingBottom;
-  num spacingLeft;
-  num spacingTop;
-  num spacingRight;
+  //List<num> get spacing => [spacingBottom, spacingLeft, spacingTop, spacingRight];
+  num labelSpacingBottom;
+  num labelSpacingLeft;
+  num labelSpacingTop;
+  num labelSpacingRight;
 
   List COLORS;         // list of colors to cycle through for lines, symbols, etc. 
   List STRIP_COLORS;   // list of colors to cycle through the panel strips
@@ -81,21 +81,27 @@ class DefaultTheme extends Theme {
     tickTextShift = 0; // how many points away is label from the tick, 0 = Centered
     tickTextSameSide = true;
 
-    // Distance between the outer edge of the chart and the plot area,
-    // as multiple of text size
-    marginBottom = 6;
-    marginLeft = 6;
-    marginTop = 4;
-    marginRight = 4;
+    /**
+     * Distance between the outer edge of the chart and the plot area
+     * as multiple of text size.  Should not be needed as it gets computed. 
+     */ 
+//    marginBottom = 6;
+//    marginLeft = 6;
+//    marginTop = 4;
+//    marginRight = 4;
 
     plotBackgroundColor = new Color.fromRgb(255, 255, 255);
     //plotBorderWidth = 0;
 
-    // distance between the chart area and the outside text as multiple of text size
-    spacingBottom = 1;
-    spacingLeft = 1;
-    spacingTop = 1;
-    spacingRight = 1;
+    /**
+     * Distance between the chart area (the tick endings) and the outside text 
+     * (lables and title) as multiple of text size.
+     * 
+     */
+    labelSpacingBottom = 1;
+    labelSpacingLeft = 1;
+    labelSpacingTop = 1;
+    labelSpacingRight = 1;
 
     COLORS = ['#4184F3', '#DB4437', '#F4B400', '#0F9D58', '#AA46BB', '#00ABC0',
               '#FF6F42', '#9D9C23', '#5B6ABF', '#EF6191', '#00786A', '#C1175A', 

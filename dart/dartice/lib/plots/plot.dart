@@ -37,7 +37,7 @@ class Plot {
    */
   String xlab;
   /**
-   * A text label for the y-axis
+   * A text label for the left y-axis
    */
   String ylab;
   /**
@@ -112,7 +112,17 @@ class Plot {
 
     panels.forEach((panel) => panel.draw());
 
-
+    DataSelection _xlab = _svggroup.selectAll('.xlab').data([0]);
+    _xlab.enter.append('text');
+    _xlab
+        ..text(xlab)
+        ..attr('x', width/2)
+        ..attr('y', height - theme.textSize)
+        ..attr('text-anchor', 'middle')
+        ..style('fill', "#000000");
+    _xlab.exit.remove();
+    
+    
   }
 
   void prepareData() {
@@ -172,7 +182,11 @@ class Plot {
       }
     }
 
-    plotArea = new Rect(50, 50, width-50-1, height-50-1); // TODO: fix me!!!
+    /**
+     * 
+     */
+    plotArea = new Rect(_spacingLeft(), _spacingTop(), width-_spacingLeft()-_spacingRight(), 
+        height-_spacingTop()-_spacingBottom()); // TODO: fix me!!!
 
     if (markerSize == null) 
       markerSize = (d) => (0.35*theme.textSize).round();
@@ -188,4 +202,17 @@ class Plot {
 
   }
 
+  // from the top side of the figure
+  num _spacingTop() => theme.textSize + (title != null ? theme.textSize*1.5 : 0); 
+  
+  // from the left side of the figure to the plotting area
+  num _spacingLeft() => theme.textSize + (ylab != null ? theme.textSize*1.5 : 0); 
+
+  // from the left side of the figure to the plotting area
+  num _spacingRight() => theme.textSize;   
+  
+  // from the bottom side of the figure
+  num _spacingBottom() => theme.textSize + (xlab != null ? theme.textSize*1.5 : 0); 
+  
+  
 }

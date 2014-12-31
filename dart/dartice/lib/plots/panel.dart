@@ -51,7 +51,6 @@ class Panel {
       position = new Rect(0, 0, plot.plotArea.width, plot.plotArea.height);
       _doStrip = false;
     }
-    print("Panel number ${panelNumber}, position = $position");
 
     Selection _group;
     _group = _host.append('g')
@@ -80,7 +79,7 @@ class Panel {
           ..style('stroke', "#000000");
       strip.exit.remove();
 
-      DataSelection stripText = _group.selectAll('.stripTxt').data([0]);
+      DataSelection stripText = _group.selectAll('.stripText').data([0]);
       stripText.enter.append('text');
       stripText
           ..text(panelName)
