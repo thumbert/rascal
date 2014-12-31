@@ -35,8 +35,8 @@ abstract class Theme extends Object with TickProperties, TextProperties {
   num marginTop;
   num marginRight;
 
-  Color plotBackgroundColor;
-  num plotBorderWidth;
+  String plotAreaBackgroundColor;
+  num plotAreaBorderWidth;
 
   //List<num> get spacing => [spacingBottom, spacingLeft, spacingTop, spacingRight];
   num labelSpacingBottom;
@@ -44,6 +44,9 @@ abstract class Theme extends Object with TickProperties, TextProperties {
   num labelSpacingTop;
   num labelSpacingRight;
 
+  num xlabRotation;
+  num ylabRotation;
+  
   List COLORS;         // list of colors to cycle through for lines, symbols, etc. 
   List STRIP_COLORS;   // list of colors to cycle through the panel strips
 }
@@ -90,7 +93,7 @@ class DefaultTheme extends Theme {
 //    marginTop = 4;
 //    marginRight = 4;
 
-    plotBackgroundColor = new Color.fromRgb(255, 255, 255);
+    plotAreaBackgroundColor = "#ffffff";
     //plotBorderWidth = 0;
 
     /**
@@ -103,6 +106,15 @@ class DefaultTheme extends Theme {
     labelSpacingTop = 1;
     labelSpacingRight = 1;
 
+    /**
+     * The rotation angle for the x label.
+     */
+    xlabRotation = 0;
+    /**
+     * The rotation angle for the y label.
+     */    
+    ylabRotation = -90;
+    
     COLORS = ['#4184F3', '#DB4437', '#F4B400', '#0F9D58', '#AA46BB', '#00ABC0',
               '#FF6F42', '#9D9C23', '#5B6ABF', '#EF6191', '#00786A', '#C1175A', 
               "#0080ff", "#ff00ff", "#006400", "#ff0000", "#ffa500", "#00ff00", 

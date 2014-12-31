@@ -47,7 +47,7 @@ plot_quakes( quakes ) {
 
 main() {
   
-  simple_panel();
+  //simple_panel();
   
   ResourceManager rm = new ResourceManager()..addTextFile("quakes", "quakes.json");
   rm.load().then((_) {

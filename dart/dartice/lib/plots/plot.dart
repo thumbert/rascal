@@ -29,7 +29,7 @@ class Plot {
   Function group; // an extractor for the group
   Function panel; // an extractor for the panel
   Function col; // a function to specify color (d,i,e) => Color String
-  Function markerSize;  // a function to control the size of the marker
+  Function markerSize; // a function to control the size of the marker
 
   Aspect aspect = Aspect.current;
   /**
@@ -94,6 +94,10 @@ class Plot {
   Interpolator scaleGroup;
   List<Panel> panels;
 
+  /**
+   * Screen coordinates of the plotting area.  This includes all the panels.  The panel strip and 
+   * the ticks of axes are included in the plotting area.
+   */
   Rect plotArea; // screen coordinates of the plot area
 
   /**
@@ -112,17 +116,34 @@ class Plot {
 
     panels.forEach((panel) => panel.draw());
 
-    DataSelection _xlab = _svggroup.selectAll('.xlab').data([0]);
-    _xlab.enter.append('text');
-    _xlab
-        ..text(xlab)
-        ..attr('x', width/2)
-        ..attr('y', height - theme.textSize)
-        ..attr('text-anchor', 'middle')
-        ..style('fill', "#000000");
-    _xlab.exit.remove();
-    
-    
+    if (xlab != null) {
+      DataSelection _xlab = _svggroup.selectAll('xlab').data([0]);
+      _xlab.enter.append('text');
+      _xlab
+          ..classed("xlab", true)
+          ..text(xlab)
+          ..attr('text-anchor', 'middle')
+          ..attr(
+              'transform',
+              'translate(${0.5*width}, ${height-0.5*theme.textSize}) rotate(${theme.xlabRotation})')
+          ..style('fill', "#000000");
+      _xlab.exit.remove();
+    }
+
+    if (ylab != null) {
+      DataSelection _ylab = _svggroup.selectAll('ylab').data([0]);
+      _ylab.enter.append('text');
+      _ylab
+          ..classed("ylab", true)
+          ..text(ylab)
+          ..attr('text-anchor', 'middle')
+          ..attr(
+              'transform',
+              'translate(${theme.textSize}, ${plotArea.y + 0.5*plotArea.height}) rotate(${theme.ylabRotation})')
+          ..style('fill', "#000000");
+      _ylab.exit.remove();
+    }
+
   }
 
   void prepareData() {
@@ -185,13 +206,15 @@ class Plot {
     /**
      * 
      */
-    plotArea = new Rect(_spacingLeft(), _spacingTop(), width-_spacingLeft()-_spacingRight(), 
-        height-_spacingTop()-_spacingBottom()); // TODO: fix me!!!
+    plotArea = new Rect(
+        _spacingLeft(),
+        _spacingTop(),
+        width - _spacingLeft() - _spacingRight(),
+        height - _spacingTop() - _spacingBottom()); // TODO: fix me!!!
 
-    if (markerSize == null) 
-      markerSize = (d) => (0.35*theme.textSize).round();
-    
-    
+    if (markerSize == null) markerSize = (d) => (0.35 * theme.textSize).round();
+
+
     // construct the panels
     if (panelNames.isEmpty) {
       panels = [new Panel(null, this, _svggroup)];
@@ -202,17 +225,17 @@ class Plot {
 
   }
 
-  // from the top side of the figure
-  num _spacingTop() => theme.textSize + (title != null ? theme.textSize*1.5 : 0); 
-  
-  // from the left side of the figure to the plotting area
-  num _spacingLeft() => theme.textSize + (ylab != null ? theme.textSize*1.5 : 0); 
+  // from the top side of the figure to the top side of the plotting area
+  num _spacingTop() => theme.textSize + (title != null ? theme.textSize * 1.5 : 0);
 
-  // from the left side of the figure to the plotting area
-  num _spacingRight() => theme.textSize;   
-  
-  // from the bottom side of the figure
-  num _spacingBottom() => theme.textSize + (xlab != null ? theme.textSize*1.5 : 0); 
-  
-  
+  // from the left side of the figure to the left side of the plotting area
+  num _spacingLeft() => theme.textSize + (ylab != null ? theme.textSize * 1.5 : 0);
+
+  // from the right side of the figure to the right side plotting area
+  num _spacingRight() => theme.textSize;
+
+  // from the bottom side of the figure to the bottom side of the plotting area
+  num _spacingBottom() => theme.textSize + (xlab != null ? theme.textSize * 1.5 : 0);
+
+
 }

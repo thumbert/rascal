@@ -9,6 +9,7 @@ import 'package:dartice/plots/plot.dart';
 import 'dart:html' as html;
 
 
+
 from_scratch(data) {
   SelectionScope scope = new SelectionScope.selector('.iris_scratch');
   Selection svg = scope.append('svg:svg')
@@ -56,7 +57,20 @@ from_scratch(data) {
       ..style('fill-opacity', '0')
       ..style('opacity', '1');
 
-
+  DataSelection _ylab = svg.selectAll('ylab').data([0]);
+  _ylab.enter.append('text');
+  _ylab
+      ..text("Sepal.Width")
+      ..classed("ylab", true)
+      ..attr('text-anchor', 'middle')
+      ..attr('transform', 'translate(20,150) rotate(-90)')
+      ..style('fill', "#000000");
+  //_ylab.exit.remove();
+  html.Element _ylabE = html.querySelector(".ylab");
+  var bb = _ylabE.getBoundingClientRect();
+  print(bb);
+  
+  
 }
 
 high_level( iris ) {
@@ -84,7 +98,7 @@ main() {
 
     from_scratch( iris );
     
-    high_level( iris );
+    //high_level( iris );
 
   });
 
