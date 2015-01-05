@@ -10,6 +10,7 @@ dependencies:
   html5lib: any
   intl: any
   mongo_dart: any
+  more: any
   polymer: any
   polymer_elements: any
   polymer_expressions: any

@@ -35,7 +35,7 @@ main() {
   y.removeWhere((p) => p.age < 20);
   print(y);
   
-  // create a mixed type List 
+  // create a mixed type List, for example for a time-series 
   var dt = new DateTime(2014);
   List res = [];
   res.add([dt]..addAll(new List.generate(4, (i)=> i)));
