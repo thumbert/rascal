@@ -1,21 +1,26 @@
 library test_median;
 
+import 'package:unittest/unittest.dart';
 import 'package:demos/math/stats/median.dart';
 
-//import 'package:unittest/unittest.dart';
-//import 'package:demos/math/stats/median.dart';
 
 main() {
   print("Hi");
 
   List x = 'KRATELEPUIMQCXOS'.split("");
   //x.sort();
-  print(x);
-  
+  print(x);  
   
   Quantile q = new Quantile(x);
-  q.sort();
+  //q.sort();
   print(q.x);
+  
+  print( q.minK(15) );
+  
+//  test("k-th min element", () {
+//    var res = [0, 3, 5, 15].map((k) => q.minK( k )).toList();
+//    expect(res, ['A', 'E', 'K', 'X']);
+//  });
   
 }
 
@@ -30,7 +35,4 @@ main() {
 //  
 //  
 //  
-////  test("median", () {
-////    expect(quickSelect([5,4,2,1,3], 3), 3);
-////  });
 //}
