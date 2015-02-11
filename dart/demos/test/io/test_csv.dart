@@ -1,6 +1,7 @@
 library test_csv;
 
 import 'package:csv/csv.dart';
+import 'dart:io';
 
 var seatac = """"month","day","year","max.temp","record.max","normal.max","min.temp","record.min","normal.min","precip","record.precip","normal.precip","time.max","time.min"
 "January",1,2007,43,58,45,34,10,35,0.13,1.37,0.17,1509,13
@@ -122,5 +123,12 @@ main() {
   print(res);
   
   
+  // performance is very bad.  It takes dart 1 min to parse this file.  R parses it in < 5 sec. 
+  print("Parsing a large file ...");
+  Stopwatch stopwatch = new Stopwatch()..start();
+  var str = new File("20150206_20150206_PRC_LMP_DAM_LMP_v1.csv").readAsStringSync();
+  List<List<String>> aux = const CsvToListConverter(eol: "\n").convert(str);
+  print("Took ${stopwatch.elapsed} to convert csv");
+  print(aux.length);
   
 }
