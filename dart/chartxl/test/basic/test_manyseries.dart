@@ -7,6 +7,20 @@ import 'package:chartxl/src/chart.dart';
 //import 'package:chartxl/src/grid.dart';
 import 'package:csv/csv.dart';
 
+List _formatData(List<List<String>> input) {
+  
+  // need to sort the data
+  
+  List out = input.map((row) => [
+    DateTime.parse(row[0]).toUtc(),    // Hour Beginning GMT
+    row[6],                            // node name  
+    num.parse(row[14])                 // LMP
+    ]).toList();
+  
+  
+  return out;
+}
+
 
 main() {
   ResourceManager resourceManager;
@@ -26,10 +40,12 @@ main() {
   renderLoop.addStage(stage);
 
   resourceManager = new ResourceManager()
-      ..addTextFile("table", "../datasets/20150206_20150206_PRC_LMP_DAM_LMP_v1.csv")
+      ..addTextFile("table", "../datasets/20150206_20150206_PRC_LMP_DAM_LMP_short.csv")
       ..load().then((result) {
-        var data = decoder.convert(resourceManager.getTextFile("table"));
-        print(data.length);
+        var aux = const CsvToListConverter(eol: "\n").convert(resourceManager.getTextFile("table"));
+        print(aux.length);
+        
+        
         
         Chart chart = new Chart(900, 900)
             ..data = data
