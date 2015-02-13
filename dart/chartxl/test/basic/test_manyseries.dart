@@ -7,6 +7,7 @@ import 'package:chartxl/src/chart.dart';
 //import 'package:chartxl/src/grid.dart';
 import 'package:csv/csv.dart';
 import 'package:more/ordering.dart';
+import 'package:chartxl/plots/plot.dart';
 
 List _formatData(List<List<String>> input) {
   
@@ -29,8 +30,6 @@ List _formatData(List<List<String>> input) {
 
 main() {
   ResourceManager resourceManager;
-  final csvCodec = new CsvCodec();
-  final decoder = csvCodec.decoder;
     
   // setup the Stage and RenderLoop
   html.CanvasElement canvas = html.querySelector('#stage');
@@ -51,13 +50,13 @@ main() {
         
         List data = _formatData(aux);
         
-        Chart chart = new Chart(900, 900)
+        Plot plot = new Plot()
             ..data = data
-            ..xData = ((e) => e["Petal.Length"])
-            ..yData = ((e) => e["Petal.Width"])
-            ..groups = ((e) => e["Species"])
+            ..xFun = ((e) => e[0])
+            ..yFun = ((e) => e[1])
+            ..groupFun = ((e) => e[2])
             ..draw();
-        stage.addChild(chart);
+        stage.addChild( plot );
       });
 
 
