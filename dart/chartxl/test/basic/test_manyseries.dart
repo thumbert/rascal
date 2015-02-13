@@ -6,17 +6,22 @@ import 'package:stagexl/stagexl.dart';
 import 'package:chartxl/src/chart.dart';
 //import 'package:chartxl/src/grid.dart';
 import 'package:csv/csv.dart';
+import 'package:more/ordering.dart';
 
 List _formatData(List<List<String>> input) {
   
-  // need to sort the data
-  
-  List out = input.map((row) => [
+  // each element of the list is [datetime, nodeName, LMP]
+  List<List> out = input.skip(1).map((row) => [
     DateTime.parse(row[0]).toUtc(),    // Hour Beginning GMT
     row[6],                            // node name  
-    num.parse(row[14])                 // LMP
+    row[14]                 // LMP
     ]).toList();
   
+  var ord = new Ordering.natural();
+  Ordering byTimestamp = ord.onResultOf((e) => e[0]);
+  Ordering byName= ord.onResultOf((e) => e[1]);
+  Ordering byNameTimestamp = byName.compound( byTimestamp );
+  byNameTimestamp.sort(out);
   
   return out;
 }
@@ -43,9 +48,8 @@ main() {
       ..addTextFile("table", "../datasets/20150206_20150206_PRC_LMP_DAM_LMP_short.csv")
       ..load().then((result) {
         var aux = const CsvToListConverter(eol: "\n").convert(resourceManager.getTextFile("table"));
-        print(aux.length);
         
-        
+        List data = _formatData(aux);
         
         Chart chart = new Chart(900, 900)
             ..data = data

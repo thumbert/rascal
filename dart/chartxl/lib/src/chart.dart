@@ -156,6 +156,3 @@ class Chart extends DisplayObjectContainer {
   
   
 }
-
-
-

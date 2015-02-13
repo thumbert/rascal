@@ -61,7 +61,7 @@ sorting2() {
   // Sort with nulls
   var natural = new Ordering.natural();  
   var ordering = natural.nullsLast();
-  print(ordering.sorted([2, null, 3, 1]));
+  print(ordering.sorted([2, null, 3, 1])); 
 
   // explicit sort
   var byMonth = new Ordering.explicit(["Jan", "Feb", "Mar", "Apr"]);
@@ -75,8 +75,9 @@ sorting2() {
               ["LAX", "Feb", 58]];
   var byCode = natural.onResultOf((obs) => obs[0]);
   print(byCode.sorted(data));
+  var byMonth2 = natural.onResultOf((obs) => obs[1]);
   
-  var byCodeMonth = byCode.compound(byMonth.onResultOf((obs) => obs[1]));
+  var byCodeMonth = byCode.compound( byMonth2 );
   print(byCodeMonth.sorted(data));  // works well and it's readable
 
 }
@@ -90,6 +91,8 @@ Map groupBy(Iterable x, Function f) {
 
 
 void main() {
+
+  sorting2();
   
   // replicate values
   print([1,2,3].expand((e) => new List.filled(5, e)));  
