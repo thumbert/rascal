@@ -100,11 +100,11 @@ class Plot extends DisplayObjectContainer {
   Rect plotArea;
 
 
-  Plot() {
+  Plot(this.width, this.height) {
     // use the stage dimensions for plot dimensions if not specified
     // TODO: stage is null at this stage as the plot has not been tied to a stage ... 
-    width = this.stage.width;     
-    height = this.stage.height;
+    //width = this.stage.width;     
+    //height = this.stage.height;
   }
 
   void draw() {

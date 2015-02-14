@@ -32,12 +32,13 @@ main() {
   ResourceManager resourceManager;
     
   // setup the Stage and RenderLoop
-  html.CanvasElement canvas = html.querySelector('#stage');
-  var stage = new Stage(canvas, width: canvas.width, height: canvas.height);
-  canvas.width = 900;
-  canvas.height = 900;
-  stage.scaleMode = StageScaleMode.NO_SCALE;
-  stage.align = StageAlign.TOP_LEFT;
+//  html.CanvasElement canvas = html.querySelector('#stage');
+//  var stage = new Stage(canvas, width: canvas.width, height: canvas.height);
+//  canvas.width = 900;
+//  canvas.height = 900;
+//  stage.scaleMode = StageScaleMode.NO_SCALE;
+//  stage.align = StageAlign.TOP_LEFT;
+  var stage = new Stage( html.querySelector('#stage') );
   stage.backgroundColor = Color.AliceBlue;
 
   var renderLoop = new RenderLoop();
@@ -50,7 +51,7 @@ main() {
         
         List data = _formatData(aux);
         
-        Plot plot = new Plot()
+        Plot plot = new Plot(600, 600)
             ..data = data
             ..xFun = ((e) => e[0])
             ..yFun = ((e) => e[1])

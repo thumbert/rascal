@@ -8,6 +8,10 @@ packages
 *.dart.js
 .pub/
 
+// some big csv files that I don't want in the repo.  
+dart/chartxl/test/datasets/20150206_20150206_PRC_LMP_DAM_LMP_short.csv
+dart/chartxl/test/datasets/20150206_20150206_PRC_LMP_DAM_LMP_v1.csv
+dart/demos/test/io/20150206_20150206_PRC_LMP_DAM_LMP_v1.csv
 
 packages/
 dart/utilio/bin/packages
