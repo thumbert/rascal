@@ -1,13 +1,11 @@
 library plot.plot;
 
-import 'dart:html' as html;
-import 'dart:math' as math;
+//import 'dart:math' as math;
 import 'package:chartxl/theme/theme.dart';
 import 'package:chartxl/core/aspect.dart';
 import 'package:chartxl/renderers/renderer.dart';
 import 'package:charted/charted.dart' as charted;
 import 'package:chartxl/scale/interpolator.dart';
-import 'package:chartxl/plots/panel.dart';
 import 'package:charted/core/core.dart';
 import 'package:stagexl/stagexl.dart';
 
@@ -92,7 +90,7 @@ class Plot extends DisplayObjectContainer {
   Interpolator xScale;
   Interpolator yScale;
   Interpolator scaleGroup;
-  List<Panel> panels;
+  //List<Panel> panels;
 
   /**
    * Screen coordinates of the plotting area.  
@@ -162,7 +160,6 @@ class Plot extends DisplayObjectContainer {
         width - _spacingLeft() - _spacingRight(),
         height - _spacingTop() - _spacingBottom()); // TODO: fix me!!!
 
-    //if (markerSize == null) markerSize = (d) => (0.35 * theme.textSize).round();
 
   }
 
