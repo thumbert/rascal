@@ -1,5 +1,10 @@
 library container;
 
+/**
+ * Two series in a plotting area, with selection and tooltip.
+ */
+
+
 import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart';
 
@@ -26,16 +31,16 @@ class Line extends Sprite {
   List<num> yData;
   int color;
   String seriesName;
-  TextField textField;
+  TextField tooltip;
   
   Line(this.xData, this.yData, {this.color: Color.Tomato, this.seriesName}) {
     draw();
     graphics.strokeColor(color, width=1.5);    
-    textField = new TextField( seriesName )
+    tooltip = new TextField( seriesName )
       ..x=250
       ..y=50
       ..alpha = 0;
-    //addChild(textField);
+    stage.addChild(tooltip);
     
     onMouseOver.listen( _onMouseOver );
     onMouseOut.listen( _onMouseOut );
@@ -49,12 +54,15 @@ class Line extends Sprite {
   }
   
   _onMouseOver( MouseEvent e) {
-    textField.alpha = 1;
+    tooltip.x = stage.mouseX + 15;
+    tooltip.y = stage.mouseY - 15;
+    tooltip.alpha = 1;
     graphics.clear();
     draw();
     graphics.strokeColor(color, width=5);    
   }
   _onMouseOut( MouseEvent e) {
+    tooltip.alpha = 0;
     graphics.clear();
     draw();
     graphics.strokeColor(color, width=1.5);
@@ -70,6 +78,7 @@ void main() {
   List xData = new List.generate(7, (i) => 50 + 100*i);
   List y1Data = [50, 150, 300, 375, 325, 275, 315];
   List y2Data = [100, 250, 250, 305, 225, 255, 325];
+  List y3Data = [5, 200, 200, 225, 125, 155, 125];
   
   var area = new PlotArea(700, 400)
     ..x = 50
@@ -78,6 +87,7 @@ void main() {
   
   area.addChild( new Line(xData, y1Data, color: Color.Tomato, seriesName:"Series 1") );
   area.addChild( new Line(xData, y2Data, color: Color.BlueViolet, seriesName:"Series 2") );
+  area.addChild( new Line(xData, y3Data, color: Color.CornflowerBlue, seriesName:"Series 3") );
   
    
 }
