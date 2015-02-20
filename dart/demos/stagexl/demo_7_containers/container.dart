@@ -60,6 +60,7 @@ class Line extends Sprite {
     graphics.clear();
     draw();
     graphics.strokeColor(color, width=5);    
+    parent.setChildIndex(this, parent.numChildren-1);  // put this line in the forefront
   }
   _onMouseOut( MouseEvent e) {
     tooltip.alpha = 0;
