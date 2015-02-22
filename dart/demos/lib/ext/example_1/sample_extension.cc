@@ -7,19 +7,20 @@
 #include "include/dart_api.h"
 #include "include/dart_native_api.h"
 
-
+// forward declaration, implementation is below
 Dart_NativeFunction ResolveName(Dart_Handle name,
                                 int argc,
                                 bool* auto_setup_scope);
 
-
+// this is called when the extension is loaded 
+// The name of the initialization function is the extension name followed
+// by _Init. 
 DART_EXPORT Dart_Handle sample_extension_Init(Dart_Handle parent_library) {
   if (Dart_IsError(parent_library)) {
     return parent_library;
   }
 
-  Dart_Handle result_code =
-      Dart_SetNativeResolver(parent_library, ResolveName, NULL);
+  Dart_Handle result_code = Dart_SetNativeResolver(parent_library, ResolveName, NULL);
   if (Dart_IsError(result_code)) {
     return result_code;
   }
@@ -35,7 +36,10 @@ Dart_Handle HandleError(Dart_Handle handle) {
   return handle;
 }
 
-
+// needs the arguments for type signature, not used anywhere else
+// return type is ALWAYS void
+// Native functions get their arguments in a Dart_NativeArguments structure
+// and return their results with Dart_SetReturnValue.
 void SystemRand(Dart_NativeArguments arguments) {
   Dart_EnterScope();
   Dart_Handle result = HandleError(Dart_NewInteger(rand()));
@@ -43,7 +47,7 @@ void SystemRand(Dart_NativeArguments arguments) {
   Dart_ExitScope();
 }
 
-
+// here it uses the first of these arguments
 void SystemSrand(Dart_NativeArguments arguments) {
   Dart_EnterScope();
   bool success = false;
@@ -140,7 +144,7 @@ FunctionLookup function_list[] = {
     {"SystemRand", SystemRand},
     {"SystemSrand", SystemSrand},
     //{"RandomArray_ServicePort", randomArrayServicePort},
-    {NULL, NULL}};
+    {NULL, NULL}};    // not sure why this is here ... 
 
 
 FunctionLookup no_scope_function_list[] = {
@@ -151,6 +155,7 @@ FunctionLookup no_scope_function_list[] = {
 Dart_NativeFunction ResolveName(Dart_Handle name,
                                 int argc,
                                 bool* auto_setup_scope) {
+  // If we fail, we return NULL, and Dart throws an exception.
   if (!Dart_IsString(name)) {
     return NULL;
   }
