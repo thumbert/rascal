@@ -8,7 +8,7 @@ main(){
   
   print(t2);
   
-  print(t2.i1);
+  print(t2);
   
   
 }

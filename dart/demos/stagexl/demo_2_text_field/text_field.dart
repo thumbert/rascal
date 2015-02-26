@@ -11,15 +11,16 @@ void main() {
   var renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
 
-  var textField = new TextField();
+  TextField textField = new TextField();
   textField.defaultTextFormat = new TextFormat("Arial", 22, Color.Black, bold: true);
   textField.text = "test";
   textField.background = true;
   textField.backgroundColor = Color.LightGray;
-  textField.width = 700;
-  textField.height = 30;
+  textField.width  = 700;
+  textField.height = 300;
   textField.x = 50;
   textField.y = 100;
+
 
   stage.addChild(textField);
   stage.focus = textField;

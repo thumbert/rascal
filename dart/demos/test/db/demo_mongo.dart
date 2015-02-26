@@ -2,6 +2,9 @@ library demo_mongo;
 
 import 'package:mongo_dart/mongo_dart.dart';
 
+/**
+ * Show basic usage of the MongoDb from Dart
+ */
 
 // http://openmymind.net/mongodb.pdf
 
@@ -9,57 +12,114 @@ var data = [{
     'name': 'Aurora',
     'gender': 'f',
     'weight': 450
-  }, {
+}, {
     'name': 'Barty',
     'gender': 'm',
     'weight': 550
-  },];
+} ];
 
 
 main() {
+  print("Original data:");
+  print(data);
 
   Db db = new Db('mongodb://127.0.0.1/test');
   DbCollection coll;
+
   db.open().then((_) {
-    print("Connection open");
+    print("\nInsert original data (2 unicorns) in the db.");
     coll = db.collection("unicorns");
     coll.remove(); // clean up previous mess
-    db.ensureIndex('unicorns', keys: {'name': 1}, unique: true);
 
-    print("Insert data one by one");
+    print("Force the index (the unicorn name) to be unique.");
+    /** This guarantees that if you try to insert a unicorn with
+     *  the same name as an already existing unicorn in the db,
+     *  the insertion will fail.
+     */
+    db.ensureIndex('unicorns', keys: {
+        'name': 1
+    }, unique: true);
+
     data.forEach((uni) {
       coll.insert(uni);
     });
+
+
   }).then((_) {
     return coll.count().then((v) {
-      print("There are $v documents in the collection");
+      if (v == data.length) {
+        print("\n${data.length} documents inserted OK.");
+      }
     });
+
+
   }).then((_) {
-    print('Finding Barty for inspection:');
+    print('\nCalling unicorn Barty for inspection:');
     return coll.find({
-      'name': 'Barty'
+        'name': 'Barty'
     }).toList().then((e) {
       print(e);
     });
+
+
   }).then((_) {
-    print("Find a u-corn that doesn't exist!");
-    coll.find({'name': 'Catherina'}).toList().then((e) {
+    print("\nFind a unicorn that doesn't exist (looking for Catherina)!");
+    coll.find({
+        'name': 'Catherina'
+    }).toList().then((e) {
       //it does not get here EVER!
-      print(e.length);
+      print("Found $e");
     });
-    return coll.count({'name': 'Catherina'}).then((v){
+    return coll.count({
+        'name': 'Catherina'
+    }).then((v) {
       // it doesn't get here EVER!
-      print("There are $v u-corns called Catherina!");
+      print("There are $v unicorns called Catherina!");
     });
+
+
   }).then((_) {
-    //db.unicorns.ensureIndex({name: 1}, {unique: true})
-    print('Inserting another Aurora u-corn (should not be allowed)');
-    return 
-      coll.insert({'name': 'Aurora', 'gender': 'f', 'weight': 330}).then((_){
+    print('\nInserting another unicorn with name Aurora (should not be allowed)');
+    return
+      coll.insert({
+          'name': 'Aurora', 'gender': 'f', 'weight': 330
+      }).then((_) {
       }, onError: (e) => print(e));
+
+
   }).then((_) {
-    print("Closing the db");
+    /**
+     * What happens when you insertAll and one of the entries has a conflict?
+     * Devon makes it (no conflict), Aurora triggers an error and the execution stops.
+     * Ellie doesn't make it in the db.
+     */
+    var aux = [{
+        'name': 'Devon', 'gender': 'm', 'weight': 222
+    }, {
+        'name': 'Aurora', 'gender': 'f', 'weight': 330
+    }, {
+        'name': 'Ellie', 'gender': 'f', 'weight': 440
+    }];
+    print('\nInserting ${aux.length} unicorns with insertAll (Aurora should conflict): \n$aux.');
+    return coll.insertAll(aux).then((_) {
+    }, onError: (e) => print(e));
+
+
+  }).then((_) {
+    return coll.count().then((v) {
+      print('\nThere are now $v documents in the collection.');
+    });
+
+
+  }).then((_) {
+    return coll.find().toList().then((List v){
+      var names = v.map((e) => e['name']).join(', ');
+      print('Names of unicorns in db are: $names.  Ellie didn\'t make it.');
+    });
+
+
+  }).then((_) {
+    print("\nClosing the db");
     return db.close();
   });
-
 }

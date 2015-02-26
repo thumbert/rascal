@@ -6,7 +6,8 @@ import 'package:csv/csv.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
-final Db db = new Db('mongodb://127.0.0.1/myiso'); // will create db if not existing already
+final Db db = new Db('mongodb://127.0.0.1/myiso');
+// will create db if not existing already
 final dateFormat = new DateFormat("MM/dd/yyyy HH:mm:ss");
 final csvCodec = new CsvCodec();
 
@@ -14,12 +15,12 @@ final csvCodec = new CsvCodec();
  * Get all the relevant files
  */
 List<File> list_files() {
-  
+
   var dir = new Directory("../../tmp");
   return dir.listSync().where((entity) =>
-     ((entity is File) && (entity.path.contains(new RegExp("outages_st_"))))   
+  ((entity is File) && (entity.path.contains(new RegExp("outages_st_"))))
   ).toList();
- 
+
 }
 
 /**
@@ -27,15 +28,15 @@ List<File> list_files() {
  */
 Future process_file(File file) {
   DbCollection coll;
-  
+
   return db.open().then((_) {
     print("Connection open");
 
     db.ensureIndex("trx_outages", keys: {
-      "ReportTime": -1,
-      "PlannedStart": 1,
-      "Company1": 1,
-      "EquipmentDescription": 1
+        "ReportTime": -1,
+        "PlannedStart": 1,
+        "Company1": 1,
+        "EquipmentDescription": 1
     });
     coll = db.collection("trx_outages");
 
@@ -48,19 +49,19 @@ Future process_file(File file) {
           print("Found $v entries for ReportTime = ${entries.first["ReportTime"]}");
           if (v == 0) {
             print("Inserting ...");
-            coll.insertAll(entries);            
+            coll.insertAll(entries);
           } else {
             print("Not inserting anything");
           }
         });
       });
-     }).then((_) {
+    }).then((_) {
 
       print("Closing the db");
       db.close();
     });
   });
-  
+
 }
 
 /**
@@ -83,7 +84,7 @@ Future<List<Map>> read_file(File file) {
 
 /**
  * Make a map useful for db insertion by converting timestamps to DateTime, etc.
- * list is one row with outage data   
+ * list is one row with outage data
  */
 Map make_entry(List list) {
   list.removeAt(0); // get rid of the H, C, D, T first column
@@ -137,21 +138,19 @@ main() {
 
   var files = list_files();
   print(files);
-  
+
   //files.forEach((file) => process_file(file, db));
-  
+
   Future.forEach(files, process_file);
-  
-   
+
+
   //process_file(new File('../../tmp/outages_st_20141022.csv'), db);
 
-  
-  
+
 }
 
 
-
-  // db.trx_outages.ensureIndex({"ApplicationNumber": 1, "ReportDate": -1, "PlannedStart": 1, "EquipmentDescription": 1, "Status": 1, "ActualStart": 1}, {unique: true})
-  // db.trx_outages.ensureIndex({"ApplicationNumber": 1, "ReportDate": -1}, {unique: true})
-  // db.trx_outages.ensureIndex({"hashKey": 1}, {unique: true})
-  //db.ensureIndex("trx_outages", keys: {'hashKey' : 1}, unique: true);  // need only once
+// db.trx_outages.ensureIndex({"ApplicationNumber": 1, "ReportDate": -1, "PlannedStart": 1, "EquipmentDescription": 1, "Status": 1, "ActualStart": 1}, {unique: true})
+// db.trx_outages.ensureIndex({"ApplicationNumber": 1, "ReportDate": -1}, {unique: true})
+// db.trx_outages.ensureIndex({"hashKey": 1}, {unique: true})
+//db.ensureIndex("trx_outages", keys: {'hashKey' : 1}, unique: true);  // need only once
