@@ -7,6 +7,7 @@ packages
 
 *.dart.js
 .pub/
+.idea/
 
 // some big csv files that I don't want in the repo.  
 dart/chartxl/test/datasets/20150206_20150206_PRC_LMP_DAM_LMP_short.csv
