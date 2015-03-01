@@ -5,13 +5,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:intl/intl.dart';
+import 'package:cviewer/utils.dart';
 
 class BindingConstraints {
 
   Db db;
   String DIR = '/Downloads/Archive/DA_BindingConstraints/Raw/';
   Map<String, String> env;
-  final fmt = new DateFormat("yyyy-MM-ddTHH:00:00.000-ZZZZ");
+  final DateFormat fmt = new DateFormat("yyyy-MM-ddTHH:00:00.000-ZZZZ");
 
   // only parses into local times!
 
@@ -22,6 +23,43 @@ class BindingConstraints {
     env = Platform.environment;
   }
 
+  /**
+   * Bring the db up to date.
+   * Find the latest day in the archive and update from there to nextDay
+   */
+  updateDb() {
+
+
+  }
+
+  /**
+   * Archive and Insert days between start, end.
+   * Parameters start and end are midnight UTC DateTime objects.
+   * For each day in the range of days, download and insert the data into the db.
+   */
+  insertDaysStartEnd(DateTime start, DateTime end) {
+    List<DateTime> days = seqDays(start, end);
+    DateFormat fmtDay = new DateFormat('yyyyMMdd');
+
+    db.open().then((_) {
+      return Future.forEach(days, (day) {
+        String yyyymmdd = fmtDay.format(day);
+        return oneDayDownload(yyyymmdd).then((_) {
+          return oneDayMongoInsert(yyyymmdd);
+        });
+      });
+    }).then((_) {
+      db.close();
+    }).then((_) {
+      print('Done!');
+    });
+
+  }
+
+  /**
+   * Make the daily insertions idempotent, so you never insert the same data over
+   * and over again.  You should run this only once when you set up the database.
+   */
   prepareCollection() {
     return db.open().then((_) {
       return db.ensureIndex('binding_constraints', keys: {
@@ -32,15 +70,34 @@ class BindingConstraints {
     });
   }
 
-//  DateTime lastDayInserted() {
-//    db.open().then((_) {
-//      DbCollection coll = db.collection('binding_constraints');
-//      db.find(where.);
-//    }).then((_) {
-//      db.close();
-//    });
-//  }
+  /**
+   * Return the last day that was ingested in the db.
+   * db.binding_constraints.aggregate([{$group: {_id: null, lastHour: {$max: '$hourEnding'}}}])
+   */
+  Future<DateTime> lastDayInserted() {
+    DateTime lastDay;
 
+    DbCollection coll = db.collection('binding_constraints');
+    List pipeline = [];
+    var group = {
+        '\$group': {
+            '_id': null, 'last': {
+                '\$max': '\$hourEnding'
+            }
+        }
+    };
+    pipeline.add(group);
+    return coll.aggregate(pipeline).then((v) {
+      print('$v');
+      Map aux = v['result'].first;
+      lastDay = aux['last']; // a local datetime
+      return new DateTime.utc(lastDay.year, lastDay.month, lastDay.day);
+    });
+  }
+
+  /**
+   * Inserts one day into the db.
+   */
   Future oneDayMongoInsert(String yyyymmdd) {
     List data = oneDayJsonRead(yyyymmdd);
     if (data.isEmpty)
@@ -49,8 +106,8 @@ class BindingConstraints {
     DbCollection coll = db.collection('binding_constraints');
     print('Inserting $yyyymmdd into db');
     return coll.insertAll(data)
-      .then((_) => print('--->  SUCCESS'))
-      .catchError((e) => print(e));
+    .then((_) => print('--->  SUCCESS'))
+    .catchError((e) => print(e));
   }
 
   /**
@@ -62,7 +119,8 @@ class BindingConstraints {
     File filename = new File(env['HOME'] + DIR + "nepool_da_bc_${yyyymmdd}.json");
     Map aux = JSON.decode(filename.readAsStringSync());
     if (aux['DayAheadConstraints'] == "") {
-      return data = [];                         // on some days there are no constraints 2/17/2015
+      return data = [];
+      // on some days there are no constraints 2/17/2015
     } else {
       data = aux['DayAheadConstraints']['DayAheadConstraint'];
     }

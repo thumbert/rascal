@@ -119,6 +119,43 @@ main() {
 
 
   }).then((_) {
+    print('\nInserting Cathy, Ellie and Frank');
+    var aux = [{
+        'name': 'Cathy', 'gender': 'f', 'weight': 2500
+    }, {
+        'name': 'Frank', 'gender': 'm', 'weight': 111
+    }, {
+        'name': 'Ellie', 'gender': 'f', 'weight': 440
+    }];
+    return coll.insertAll(aux).then((_) {
+    }, onError: (e) => print(e));
+
+
+  }).then((_) {
+    return coll.find(where.sortBy('weight', descending: true).limit(1)).toList().then((v) {
+      print('\nFind the fattest unicorn of them all:\n$v');
+    });
+
+
+  }).then((_) {
+    /**
+     * see: https://github.com/vadimtsushko/mongo_dart/blob/master/test/database_tests.dart
+     * Aggregation pipeline example.
+     * Find the max weight by gender
+     db.unicorns.aggregate([
+      {$group: {_id: '$gender', maxWeight: {$max: '$weight'}}}
+     ])
+    */
+    List pipeline = [];
+    var group = {'\$group': {'_id': '\$gender', 'maxWeight': {'\$max': '\$weight'}}};
+    pipeline.add( group );
+    return coll.aggregate(pipeline).then((v){
+      print('\nFind the fattest unicorn by gender (Aggregation pipeline):');
+      v['result'].forEach((e) => print(e));
+    });
+
+
+  }).then((_) {
     print("\nClosing the db");
     return db.close();
   });
