@@ -7,29 +7,71 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:intl/intl.dart';
 import 'package:cviewer/utils.dart';
 
+/**
+ * Get start/end date of the data
+ *   db.binding_constraints.aggregate([{$group: {_id: null, minHour:{$min: '$hourEnding'}, maxHour: {$max: '$hourEnding'}}}])
+ * Get all distinct constraints
+ *   db.binding_constraints.distinct('ConstraintName').sort('ConstraintName', 1)
+ *
+ */
+
 class BindingConstraints {
 
   Db db;
+  DbCollection coll;
   String DIR = '/Downloads/Archive/DA_BindingConstraints/Raw/';
   Map<String, String> env;
   final DateFormat fmt = new DateFormat("yyyy-MM-ddTHH:00:00.000-ZZZZ");
 
-  // only parses into local times!
 
   BindingConstraints({this.db}) {
     if (db == null)
       db = new Db('mongodb://127.0.0.1/nepool');
 
+    coll = db.collection('binding_constraints');
+
     env = Platform.environment;
   }
+
+  /**
+   * Get the binding constraints between two dates [start, end], maybe filter them
+   * by constraint names.
+   * Return a list.
+   */
+  Future<List> getBindingConstraints(DateTime start, DateTime end, {List<String> constraintNames}) {
+
+    SelectorBuilder query = where;
+
+    if (start != null)
+      query = query.gte('hourEnding', start.toUtc());
+
+    if (end != null)
+      query = query.lte('hourEnding', end.toUtc());
+
+    if (constraintNames != null && constraintNames.isNotEmpty)
+      query = query.all('ConstraintName', constraintNames);
+
+    query = query.fields(['hourEnding', 'ConstraintName']).excludeFields(['_id']);
+
+    return coll.find(query).toList();
+  }
+
+
+
 
   /**
    * Bring the db up to date.
    * Find the latest day in the archive and update from there to nextDay
    */
   updateDb() {
-
-
+    return db.open()
+    .then((_) => lastDayInserted()
+    .then((DateTime lastDay) {
+      DateTime start = nextDay(from: lastDay);
+      DateTime end = nextDay();
+      print('Updating the db from $start to $end.');
+      return insertDaysStartEnd(start, end);
+    }));
   }
 
   /**
@@ -59,11 +101,12 @@ class BindingConstraints {
   /**
    * Make the daily insertions idempotent, so you never insert the same data over
    * and over again.  You should run this only once when you set up the database.
+   * db.binding_constraints.ensureIndex({'hourEnding': 1, 'ConstraintName' : 1, 'ContingencyName': 1}, unique: true)
    */
   prepareCollection() {
     return db.open().then((_) {
       return db.ensureIndex('binding_constraints', keys: {
-          'hourEnding': 1, 'ConstraintName' : 1
+          'hourEnding': 1, 'ConstraintName' : 1, 'ContingencyName': 1
       }, unique: true);
     }).then((_) {
       db.close();
@@ -127,6 +170,7 @@ class BindingConstraints {
 
     data.forEach((Map row) {
       row['hourEnding'] = fmt.parse(row['BeginDate']).toUtc().add(new Duration(minutes: 60));
+      row['ContingencyName'] = row['ContingencyName'].toString();  // sometimes it reads as a number!
     });
     //data.forEach((e) => print(e));
 
