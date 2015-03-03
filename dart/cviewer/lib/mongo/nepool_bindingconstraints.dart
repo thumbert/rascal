@@ -31,6 +31,7 @@ class BindingConstraints {
     coll = db.collection('binding_constraints');
 
     env = Platform.environment;
+    //print('${env["ISO1_LOGIN"]} and ${env["ISO1_PASSWD"]}');
   }
 
   /**
@@ -83,7 +84,7 @@ class BindingConstraints {
     List<DateTime> days = seqDays(start, end);
     DateFormat fmtDay = new DateFormat('yyyyMMdd');
 
-    db.open().then((_) {
+    return db.open().then((_) {
       return Future.forEach(days, (day) {
         String yyyymmdd = fmtDay.format(day);
         return oneDayDownload(yyyymmdd).then((_) {
@@ -101,7 +102,7 @@ class BindingConstraints {
   /**
    * Make the daily insertions idempotent, so you never insert the same data over
    * and over again.  You should run this only once when you set up the database.
-   * db.binding_constraints.ensureIndex({'hourEnding': 1, 'ConstraintName' : 1, 'ContingencyName': 1}, unique: true)
+   * db.binding_constraints.ensureIndex({hourEnding: 1, ConstraintName : 1, ContingencyName: 1}, {unique: true})
    */
   prepareCollection() {
     return db.open().then((_) {

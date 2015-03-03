@@ -10,17 +10,20 @@ import 'package:cviewer/mongo/nepool_bindingconstraints.dart';
 //import 'package:cviewer/utils.dart';
 
 
+
+
 main() {
 
-  DateTime start = new DateTime.utc(2015, 2, 26);
-  DateTime end = new DateTime.utc(2015, 2, 28);
+  DateTime start = new DateTime.utc(2015, 1, 1);
+  DateTime end = new DateTime.utc(2015, 2, 1);
   List names = ['KR-EXP', 'NHSC-I'];
 
   BindingConstraints bc = new BindingConstraints();
   bc.db.open().then((_) {
-    return bc.getBindingConstraints(start, end, constraintNames: null).then((List rows) {
-      rows.forEach((row) => print(row));
-    });
+    return bc.insertDaysStartEnd(start, end);
+//    return bc.getBindingConstraints(start, end, constraintNames: null).then((List rows) {
+//      rows.forEach((row) => print(row));
+//    });
   }).then((_) => bc.db.close());
 
 //  bc.updateDb();
