@@ -12,7 +12,8 @@ import 'package:cviewer/utils.dart';
  *   db.binding_constraints.aggregate([{$group: {_id: null, minHour:{$min: '$hourEnding'}, maxHour: {$max: '$hourEnding'}}}])
  * Get all distinct constraints
  *   db.binding_constraints.distinct('ConstraintName').sort('ConstraintName', 1)
- *
+ * Get binding constraints after a date
+ *   db.binding_constraints.find({hourEnding: {$gte: new Date("2015-03-05T00:00:00.000Z")}})
  */
 
 class BindingConstraints {
@@ -59,8 +60,6 @@ class BindingConstraints {
   }
 
 
-
-
   /**
    * Bring the db up to date.
    * Find the latest day in the archive and update from there to nextDay
@@ -85,16 +84,13 @@ class BindingConstraints {
     List<DateTime> days = seqDays(start, end);
     DateFormat fmtDay = new DateFormat('yyyyMMdd');
 
-    return db.open().then((_) {
-      return Future.forEach(days, (day) {
-        String yyyymmdd = fmtDay.format(day);
-        return oneDayDownload(yyyymmdd).then((_) {
-          return oneDayMongoInsert(yyyymmdd);
-        });
+    return Future.forEach(days, (day) {
+      String yyyymmdd = fmtDay.format(day);
+      return oneDayDownload(yyyymmdd).then((_) {
+        return oneDayMongoInsert(yyyymmdd);
       });
-    }).then((_) {
-      db.close();
-    }).then((_) {
+    })
+    .then((_) {
       print('Done!');
     });
 
@@ -152,7 +148,7 @@ class BindingConstraints {
     print('Inserting $yyyymmdd into db');
     return coll.insertAll(data)
     .then((_) => print('--->  SUCCESS'))
-    .catchError((e) => print(e));
+    .catchError((e) => print('   ' + e.toString()));
   }
 
   /**
@@ -172,7 +168,8 @@ class BindingConstraints {
 
     data.forEach((Map row) {
       row['hourEnding'] = fmt.parse(row['BeginDate']).toUtc().add(new Duration(minutes: 60));
-      row['ContingencyName'] = row['ContingencyName'].toString();  // sometimes it reads as a number!
+      row['ContingencyName'] = row['ContingencyName'].toString();
+      // sometimes it reads as a number!
     });
     //data.forEach((e) => print(e));
 
@@ -184,6 +181,8 @@ class BindingConstraints {
 
     if (fileout.existsSync()) {
       return new Future.value(print('Day $yyyymmdd was already downloaded.'));
+
+
     } else {
       String URL = "https://webservices.iso-ne.com/api/v1.1/dayaheadconstraints/day/${yyyymmdd}";
       HttpClient client = new HttpClient();
@@ -202,7 +201,7 @@ class BindingConstraints {
         return request.close();
       })
       .then((HttpClientResponse response) => response.pipe(fileout.openWrite()))
-      .then((_) => 'Downloaded binding constraints for day $yyyymmdd.');
+      .then((_) => print('Downloaded binding constraints for day $yyyymmdd.'));
     }
   }
 

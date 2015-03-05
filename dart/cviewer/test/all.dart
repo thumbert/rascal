@@ -3,8 +3,8 @@
 
 library all_tests;
 
-import 'cviewer_test.dart' as cviewer_test;
+//import 'cviewer_test.dart' as cviewer_test;
 
 void main() {
-  cviewer_test.defineTests();
+  //cviewer_test.defineTests();
 }

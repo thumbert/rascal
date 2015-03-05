@@ -156,6 +156,10 @@ main() {
 
 
   }).then((_) {
+    print('Have an example on how to remove records ...');
+
+
+  }).then((_) {
     print("\nClosing the db");
     return db.close();
   });

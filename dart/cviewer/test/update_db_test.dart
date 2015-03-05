@@ -14,12 +14,13 @@ import 'package:cviewer/mongo/nepool_bindingconstraints.dart';
 
 main() {
 
-  DateTime start = new DateTime.utc(2015, 1, 1);
-  DateTime end = new DateTime.utc(2015, 2, 1);
+  DateTime start = new DateTime.utc(2015, 3, 1);
+  DateTime end = new DateTime.utc(2015, 3, 5);
   List names = ['KR-EXP', 'NHSC-I'];
 
   BindingConstraints bc = new BindingConstraints();
   bc.db.open().then((_) {
+    //return bc.updateDb();
     return bc.insertDaysStartEnd(start, end);
 //    return bc.getBindingConstraints(start, end, constraintNames: null).then((List rows) {
 //      rows.forEach((row) => print(row));

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Binding constraints selector</title>
+    <link rel="stylesheet" href="client.css">
+</head>
+<body>
+    <div id="container">
+        <div id="content">
+            <h2>Binding constraints selector:</h2>
+            <div>
+                Start:  <input id='start-input' type="date" name="end" value="end">
+                End:  <input id='end-input' type="date" name="end" value="end">
+            </div>
+            <p>
+
+
+            <div id='bc-checkbox'>
+                <input type="checkbox" name="bc1" value="bc1">LS-ERI<br>
+                <input type="checkbox" name="bc2" value="bc2">NHSC-I<br>
+            </div>
+        </div>
+        <div id="footer"></div>
+    </div>
+
+    <script type="application/dart" src="client.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+</body>
+</html>

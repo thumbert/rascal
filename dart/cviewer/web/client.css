@@ -1,0 +1,54 @@
+html, body {
+  font-family: 'Open Sans', sans-serif;
+  background-color: WhiteSmoke;
+  margin: 15px;
+  height: 90%
+}
+
+#container {
+  position: relative;
+  min-height: 100%;
+}
+#footer {
+    position: absolute;
+    bottom: 0;
+    /*border: 1px solid Silver;*/
+    color: red;
+    width: 100%;
+    padding: 5px 0px 5px 5px;
+}
+
+#start-input {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  padding: 5px 0px 5px 5px;
+  /*width: 100%; */
+  border: 1px solid Silver;
+  background-color: White;
+}
+
+#end-input {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  padding: 5px 0px 5px 5px;
+  /*width: 100%; */
+  border: 1px solid Silver;
+  background-color: White;
+}
+
+
+
+#bc-list {
+  padding:0px;
+  margin:0px;
+  list-style-position:inside;
+  list-style-type: none;  /* to avoid the bullet */
+}
+
+#bc-list li {
+  padding:5px 0px 5px 5px;
+  border-bottom: 1px dotted Silver;
+}
+
