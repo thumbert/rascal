@@ -37,6 +37,7 @@ class BindingConstraints {
   /**
    * Get the binding constraints between two dates [start, end], maybe filter them
    * by constraint names.
+   * db.binding_constraints.find({ConstraintName: {$in: ['KR-EXP', 'NHSC-I']}}, {_id: 0}).limit(10)
    * Return a list.
    */
   Future<List> getBindingConstraints(DateTime start, DateTime end, {List<String> constraintNames}) {
@@ -50,7 +51,7 @@ class BindingConstraints {
       query = query.lte('hourEnding', end.toUtc());
 
     if (constraintNames != null && constraintNames.isNotEmpty)
-      query = query.all('ConstraintName', constraintNames);
+      query = query.oneFrom('ConstraintName', constraintNames);
 
     query = query.fields(['hourEnding', 'ConstraintName']).excludeFields(['_id']);
 
