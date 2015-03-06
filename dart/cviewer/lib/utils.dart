@@ -26,3 +26,6 @@ List<DateTime> seqDays(DateTime start, DateTime end) {
   
   return res;
 }
+
+String unquote(String x) => x.substring(1,x.length-1);
+

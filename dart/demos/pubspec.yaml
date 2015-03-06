@@ -12,6 +12,7 @@ dependencies:
   intl: ">=0.1.0 <0.13.0"
   mongo_dart: any
   more: any
+  msgpack: any
   petitparser: ">=1.0.0 <2.0.0"
   polymer: any
   polymer_elements: any
