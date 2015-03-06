@@ -15,7 +15,7 @@ main() {
   startInput = querySelector('#start-input');
   endInput   = querySelector('#end-input');
   errorMessage = querySelector('#footer');
-  bcList = querySelector('#bc-checkbox');
+  //bcList = querySelector('#bc-checkbox');
 
   startInput.onChange.listen(startOnChange);
   endInput.onChange.listen(endOnChange);
@@ -23,8 +23,14 @@ main() {
   //http://stackoverflow.com/questions/13746105/how-to-listen-to-key-press-repetitively-in-dart-for-games
   //window.onKeyPress();
   // See the KeyEvent class in dart:html
+  var stream = KeyEvent.keyPressEvent.forTarget(document.body);
+  // Start listening to the stream of KeyEvents.
+  stream.listen((keyEvent) =>
+    print('KeyPress event detected ${keyEvent.charCode}'));
 
 }
+
+
 
 
 void startOnChange(Event e) {
@@ -53,3 +59,24 @@ void endOnChange(Event e) {
   if (errorMessage.text != '') errorMessage.text = '';  // all OK here
 }
 
+
+
+// should this validation logic stay outside?
+bool isValid() {
+  bool isOk = true;
+
+  if (end != null && start.isAfter(end)) {
+    errorMessage.text = 'ERROR:  Cannot have start date after end date!';
+    startInput.value = '';
+    isOk = false;
+  }
+
+  if (start != null && end.isBefore(start)) {
+    errorMessage.text = 'ERROR:  Cannot have end date before start date!';
+    endInput.value = '';
+    isOk =false;
+  }
+
+
+  return isOk;
+}
