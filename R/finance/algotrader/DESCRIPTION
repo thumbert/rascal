@@ -1,0 +1,12 @@
+Package: algotrader
+Type: Package
+Title: Formalize trading alorithms definition and performance.
+Version: 0.0.1
+Date: 2008-08-26
+Author: Adrian Dragulescu
+Maintainer: Adrian Dragulescu <adrian.dragulescu@gmail.com>
+Depends: R (>= 2.6.0), reshape, zoo
+Description: A collection of S4 classes for defining trading algorithms and analyzing their performance.
+License: GPL-3
+LazyLoad: false
+

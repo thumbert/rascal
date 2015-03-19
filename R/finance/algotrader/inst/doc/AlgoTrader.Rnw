@@ -1,0 +1,558 @@
+% \VignetteIndexEntry{AlgoTrader: an R package for working with
+% trading algorithms} 
+% \VignetteDepends{}
+% \VignetteKeywords{finance, trading, algorithm}
+% \VignettePackage{AlgoTrader}
+
+% setwd('H:/user/R/Adrian/algotrader/inst/doc/')
+% Sweave('AlgoTrader.Rnw');system("mypdflatex AlgoTrader")
+
+%\documentclass{article}
+\documentclass[nofootinbib]{revtex4}
+
+\usepackage{Sweave}
+\usepackage{hyperref}
+\hypersetup{colorlinks,%
+            citecolor=black,%
+            linkcolor=blue,%
+            urlcolor=blue,%
+            }
+\newcommand{\Rpackage}[1]{\textit{#1}}
+\newcommand{\Rfunction}[1]{\textit{#1}}
+\newcommand{\Robject}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\textit{#1}}}
+\newcommand{\R}{{\normalfont\textsf{R }}{}}
+\newcommand{\classdef}[1]{%
+  {\em #1}
+}
+\newcommand{\code}[1]{{\texttt{#1}}}
+\newcommand{\file}[1]{{\texttt{#1}}}
+
+\begin{document}
+
+\title{AlgoTrader: an R package for trading algorithms}
+\author{Adrian A. Dr\u{a}gulescu}
+\email{adrian.dragulescu@gmail.com}
+\date{\today, last modified on 1/5/2009}
+
+\begin{abstract}
+The \code{AlgoTrader} package provides a framework \R
+offers a great environment for rapid trade
+idea development and testing. 
+\end{abstract}
+%\pacs{R, algorithmic trading, prototype based programming}
+
+\maketitle
+\tableofcontents
+
+<<setup, echo=FALSE, results=hide>>=
+options(width=72, continue=" ")
+require(proto)
+require(algotrader)
+@ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%% \textcolor{red}{ texttext}
+
+Financial trading is a complex activity that can be decomposed into
+several distinct components: data acquisition, data analysis, model
+building, decision making, risk analysis, order placement, execution,
+and reporting.  Traditionally, a brokerage house provides the later
+part of this trading flow while the steps leading to the decision
+making are left to the trader himself.  For algorithmic trading 
+computers are used to automate all the steps of the trading flow.
+
+There are a lot of useful open-source \R packages that focus on
+different aspects of trading.  Without trying to be comprehensive,
+here are a few relevant packages (not all are on CRAN).
+\begin{quote}
+\begin{description}
+\item[Data aquisition:]quantmod, IBrokers, RIB, RBloomberg, opentick
+\item[Data analysis:]quantmod, TTR, xts, zoo, Rmetrics, tseries, etc. 
+\item[Model building:] 
+\item[Decision making:]
+\item[Risk analysis:] PerformanceAnalytics
+\item[Order placement:] IBrokers, RIB
+\item[Reporting:] PerformanceAnalytics
+\end{description}
+\end{quote}
+
+The lack of solutions for the \textbf{Model building} and
+\textbf{Decision making} steps reflects their idiosyncratic nature.  A
+user can combine any \R packages with his own code to arrive at a 
+personal trading strategy.  It would be useful to have a consistent
+\R framework to catalog, evaluate, and use trading ideas.  For
+example, it should be easy to add a new trading rule to an existing
+algorithm, and see it's effect.  Also, it should be easy to modify the
+way every instrument position change under a given trade signal. 
+
+The goal of the package {\tt\textbf{AlgoTrader}} is to provide such a
+framework using an object oriented approach\footnote{See Section
+  \ref{appendixProto} for a discussion on the design decision.}.  There
+are two main classes.  An {\tt Algo} class from which all user
+algorithms inherit and a {\tt Trader} class used for performace
+tracking and reporting.  By convention, the parent classes {\tt Algo}
+and {\tt Trader} are capitalized, while lower case names, say {\tt
+  algo1} and {\tt trader1} are used for instances of these classes.
+Conceptually, a model is represented by an algorithm and a trader.  
+
+The functionality provided in this package allows the user to define
+multiple trading algorithms.  He could gradually refine these
+algorithms by using the inheritance mechanism, or use the same
+algorithms with different parameters to instantiate different
+\code{Algo} objects.
+
+The \code{Algo} object contains all the historical data necessary, a
+set of parameters, functions that generate trading signals, and a set
+of functions that modify the positions given a trading signal.  Using
+an algorithm {\tt algo}, the user can create a {\tt trader} that uses
+the algoritm over a specified time interval to arrive at a trading
+decision for each time step.  A trade log is kept by the trader, so
+that an analysis of the trading performance can be done.  The
+\code{trader} has different methods to summarize/plot/evaluate his
+performance.  For strategy selection or for tuning the algorithm
+parameters, the performance of several traders can be compared side by
+side.  As the \code{AlgoTrader} package does backtesting, it is best
+if only deterministic trading algorithms are used so performance
+results are reproducible.
+
+Once a trading strategy is in place, one can use it with a real-time
+data feed, so that the trading decision made during the last time step
+be sent to a broker for order placement and execution.  A word of
+caution may be in order.  Depending on how the data feeds are set up
+and the complexity of the trading algorithm, the current
+implementation will likely not support a higher than a few seconds
+trading frequency.
+
+In Sections \ref{Algo} and \ref{Trader} the objects \code{Algo} and
+\code{Trader} are discussed in detail.  Section \ref{appendixTF}
+presents a simple trend following algorithm for one instrument, while
+Section \ref{appendixLG} shows an algorithm with two instruments, a
+stock and a call option.  If you are not familiar with the package
+\code{proto} \cite{proto}, before diving into the next sections please
+take the time to read the excellent vignettes and documentation
+available for this package; at a minimum read over Section
+\ref{appendixProto}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Class {\tt Algo}}
+\label{Algo}
+
+The \code{Algo} object is a top level proto object which all user
+algorithms implement.  It is conceptually equivalent to an abstract
+class in the Java programming language.  By itself, an \code{Algo}
+object is not useful because it is just an empty shell that the user
+algo needs to fill.  It does not have a constructor method.
+
+To create a new algorithm, one can start filling the required slots 
+sequentially
+<<keep.source=true, print=false>>=
+algo1 <- Algo$proto()              # announce that you inherit from Algo
+algo1$algoName <- "my best one!"   # you should put something more descriptive
+algo1$validSignalNames <- c("NONE", "BUY", "SELL", "LIQUIDATE")
+algo1$ls()
+@ 
+
+It is required to declare what signal names your algorithm generates.
+\code{"NONE"} is a reserved signal name that will do nothing,
+essentially advancing the current state one time step into the future.
+So unless you will have a trading decision at each time step, you will
+need to specify \code{"NONE"} among your \code{validSignalNames}.
+
+Signal functions are a collection of functions that get called at each
+time step to determine the trading decision.  To avoid ambiguities,
+there is only one posible trading signal at each time step.  You can
+register as many signal functions as you need, the only requirement
+being that they return one of the \code{validSignalNames} already
+registered. It is best if the signal functions are defined in the same
+\code{algo1} environment.  So assuming we have these functions
+defined, we can register them 
+
+<<keep.source=true, print=false>>=
+algo1$signalFunctions <- c(".buyFun", ".sellFun", ".liquidateFun")
+@ 
+
+For flexibility, it is not necessary to have a one to one
+correspondence between a signal name and a signal function.  One
+signal function can return several signal names at different time
+steps, for example the same function can return a \code{"BUY"} or a
+\code{"SELL"} signal at different time steps.
+
+If one wants to implement several trading rules, each trading rule can
+have its own signal function.  All signal functions are evaluated at
+each time step.  As each signal function returns a signal name,
+potentially there can be conflicting signals in the same time step.
+This ambiguity is resolved using signal priorities.  The higher the
+signal priority for a signal function is, the higher its precedence is
+when the trading signal for that time step is decided.  Signal
+priorities should be a vector of positive numbers and should have the
+same length as the \code{signalFunctions}.  For example,  
+
+<<keep.source=true, print=false>>=
+algo1$signalPriority <- c(1, 1, 2)
+@ 
+
+In this case, we set the signal function \code{".buyFun"} to have the
+same priority as \code{".sellFun"}, but they are both trumped by the
+signal function \code{".liquidateFun"} which has a higher priority.
+
+The signal functions are expected to take an object of class
+\code{Trader} as their first argument after the \code{.} argument that
+denotes their own proto object.  This allows the implementation of
+state dependent algorithms\footnote{By state dependent, I refer to
+  algorithms that generate signals based on the current state of the
+  portfolio/account.}.  For example, the algo can initiate a
+\code{"LIQUIDATE"} signal if the current PnL is below a treshold, or
+if there exists a cash/margin constraint.  One can easily think of
+other such useful criteria.
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{lll}
+       Type & Name & Description \\ \hline
+       variable & \code{algoName}  &  name of the algorithm, character \\
+       variable & \code{validSignalNames} &  character vector \\
+       variable & \code{signalFunctions}  &  names of signal functions, 
+         vector of characters \\
+       variable & \code{signalPriority}   &  numeric vector, same
+         length as \code{signalFunctions} \\ 
+       variable & \code{quantityFunctions} & character vector, named
+         with \code{validSignalNames} \\
+       method   & \code{getPrices} & return instrument prices in
+         current period as a named vector \\
+       method   & \code{validate} & performs validity checks on the
+         algo object.  \\
+       \hline
+    \end{tabular}
+  \end{center}
+  \caption{A description of required fields for each \code{Algo} object.}
+  \label{tab:Algo}
+\end{table}  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Class {\tt Trader}}
+\label{Trader}
+
+As mentioned in the introduction, analysis of a trading algorithm
+consists from an user defined \code{algo} object together with a user
+defined \code{trader} object.  If the \code{Algo} object has all the
+logic of the algorithm, the proto object \code{Trader} holds all the
+methods that allow to report on the algorithm performace for a
+collection of time steps.
+
+Internally, when the method \code{trade} is called, two nested for
+loops are executed.  The first, outer loop is over the time steps
+while the second, inner loop is over all the signal functions of the
+algorithm.  Looping in R usually creates a performance bottleneck, and
+having state-dependent algorithms requires that the trader object is
+passed to each signal function.  As \R does not support partial
+function application (currying), the only way to avoid passing large
+\code{Trader} objects back and forth to each signal function is to use
+references.
+
+In fact, because the signal functions can be ordered based on their
+priority, not all the functions are needed to be evaluated at each
+time step.  You evaluate until you get one function that does not
+return "NONE".  In an algo with many trading rules, this can shorten
+the run time significantly.
+
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{lll}
+       Type & Name & Description \\ \hline
+       variable & \code{currentBar}  &  current time step, class POSIXct \\
+       variable & \code{barIndex} &  a POSIXct vector of time steps  \\
+       variable & \code{tradingSignal}  &  character vector with
+       trading signal, same length as \code{barIndex} \\
+       variable & \code{PnL}   &  list with performance details, 
+         length as \code{barIndex} \\ 
+       variable & \code{...} & other variables, see documentation \\
+       method   & \code{new} & constructor for the class \\
+       method   & \code{trade} & get trading signals, calculate performance \\
+       method   & \code{summary} & summarize the object Trader \\
+       method   & \code{plot} & attempts to plot the trading signals, prices, 
+         quantities \\
+       method & \code{extend} & extend a trader with another set of
+         time steps \\
+       method & \code{getPnL} & returns the profit and loss as an xts object
+         \\
+       method & \code{getPositions} & returns the positions as an xts object
+         \\
+         
+       \hline
+    \end{tabular}
+  \end{center}
+  \caption{A partial description of the \code{Trader} object and some
+    of its methods.}
+  \label{tab:Algo}
+\end{table}  
+
+Variables: currentBar, barIndex, tradingSignal, PnL, prevQty
+Methods: trade, plot, summary, print.
+Getter methods: getPnL, getPositions. 
+
+MTM can be calculated easily from 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Examples}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A trend following algo}
+\label{appendixTF}
+
+As an example of implementing a trading algo, I will present a very
+simple trend following algorithm.  It has three available signals
+\code{c("NONE", "BUY", "SELL")}.  A buy signal is generated if the
+last price of the instrument has been above a moving average for a
+given number of time periods.  Similarly, a sell signal is generated
+if the last price of the instrument has been below a moving average
+for a given number of time periods.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A long gamma algo}
+\label{appendixLG}
+
+This section presents a simple trading strategy that uses two
+instruments and one signal function.  We consider a strategy with a
+short position in a stock and a long position in a call option.  The
+portfolio is overall long gamma.  We open the trade by being delta
+neutral and as the stock moves and the option becomes more in or out
+of the money we rebalance (hedge) the portfolio by buying or selling
+the stock.  We decide to trade only the stock as it has a smaller
+bid/ask spread and is more liquid.
+
+Such a strategy works when the the implied volatility of the option
+ends up being higher than the realized volatility.  A scenario that
+will make money is if the stock has a large one directional move, or
+if it crosses several times the strike of the option before the option
+expires.  As we initiate the trade by being long the call options, we
+need to recoup the initial capital overlay required to purchase the
+options.
+
+We choose to rebalance the portfolio only when the net delta of the
+portfolio is a fraction of the initial stock delta.  The algorithm has
+only two valid signals \code{c("NONE", "REBALANCE")}, and only one
+signal function that determines when it's time to rebalance.  Because
+there is only one signal other then \code{"NONE"}, we have only one
+function that determines the positions after the \code{"REBALANCE"}
+signal.  We need to implement the \code{getPrices} method to get the
+prices of the instruments in the current period.  
+
+Here is the code that implements this simple trading strategy.  The
+class name is \code{LG1} (long gamma), and inherits from the abstract
+class \code{Algo}.  See also the source file \code{example\_LG1.R} and
+\code{?example\_LG1}.
+
+<<keep.source=false, print=false, eval=true, echo=false>>=
+cat('LG1 <- Algo$proto()  # inherit from Algo
+
+LG1$algoName         = "Long Gamma (long call, short stock) 1"
+LG1$validSignalNames = c("NONE", "REBALANCE")
+
+# Required getter to extract the prices for a given barIndex
+LG1$getPrices <- function(., currentBar){
+  structure(as.numeric(.$hdata[currentBar,c("Close.stock", "Close.call")]),
+            names=c("stock", "call"))
+}
+
+# Register the signal functions.
+LG1$signalFunctions  = c(".rebalanceFun")
+LG1$signalPriority   = c(1)      # priority 0 is for signal "NONE"
+
+# and the mapping between signal name and the quantity function. 
+LG1$quantityFunctions <- structure(
+   c(".qtyRebalanceFun"), names = c("REBALANCE")    
+)
+
+# The quantity for this bar for a trading signal.
+LG1$.qtyRebalanceFun <- function(., trader)
+{
+  netQty <- trader$prevQty["stock"] +
+    trader$prevQty["call"]*.$hdata[trader$currentBar, "delta"]
+
+  Qty <- trader$prevQty
+  Qty["stock"] <- Qty["stock"] - netQty
+
+  Qty
+}
+
+# the REBALANCE signal function
+LG1$.rebalanceFun <- function(., trader)
+{
+  signal <- "NONE"
+
+  q0Stock <- abs(trader$q0["stock"])      # q0Stock is negative
+  netQty  <- trader$prevQty["stock"] +
+    trader$prevQty["call"]*.$hdata[trader$currentBar, "delta"]
+
+  if ((netQty >= .$FRACTION*q0Stock) | (netQty <= -.$FRACTION*q0Stock))
+    signal <- "REBALANCE"    
+    
+  return( signal )
+}
+
+# constructor method            
+LG1$new <- function(., x, FRACTION = 0.20)
+{  
+  .$proto(
+    FRACTION = FRACTION,     # when to rebalance
+    hdata = x
+  )
+}')
+@
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusions}
+\label{Conclusions}
+
+We provide a prototype based framework for defining, evaluating and
+using trading algorithms.  As mentioned in \cite{KatesPetzoldt}
+prototype programing is particularly suitable for situations with
+small number of objects and with frequent exceptions.  This is exactly
+the the case when working with trading algorithms.
+
+The implementation is dependent on the proto package, so the user has
+to learn about proto objects and proto programming, but this can be
+overcome quickly and benefits are worthwile.  The user has the ability
+to overwrite or customize all the available methods that ship with the
+package.   For example, the \code{Trader\$plot} method is one such
+candidate for user customization.
+
+Can the proposed \code{AlgoTrader} framework deal with adaptative
+algorithms?  That is, can the algo automatically suggest trading a
+different instrument, or it is limited the same set of instruments?
+There is no such limitation as long as the algo methods can gracefully
+exit one instrument and start trading a different one.  For example,
+algorithms that involve instruments with a finite life (e.g. options,
+futures, etc.) need to explicitly create a switch signal, define the
+quantity functions, etc.  
+
+The present framework can be extended in several ways.  It may be of
+interest to calculate the margin requirements of the existing position
+at each time step, so \code{Trader} class could have a method to
+calculate the so called "Reg T" margin.  Also, a risk metric like VaR
+can be useful to report.  Then, users can define algorithms that
+trigger decision based on margin or VaR.  Having methods to compare
+two traders would also be interesting.  Further analyzing the returns
+of the trader with the \code{Performance Analytics}\cite{PA} package
+can also provide useful insights.
+
+Interested parties are encouraged to contribute code and suggest
+improvements to the existing \code{AlgoTrader} package, in order to
+advance the use of open source \R in finance.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Appendix: proto objects}
+\label{appendixProto}
+
+I experimented with different approaches for the internals of the {\tt
+  AlgoTrader} package.  An initial implementation used {\tt S4}
+classes and methods, but I was unsatisfied with performance and the
+resulting coding style.  The performance bottlenecks came from {\tt
+  R}'s copy-on-modify paradigm and the lack of pass by reference
+support.  While there are some advantages of using {\tt S4} classes,
+in the end I felt unsatisfied and looked for other ways of doing what
+I wanted.
+
+Other object-oriented choices available in {\tt R} are the {\tt
+  R.oo}\cite{Roo} package and the {\tt proto}\cite{proto} package.  In
+the end I chose the {\tt proto} package after reading the excellent
+documentation available for this package that clarified some subtle
+points.
+
+To show how easy and natural it is to work with proto objects, I
+present the definition of a {\tt Circle} class.
+<<keep.source=true, print=false>>=
+Circle <- proto(
+  noCircles = 0,                      # class variable
+  radius    = numeric(),              # instance variable
+  area = function(.){pi*.$radius^2},  # class method
+  new  = function(., radius){         # define a constructor
+    .$noCircles <- .$noCircles + 1    
+    .$proto(radius = radius)          # return the object
+  })
+@ 
+The \code{.} refers to the current object and is equivalent to the
+Java's \code{this} keyword.  You can create two circle objects by
+calling the {\tt new} method.
+<<>>=
+c1 <- Circle$new(1)
+c2 <- Circle$new(2)
+@ 
+And now explore the objects
+<<keep.source=true, print=false, results=hide>>=
+c1$radius          # = 1
+c1$area()          # = pi
+Circle$noCircles   # = 2, two circles created
+@ 
+%$
+
+Because proto objects are references stored internally as
+environments, debugging or updating a method is very convenient.  For
+example, suppose you want to modify your signal functions.  You just
+evaluate the modified algo method, and all the objects that point to
+it will use the updated algo method.
+
+As prototype programming is not really main stream, but has common
+features with object oriented programming which is much better know, I
+will tend to use language that matches an object oriented approach.
+While this can be slightly inaccurate, it should help the reading of
+the paper.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{99}
+
+\bibitem{R} R Development Core Team:
+\emph{R: A Language and Environment for Statistical Computing},
+R Foundation for Statistical Computing, Vienna, Austria.
+ISBN 3-900051-07-0, URL \url{http://www.R-project.org}
+
+\bibitem{IBrokers}Jeffrey A. Ryan: \emph{IBrokers: R API to
+  Interactive Brokers Trader Workstation}, R package version 0.1-0,
+  2008
+
+\bibitem{proto}Louis Kates and Thomas Petzoldt (2007) \emph{proto:
+  Prototype object-based programming.} R package version
+  0.3-8. URL \url{http://code.google.com/p/r-proto/}
+  
+\bibitem{KatesPetzoldt} Kates, L., and Petzoldt, T. (2004)
+  "Prototype-Based Programming in Statistical Computation.", URL
+  \url{http://r-proto.googlecode.com/files/prototype_approaches.pdf}.
+
+\bibitem{Roo} Bengtsson, H., (2003) \emph{The R.oo package - Object-Oriented
+  Programming with References Using Standard R Code}, Proceedings of
+  the 3rd International Workshop on Distributed Statistical Computing
+  (DSC 2003), ISSN 1609-395X, Hornik, K.; Leisch, F. \& Zeileis,
+  A. (ed.)
+
+\bibitem{PA} Peter Carl and Brian G. Peterson
+  (2008). PerformanceAnalytics: Econometric tools for performance and
+  risk analysis.. R package version 0.9.7.1.
+  \url{http://braverock.com/R/}
+  
+\end{thebibliography}
+
+\end{document}

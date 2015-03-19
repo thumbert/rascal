@@ -1,0 +1,14 @@
+digraph G {
+  size ="6,4";
+  graph [rankdir = TB];
+  node  [fontsize= "12" shape="record"];
+  edge  [];
+
+  Algo -> algo1;
+  Algo -> algo2;
+  Algo -> algo3;
+
+  Trader -> trader1;
+  Trader -> trader2;
+
+}
