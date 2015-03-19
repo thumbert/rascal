@@ -1,0 +1,8 @@
+name: quadrature
+author: Adrian Dragulescu
+version: 0.0.1
+description: Numerical integration with Dart
+dependencies:
+  logging: any
+  logging_handlers: any
+  unittest: any
