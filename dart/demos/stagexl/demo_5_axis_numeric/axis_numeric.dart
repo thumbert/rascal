@@ -1,53 +1,69 @@
 library axis_numeric;
 
-import 'dart:math';
+import 'dart:math' as math;
 import 'package:intl/intl.dart';
 import 'package:stagexl/stagexl.dart';
 import 'package:demos/graphics/ticks_numeric.dart';
-
+import 'package:demos/graphics/tick.dart';
 
 
 /**
  * A Numeric axis.
+ * [min] lowest value to represent
  */
 class NumericAxis extends Sprite {
 
+  num min, max;
   List<num> ticks;
   List<String> tickLabels;
-  num min, max;
+  TextFormat fmt;
 
-  // go from a num to a screen coordinate;
+  /// go from a num to a screen coordinate;
   Function scale;
-  // the label gets under the ticks to clarify the meaning of the ticks
+
+  /// the label gets under the ticks to clarify the meaning of the ticks
   String label;
 
-  // margin in points from the edges of the parent
+  /// margin in points from the edges of the parent
   int _margin = 10;
 
-  NumericAxis(num this.min, num this.max, {String this.label: ''}) {
+  NumericAxis(num this.min, num this.max, {List<num> this.ticks, List<String> this.tickLabels, String this.label: ''}) {
     assert(min <= max);
 
-    ticks = calculateTicks(min, max);
-    print('ticks are: ${ticks.join(',')}');
+    if (ticks == null)
+      ticks = calculateTicks(min, max);
+
+    ///print('ticks are: ${ticks.join(',')}');
+    fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
+
   }
 
   draw() {
     var _width = parent.width;
     var range = max - min;
-    scale = (num x) => ((x - min)*(_width-2*_margin) / range + _margin).round();
+    scale = (num x) => ((x - min) * (_width - 2 * _margin) / range + _margin).round();
 
-    print('x: $x, y: $y');
-    print('width is $width, parent width is ${parent.width}, parentName is ${parent.name}');
+    int precision = 1;
+    if (tickLabels == null) {
+      int range10 = (math.log(max - min)*math.LOG10E).round();
+      if (range10 <=0) {
+        precision = math.max(-range10 + 1, 1);
+      } else {
+        precision = math.max(range10, 1);
+      }
+    }
+
     graphics.moveTo(0, y);
-    graphics.lineTo(parent.width, y);
-    for (int i=0; i<ticks.length; i++) {
+    graphics.lineTo(_width, y);
+    for (int i = 0; i < ticks.length; i++) {
       print('i: $i, ${scale(ticks[i])}');
-      graphics.moveTo(scale(ticks[i]), y);
-      graphics.lineTo(scale(ticks[i]), y+10);
+      Tick tick = new Tick(ticks[i].toStringAsPrecision(precision), Direction.DOWN)
+        ..x = scale(ticks[i]);
+      addChild(tick);
     }
     graphics.strokeColor(Color.Black);
-  }
 
+  }
 
 
 }

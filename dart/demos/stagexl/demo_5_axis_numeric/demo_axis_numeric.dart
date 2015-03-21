@@ -1,25 +1,22 @@
 library demo_axis_numeric;
 
-import 'dart:html' as html;
+//import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart';
-import 'dart:math';
 import 'dart:html';
 import 'axis_numeric.dart';
 
-CanvasElement canvas = html.querySelector('#stage');
+CanvasElement canvas = querySelector('#stage');
 Stage stage = new Stage(canvas);
 
 
 class PlotArea extends DisplayObjectContainer {
-
   PlotArea(int width, int height) {
-    print("Plot area width={$width} and heigth={$height}");
     Shape background = new Shape()
-  ..width = width
-  ..height = height
-  ..graphics.rect(0, 0, width-1, height-1)
-  ..graphics.strokeColor(Color.Black, 1, JointStyle.MITER)
-  ..graphics.fillColor(Color.White);
+      ..width = width
+      ..height = height
+      ..graphics.rect(0, 0, width - 1, height - 1)
+      ..graphics.strokeColor(Color.Black, 1, JointStyle.MITER)
+      ..graphics.fillColor(Color.White);
     addChild(background);
   }
 }
@@ -30,20 +27,32 @@ main() {
   RenderLoop renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
   stage.backgroundColor = Color.Beige;
+  stage.scaleMode = StageScaleMode.SHOW_ALL;
+  stage.align = StageAlign.NONE;
+  print('stage width: ${stage.width}, stage height: ${stage.height}');
 
   var area = new PlotArea(700, 500)
-..x = 50
-..y = 50
-..name = 'PlotArea'
-..addTo(stage);
+    ..x = 50
+    ..y = 50
+    ..name = 'PlotArea'
+    ..addTo(stage);
   print('stage width: ${stage.width}, stage height: ${stage.height}');
-  print("Plot area width=${area.width} and heigth=${area.height}");
+  print('Plot area width=${area.width} and heigth=${area.height}');
 
-  NumericAxis ax1 = new NumericAxis(0, 1)
+  new NumericAxis(0, 1)
+    ..width = area.width
     ..addTo(area)
-    ..y = 10
-    ..draw();
+    ..draw()
+    ..y = 25;
+
+  new NumericAxis(0, 100)
+    ..width = area.width
+    ..addTo(area)
+    ..draw()
+    ..y = 75;
 
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
 }
+
+

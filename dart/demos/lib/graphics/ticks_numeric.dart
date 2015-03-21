@@ -3,6 +3,7 @@ library graphics.ticks_numeric;
 import 'dart:math';
 import 'package:demos/math/utils.dart';
 
+
 /**
  * Calculate the numerical ticks.
  */
