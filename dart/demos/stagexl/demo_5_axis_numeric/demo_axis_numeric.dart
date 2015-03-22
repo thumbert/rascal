@@ -51,6 +51,15 @@ main() {
     ..draw()
     ..y = 75;
 
+  new NumericAxis(0, 3)
+    ..width = area.width
+    ..addTo(area)
+    ..draw()
+    ..y = 125;
+
+
+
+
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
 }

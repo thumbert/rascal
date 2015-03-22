@@ -9,7 +9,6 @@ import 'package:demos/graphics/tick.dart';
 
 /**
  * A Numeric axis.
- * [min] lowest value to represent
  */
 class NumericAxis extends Sprite {
 
@@ -25,9 +24,16 @@ class NumericAxis extends Sprite {
   String label;
 
   /// margin in points from the edges of the parent
-  int _margin = 10;
+  int margin = 10;
 
-  NumericAxis(num this.min, num this.max, {List<num> this.ticks, List<String> this.tickLabels, String this.label: ''}) {
+  /**
+   * A numeric axis.
+   *
+   * [min] lowest value to represent
+   * [margin]  margin in points from the edges of the parent
+   */
+  NumericAxis(num this.min, num this.max, {List<num> this.ticks, List<String> this.tickLabels, String this.label: '',
+    int this.margin: 10}) {
     assert(min <= max);
 
     if (ticks == null)
@@ -41,23 +47,29 @@ class NumericAxis extends Sprite {
   draw() {
     var _width = parent.width;
     var range = max - min;
-    scale = (num x) => ((x - min) * (_width - 2 * _margin) / range + _margin).round();
+    scale = (num x) => ((x - min) * (_width - 2 * margin) / range + margin).round();
+    Function fmtLabel;
 
-    int precision = 1;
     if (tickLabels == null) {
-      int range10 = (math.log(max - min)*math.LOG10E).round();
-      if (range10 <=0) {
-        precision = math.max(-range10 + 1, 1);
+      num range10 = (math.log(max - min)*math.LOG10E);
+      print('range10: $range10');
+      if (range10 <= 0.6) {
+        int precision = math.max(range10, 1).ceil();
+        print('precision: $precision');
+        fmtLabel = (num x) => (x.toStringAsFixed(precision));
       } else {
-        precision = math.max(range10, 1);
+        fmtLabel = (num x) => x.toStringAsFixed(0);
       }
+      tickLabels = ticks.map((e) => fmtLabel(e)).toList();
+    } else {
+      assert(tickLabels.length == ticks.length);
     }
 
     graphics.moveTo(0, y);
     graphics.lineTo(_width, y);
     for (int i = 0; i < ticks.length; i++) {
-      print('i: $i, ${scale(ticks[i])}');
-      Tick tick = new Tick(ticks[i].toStringAsPrecision(precision), Direction.DOWN)
+      //print('i: $i, ${scale(ticks[i])}');
+      Tick tick = new Tick(tickLabels[i], Direction.DOWN)
         ..x = scale(ticks[i]);
       addChild(tick);
     }
