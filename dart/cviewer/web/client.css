@@ -38,6 +38,10 @@ html, body {
   background-color: White;
 }
 
+#submit-button {
+    font-size: 30 px;
+    padding: 5px 5px 5px 5px;
+}
 
 
 #bc-list {
