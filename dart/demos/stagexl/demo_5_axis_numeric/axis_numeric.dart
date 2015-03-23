@@ -30,7 +30,8 @@ class NumericAxis extends Sprite {
    * A numeric axis.
    *
    * [min] lowest value to represent
-   * [margin]  margin in points from the edges of the parent
+   * [margin]  margin in points from the edges of the parent.  If margin is too little, labels may
+   *  push the axis
    */
   NumericAxis(num this.min, num this.max, {List<num> this.ticks, List<String> this.tickLabels, String this.label: '',
     int this.margin: 10}) {
