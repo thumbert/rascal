@@ -70,22 +70,27 @@ main() {
 
   new NumericAxis(0, 1)
     //..width = area.width
-    ..addTo(figure)
+    ..addTo(plotArea)
     ..draw()
-    ..x = 100
     ..y = 25;
 
-  new NumericAxis(0, 100)
-    ..addTo(figure)
+  var ax2 = new NumericAxis(0, 100)
+    ..addTo(plotArea)
     ..draw()
-    ..x = 100
-    ..y = 125;
+    ..y = 100;
+  ax2.scaleX = 400/ax2.width;
 
-  new NumericAxis(0, 3)
-    ..addTo(figure)
+  var ax3 = new NumericAxis(0, 3)
+    ..addTo(plotArea)
     ..draw()
-    ..x = 100
     ..y = 175;
+  ax3.scaleX = 400/ax3.width;
+
+  var ax4 = new NumericAxis(1, 3000)
+    ..addTo(plotArea)
+    ..draw()
+    ..y = 250;
+  ax4.scaleX = 400/ax4.width;
 
 
   print('stage width: ${stage.width}, stage height: ${stage.height}');
