@@ -1,6 +1,6 @@
 name: timeseries
 version: 0.0.1
-author: Adrian A. Dragulescu
+author: Tony Humbert
 description: timeseries functionality for Dart
 dependencies:
   intl: any
