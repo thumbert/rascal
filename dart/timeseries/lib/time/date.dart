@@ -41,7 +41,9 @@ class Date extends Comparable<Date>{
   }
   
   int get year => _year;
+  /// month of year
   int get month => _month;
+  /// day of month
   int get day => _day;
   int get value => _value;
   

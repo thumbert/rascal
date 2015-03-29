@@ -1,5 +1,8 @@
 library elec.bucket;
 
+import 'package:timeseries/time/calendar.dart';
+import 'package:timeseries/time/date.dart';
+
 abstract class Bucket {
   final H1 = new Duration(hours: 1);
 
@@ -49,9 +52,6 @@ abstract class _CompositeBucket extends Bucket {
 
 
 class Bucket7x24 extends _SimpleBucket {
-  final Set<int> hours = new Set.from(new List.generate(24, (i) => i));
-
-
   bool containsHourEnding(DateTime dt) => true;
 }
 
@@ -63,6 +63,7 @@ class Bucket7x8 extends _SimpleBucket {
 class Bucket5x16 extends _SimpleBucket {
   final Set<int> hours = new Set.from(new List.generate(16, (i) => i+8));
   final Set<int> days  = new Set.from(new List.generate(5, (i) => i+1));
+  Calendar calendar = new NercCalendar();
 
   bool containsHourEnding(DateTime dt) {
     bool res;
@@ -71,15 +72,19 @@ class Bucket5x16 extends _SimpleBucket {
       /// you are not the right day of the week
       return false;
     } else {
-      if (!hours.contains(dt.hour + 1)) {
-        /// you are not the right hour of the day
+      if (!hours.contains(dt.hour)) {
+        /// you are not at the right hour of the day
         return false;
       } else {
-        /// TODO: continue me
+        if (calendar.isHoliday(new Date.fromDateTime(dt-3600000)))   ///TODO: what happens with midnight?
+          /// it's a holiday
+          return false;
+        else
+          return true;
       }
     }
 
-    return res;
+    return res;  /// should not even get here
   }
 }
 
