@@ -66,7 +66,7 @@ main() {
 //    ..y = 10
 //    ..addTo(plotArea)
 //    ..draw();
-//  print('After adding HLine, plot area width=${plotArea.width} and plot area heigth=${plotArea.height}');
+//  print('After adding HLine, plot area width=${plotArea.width} and plot area height=${plotArea.height}');
 
   new NumericAxis(0, 1)
     //..width = area.width
