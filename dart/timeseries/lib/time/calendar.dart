@@ -10,18 +10,29 @@ abstract class Calendar {
 
 class NercCalendar extends Calendar {
   bool isHoliday(Date date) {
-    bool res = false;
-    if (date.month == 1 && Holiday.isNewYearsEve(date))
-      res = true;
-    else if (date.month == 7 && Holiday.isFourthOfJuly(date))
-      res = true;
-    else if (date.month == 9 && Holiday.isLaborDay(date))
-      res = true;
-    else if (date.month == 11 && Holiday.isThanksgiving(date))
-      res = true;
-    else if (date.month == 12 && Holiday.isChristmas(date))
-      res = true;
+    switch (date.month) {
+      case 1:
+        if (Holiday.isNewYearsEve(date)) return true;
+        break;
+      case 5:
+        if (Holiday.isMemorialDay(date)) return true;
+        break;
+      case 7:
+        if (Holiday.isNercFourthOfJuly(date)) return true;
+        break;
+      case 9:
+        if (Holiday.isLaborDay(date)) return true;
+        break;
+      case 11:
+        if (Holiday.isThanksgiving(date)) return true;
+        break;
+      case 12:
+        if (Holiday.isNercChristmas(date)) return true;
+        break;
+      default:
+        return false;
+    }
 
-    return res;
+    return false;  /// should never get here
   }
 }

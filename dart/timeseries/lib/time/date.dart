@@ -12,6 +12,7 @@ class Date extends Comparable<Date>{
   int _month;
   int _day;
   int _value;  // number of days since origin 1970-01-01
+  int _dayOfWeek;
   
   static final DateFormat DEFAULT_FMT = new DateFormat('yyyy-MM-dd');
   static final Duration _1day = new Duration(days: 1);
@@ -93,9 +94,12 @@ class Date extends Comparable<Date>{
   /**
    * Return the day of the week.  Mon=1, ... Sat=6, Sun=7.
    */
-  int get weekday => _dayOfWeek();
-  
-  int _dayOfWeek() {
+  int get weekday {
+    if (_dayOfWeek == null) _calcDayOfWeek();
+    return _dayOfWeek;
+  }
+
+  void _calcDayOfWeek() {
     var ix = _year + ((_month-14)/12).truncate();
     var jx = ((13 * (_month + 10 - (_month + 10) ~/ 13 * 12) - 1)/5).truncate()
         + _day + 77 + (5 * (ix - (ix ~/ 100) * 100)) ~/ 4
@@ -103,7 +107,7 @@ class Date extends Comparable<Date>{
     jx = jx % 7;
     if (jx == 0) jx = 7;  // Make Sun = 7
     
-    return jx;
+    _dayOfWeek = jx;
   }
 
   int dayOfYear() => value - new Date(_year, 1, 1).value + 1;    

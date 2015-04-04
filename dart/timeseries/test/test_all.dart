@@ -7,10 +7,11 @@ import 'test_holiday.dart';
 import 'test_interval.dart';
 import 'test_month.dart';
 import 'test_period.dart';
+import 'test_calendar.dart';
 
 
 main () {
-  
+  testNercCalendar();
   test_date();
   //test_dst();
   test_holiday();

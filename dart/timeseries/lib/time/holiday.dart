@@ -23,6 +23,15 @@ class Holiday {
   static bool isChristmas(Date date) {
     if (date.month == 12 && date.day == 25) return true; else return false;
   }
+  static bool isNercChristmas(Date date) {
+    if (date.month == 12) {
+      if (date.day == 25 && date.weekday != 7) return true;
+      if (date.day == 26 && date.weekday == 1) return true;
+    }
+
+    return false;
+  }
+
 
   static Holiday fourthOfJuly(int year) =>
   new Holiday.from(new Date(year, 7, 4))
@@ -31,6 +40,14 @@ class Holiday {
   static bool isFourthOfJuly(Date date) {
     if (date.month == 7 && date.day == 4) return true; else return false;
   }
+  static bool isNercFourthOfJuly(Date date) {
+    if (date.month == 7) {
+      if (date.day == 4 && date.weekday != 7) return true;
+      if (date.day == 5 && date.weekday == 1) return true;
+    }
+    return false;
+  }
+
 
   /**
    * Labor Day, 1st Monday in Sep
@@ -80,6 +97,13 @@ class Holiday {
     ..name = "New Year's Eve";
   static bool isNewYearsEve(Date date) {
     if (Holiday.newYearsEve(date.year).day == date) return true; else return false;
+  }
+  static bool isNercNewYearsEve(Date date) {
+    if (date.month == 1) {
+      if (date.day == 1 && date.weekday != 7) return true;
+      if (date.day == 2 && date.weekday == 1) return true;
+    }
+    return false;
   }
 
   /**

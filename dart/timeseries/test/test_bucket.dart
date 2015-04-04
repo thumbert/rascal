@@ -14,6 +14,7 @@ List<DateTime> seqHours(DateTime start, DateTime end) {
 
   return res;
 }
+
 test_bucket() {
   List<DateTime> hrs = seqHours(new DateTime(2015,1,1,1), new DateTime(2016));
   Bucket b7x24 = new Bucket7x24();
