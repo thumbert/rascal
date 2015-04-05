@@ -6,4 +6,5 @@ dependencies:
   intl: any
   logging: any
   logging_handlers: any
+  timezone: any
   unittest: any

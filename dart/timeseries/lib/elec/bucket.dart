@@ -1,51 +1,68 @@
 library elec.bucket;
 
+import 'package:timezone/standalone.dart';
 import 'package:timeseries/time/calendar.dart';
 import 'package:timeseries/time/date.dart';
+import 'package:timeseries/elec/iso.dart';
 
 abstract class Bucket {
-  final Duration H1 = new Duration(hours: 1);
-  final Calendar calendar = new NercCalendar();
+  static final Duration H1 = new Duration(hours: 1);
+  Calendar calendar;
   String name;
+  Iso iso;
 
   /**
    * Does this bucket contains the HourEnding dt?
    * [dt] needs to be an hour ending DateTime (0 min, 0 seconds, 0 millis)
+   * If the location of [dt] is not the same as the [iso] location, error.
    */
-  bool containsHourEnding(DateTime dt);
+  bool containsHourEnding(TZDateTime dt) => containsHourBeginning(dt.subtract(Bucket.H1));
 
   /**
    * Does this bucket contains the HourBeginning dt?
    */
-  bool containsHourBeginning(DateTime dt) => containsHourEnding(dt.subtract(H1));
+  bool containsHourBeginning(TZDateTime dt);
 
   /**
    * Count the number of Hour Ending hours between start and end that belong to this bucket.
    * [start] is an HourEnding DateTime
    * [end] is an HourEnding DateTime
    */
-  int hoursIn(DateTime start, DateTime end) {
-    int hrs = 0;
-    var current = start;
-    while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
-      if (containsHourEnding(current))
-        hrs += 1;
-    }
-
-    return hrs;
-  }
+//  int hoursIn(DateTime start, DateTime end) {
+//    int hrs = 0;
+//    var current = start;
+//    while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
+//      if (containsHourEnding(current))
+//        hrs += 1;
+//    }
+//
+//    return hrs;
+//  }
 }
 
 
 class Bucket7x24 extends Bucket {
-  String name = '7x24';
+  final String name = '7x24';
+  Iso iso;
+  Calendar calendar = new NercCalendar();
+
+  Bucket7x24(Iso this.iso);
+
   bool containsHourEnding(DateTime dt) => true;
+  bool containsHourBeginning(DateTime dt) => true;
 }
 
 class Bucket7x8 extends Bucket {
-  String name = '7x8';
-  bool containsHourEnding(DateTime dt) {
-    if (dt.hour >= 0 && dt.hour <=7)
+  final String name = '7x8';
+  Iso iso;
+  Calendar calendar = new NercCalendar();
+
+  Bucket7x8(Iso this.iso);
+
+  bool containsHourBeginning(TZDateTime dt) {
+    if (dt.location != Iso.location)
+      throw new ArgumentError('dt location doesn\'t match iso location');
+    if ((dt.hour >= 0 && dt.hour <= 6) || dt.hour == 23)
       return true;
 
     return false;
@@ -53,21 +70,25 @@ class Bucket7x8 extends Bucket {
 }
 
 class Bucket5x16 extends Bucket {
-  String name = '5x16';
-  final Set<int> hours = new Set.from(new List.generate(16, (i) => i+8));
-  final Set<int> days  = new Set.from(new List.generate(5, (i) => i+1));
+  final String name = '5x16';
+  Iso iso;
+  Calendar calendar = new NercCalendar();
 
-  bool containsHourEnding(DateTime dt) {
+  Bucket5x16(Iso this.iso);
+
+  bool containsHourBeginning(TZDateTime dt) {
+    if (dt.location != Iso.location)
+      throw new ArgumentError('dt location doesn\'t match iso location');
     int dayOfWeek = dt.weekday;
     if (dayOfWeek == 6 || dayOfWeek == 7) {
       /// not the right day of the week
       return false;
     } else {
-      if (!hours.contains(dt.hour)) {
+      if (dt.hour < 7 || dt.hour == 23) {
         /// not at the right hour of the day
         return false;
       } else {
-        if (calendar.isHoliday(new Date.fromDateTime(dt.subtract(H1))))
+        if (calendar.isHoliday(new Date(dt.year, dt.month, dt.day)))
           /// it's a holiday
           return false;
         else
@@ -80,14 +101,20 @@ class Bucket5x16 extends Bucket {
 }
 
 class Bucket2x16H extends Bucket {
-  String name = '2x16H';
+  final String name = '2x16H';
+  Iso iso;
+  Calendar calendar = new NercCalendar();
 
-  bool containsHourEnding(DateTime dt) {
+  Bucket2x16H(Iso this.iso);
+
+  bool containsHourBeginning(TZDateTime dt) {
+    if (dt.location != Iso.location)
+      throw new ArgumentError('dt location doesn\'t match iso location');
     int dayOfWeek = dt.weekday;
     if (dayOfWeek == 6 || dayOfWeek == 7) {
       return true;
     } else {
-      if (calendar.isHoliday(new Date.fromDateTime(dt.subtract(H1))))
+      if (calendar.isHoliday(new Date(dt.year, dt.month, dt.year)))
         return true;
       else
         return false;
@@ -98,16 +125,22 @@ class Bucket2x16H extends Bucket {
 }
 
 class BucketOffpeak extends Bucket {
-  String name = 'Offpeak';
+  final String name = 'Offpeak';
+  Iso iso;
+  Calendar calendar = new NercCalendar();
 
-  bool containsHourEnding(DateTime dt) {
+  BucketOffpeak(Iso this.iso);
+
+  bool containsHourBeginning(TZDateTime dt) {
+    if (dt.location != Iso.location)
+      throw new ArgumentError('dt location doesn\'t match iso location');
     int dayOfWeek = dt.weekday;
     if (dayOfWeek == 6 || dayOfWeek == 7) {
       return true;
     } else {
-      if (dt.hour >= 0 && dt.hour <= 7)
+      if (dt.hour < 7 || dt.hour == 23)
         return true;
-      if (calendar.isHoliday(new Date.fromDateTime(dt.subtract(H1))))
+      if (calendar.isHoliday(new Date(dt.year, dt.month, dt.day)))
         return true;
     }
 
