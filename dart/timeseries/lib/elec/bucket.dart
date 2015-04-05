@@ -4,12 +4,19 @@ import 'package:timeseries/time/calendar.dart';
 import 'package:timeseries/time/date.dart';
 
 abstract class Bucket {
-  final H1 = new Duration(hours: 1);
+  final Duration H1 = new Duration(hours: 1);
+  final Calendar calendar = new NercCalendar();
+  String name;
 
-  /// does this bucket contains the HourEnding dt?
+  /**
+   * Does this bucket contains the HourEnding dt?
+   * [dt] needs to be an hour ending DateTime (0 min, 0 seconds, 0 millis)
+   */
   bool containsHourEnding(DateTime dt);
 
-  /// does this bucket contains the HourBeginning dt?
+  /**
+   * Does this bucket contains the HourBeginning dt?
+   */
   bool containsHourBeginning(DateTime dt) => containsHourEnding(dt.subtract(H1));
 
   /**
@@ -29,54 +36,38 @@ abstract class Bucket {
   }
 }
 
-abstract class _SimpleBucket extends Bucket {
-  /// hour of the day, in HE convention that belong to this bucket
-  Set<int> hours;
-  Set<int> days;             /// day of the week, Monday==1, Sunday==7
-  Set<int> seasonalMonths;
-  bool includeHolidays;
-  ///Calendar calendar;
-}
 
-abstract class _CompositeBucket extends Bucket {
-  Set<Bucket> buckets;
-
-  bool containsHourEnding(DateTime dt) =>
-    buckets.any((Bucket bucket) => bucket.containsHourEnding(dt));
-
-  bool containsHourBeginning(DateTime dt) =>
-    buckets.any((Bucket bucket) => bucket.containsHourBeginning(dt));
-
-
-}
-
-
-class Bucket7x24 extends _SimpleBucket {
+class Bucket7x24 extends Bucket {
+  String name = '7x24';
   bool containsHourEnding(DateTime dt) => true;
 }
 
-class Bucket7x8 extends _SimpleBucket {
-  final Set<int> hours = new Set.from([1,2,3,4,5,6,7,24]);
-  bool containsHourEnding(DateTime dt) => hours.contains(dt.hour + 1);
+class Bucket7x8 extends Bucket {
+  String name = '7x8';
+  bool containsHourEnding(DateTime dt) {
+    if (dt.hour >= 0 && dt.hour <=7)
+      return true;
+
+    return false;
+  }
 }
 
-class Bucket5x16 extends _SimpleBucket {
+class Bucket5x16 extends Bucket {
+  String name = '5x16';
   final Set<int> hours = new Set.from(new List.generate(16, (i) => i+8));
   final Set<int> days  = new Set.from(new List.generate(5, (i) => i+1));
-  Calendar calendar = new NercCalendar();
 
   bool containsHourEnding(DateTime dt) {
-    bool res;
     int dayOfWeek = dt.weekday;
     if (dayOfWeek == 6 || dayOfWeek == 7) {
-      /// you are not the right day of the week
+      /// not the right day of the week
       return false;
     } else {
       if (!hours.contains(dt.hour)) {
-        /// you are not at the right hour of the day
+        /// not at the right hour of the day
         return false;
       } else {
-        if (calendar.isHoliday(new Date.fromDateTime(dt-3600000)))   ///TODO: what happens with midnight?
+        if (calendar.isHoliday(new Date.fromDateTime(dt.subtract(H1))))
           /// it's a holiday
           return false;
         else
@@ -84,14 +75,42 @@ class Bucket5x16 extends _SimpleBucket {
       }
     }
 
-    return res;  /// should not even get here
+    return false;
   }
 }
 
-class Bucket2x16H extends _SimpleBucket {
-  bool containsHourEnding(DateTime dt) {
-    bool res;
+class Bucket2x16H extends Bucket {
+  String name = '2x16H';
 
-    return res;
+  bool containsHourEnding(DateTime dt) {
+    int dayOfWeek = dt.weekday;
+    if (dayOfWeek == 6 || dayOfWeek == 7) {
+      return true;
+    } else {
+      if (calendar.isHoliday(new Date.fromDateTime(dt.subtract(H1))))
+        return true;
+      else
+        return false;
+    }
+
+    return false;
+  }
+}
+
+class BucketOffpeak extends Bucket {
+  String name = 'Offpeak';
+
+  bool containsHourEnding(DateTime dt) {
+    int dayOfWeek = dt.weekday;
+    if (dayOfWeek == 6 || dayOfWeek == 7) {
+      return true;
+    } else {
+      if (dt.hour >= 0 && dt.hour <= 7)
+        return true;
+      if (calendar.isHoliday(new Date.fromDateTime(dt.subtract(H1))))
+        return true;
+    }
+
+    return false;
   }
 }
