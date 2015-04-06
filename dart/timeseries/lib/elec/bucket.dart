@@ -9,7 +9,7 @@ abstract class Bucket {
   static final Duration H1 = new Duration(hours: 1);
   Calendar calendar;
   String name;
-  Iso iso;
+  //Iso iso;
 
   /**
    * Does this bucket contains the HourEnding dt?
@@ -71,13 +71,13 @@ class Bucket7x8 extends Bucket {
 
 class Bucket5x16 extends Bucket {
   final String name = '5x16';
-  Iso iso;
+  Location location;
   Calendar calendar = new NercCalendar();
 
-  Bucket5x16(Iso this.iso);
+  Bucket5x16(Location this.location);
 
   bool containsHourBeginning(TZDateTime dt) {
-    if (dt.location != Iso.location)
+    if (dt.location != location)
       throw new ArgumentError('dt location doesn\'t match iso location');
     int dayOfWeek = dt.weekday;
     if (dayOfWeek == 6 || dayOfWeek == 7) {

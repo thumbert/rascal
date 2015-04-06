@@ -6,5 +6,5 @@ dependencies:
   intl: any
   logging: any
   logging_handlers: any
-  timezone: any
+  timezone: ">=0.2.5"
   unittest: any
