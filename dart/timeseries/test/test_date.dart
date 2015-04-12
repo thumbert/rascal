@@ -65,6 +65,17 @@ test_date() {
           "2014-02-01,2014-08-01,2014-12-01");
     });
 
+    test("toSet() on a list of Dates", () {
+      var x = [new Date(2014,1,1), new Date(2014,1,1)];
+      print(new Date(2014,1,1) == new Date(2014,1,1));
+      print(x.toSet());
+      var s = new Set()..add(new Date(2014,1,1));
+      print(s.add(new Date(2014,1,1)));
+      print(s);
+
+      expect(x.toSet().toList().length, 1);  // FIXME: Why this doesn't work???
+    });
+
   });
 }
 

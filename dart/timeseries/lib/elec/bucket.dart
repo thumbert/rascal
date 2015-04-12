@@ -54,10 +54,10 @@ class Bucket7x24 extends Bucket {
 
 class Bucket7x8 extends Bucket {
   final String name = '7x8';
-  Iso iso;
+  Location location;
   Calendar calendar = new NercCalendar();
 
-  Bucket7x8(Iso this.iso);
+  Bucket7x8(Location this.location);
 
   bool containsHourBeginning(TZDateTime dt) {
     if (dt.location != Iso.location)
@@ -102,13 +102,13 @@ class Bucket5x16 extends Bucket {
 
 class Bucket2x16H extends Bucket {
   final String name = '2x16H';
-  Iso iso;
+  Location location;
   Calendar calendar = new NercCalendar();
 
-  Bucket2x16H(Iso this.iso);
+  Bucket2x16H(Location this.location);
 
   bool containsHourBeginning(TZDateTime dt) {
-    if (dt.location != Iso.location)
+    if (dt.location != location)
       throw new ArgumentError('dt location doesn\'t match iso location');
     int dayOfWeek = dt.weekday;
     if (dayOfWeek == 6 || dayOfWeek == 7) {
@@ -126,13 +126,13 @@ class Bucket2x16H extends Bucket {
 
 class BucketOffpeak extends Bucket {
   final String name = 'Offpeak';
-  Iso iso;
+  Location location;
   Calendar calendar = new NercCalendar();
 
-  BucketOffpeak(Iso this.iso);
+  BucketOffpeak(Location this.location);
 
   bool containsHourBeginning(TZDateTime dt) {
-    if (dt.location != Iso.location)
+    if (dt.location != location)
       throw new ArgumentError('dt location doesn\'t match iso location');
     int dayOfWeek = dt.weekday;
     if (dayOfWeek == 6 || dayOfWeek == 7) {
