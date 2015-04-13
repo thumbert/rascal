@@ -60,9 +60,9 @@ class Bucket7x8 extends Bucket {
   Bucket7x8(Location this.location);
 
   bool containsHourBeginning(TZDateTime dt) {
-    if (dt.location != Iso.location)
+    if (dt.location != location)
       throw new ArgumentError('dt location doesn\'t match iso location');
-    if ((dt.hour >= 0 && dt.hour <= 6) || dt.hour == 23)
+    if (dt.hour <= 6 || dt.hour == 23)
       return true;
 
     return false;
@@ -111,10 +111,12 @@ class Bucket2x16H extends Bucket {
     if (dt.location != location)
       throw new ArgumentError('dt location doesn\'t match iso location');
     int dayOfWeek = dt.weekday;
+    if (dt.hour < 7 || dt.hour == 23)
+      return false;
     if (dayOfWeek == 6 || dayOfWeek == 7) {
       return true;
     } else {
-      if (calendar.isHoliday(new Date(dt.year, dt.month, dt.year)))
+      if (calendar.isHoliday(new Date(dt.year, dt.month, dt.day)))
         return true;
       else
         return false;

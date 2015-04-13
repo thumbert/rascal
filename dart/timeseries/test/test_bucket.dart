@@ -29,7 +29,7 @@ List<int> countByMonth(int year, Bucket bucket) {
     List<DateTime> hrs = seqHours(start, end);
     int count = hrs.where((hour) => bucket.containsHourBeginning(hour)).length;
     res.add(count);
-    print('start: $start, end: $end, count: $count');
+    //print('start: $start, end: $end, count: $count');
   }
 
   return res;
@@ -46,6 +46,14 @@ List<String> daysInBucket(int year, int month, Bucket bucket) {
   return days;
 }
 
+showHourBeginning(int year, int month, Bucket bucket) {
+  Month next = new Month(year, month).next();
+  TZDateTime start = new TZDateTime(Nepool.location, year, month, 1);
+  TZDateTime end = new TZDateTime(Nepool.location, next.year, next.month).subtract(new Duration(hours: 1));
+  List<DateTime> hrs = seqHours(start, end);
+  hrs.where((hour) => bucket.containsHourBeginning(hour)).forEach((hr) => print(hr));
+}
+
 
 
 test_bucket() {
@@ -58,7 +66,7 @@ test_bucket() {
         List<DateTime> hrs = seqHours(new TZDateTime(Nepool.location, year, 1, 1), new TZDateTime(Nepool.location, year, 12, 31, 23));
         res.add(hrs.where((hour) => b5x16.containsHourBeginning(hour)).length);
       }
-      expect(res, [4096, 4080, 4080, 4096, 4080]);
+      expect(res, [4080, 4080, 4080, 4096, 4080]);
     });
     test("peak hours by month in 2012", () {
       expect(countByMonth(2012, Nepool.bucket5x16),
@@ -76,12 +84,41 @@ test_bucket() {
 
 
   group("Test the 2x16H bucket NEPOOL", () {
-    solo_test("2x16H hours by month in 2012", () {
-      //daysInBucket(2012, 2, Nepool.bucket2x16H).forEach((e) => print(e));
+    test("2x16H hours by month in 2012", () {
+//      daysInBucket(2012, 1, Nepool.bucket2x16H).forEach((e) => print(e));
+//      showHourBeginning(2012, 2, Nepool.bucket2x16H);
       expect(countByMonth(2012, Nepool.bucket2x16H),
-      [216, 192, 215, 216, 192, 216, 216, 192, 240, 192, 193, 240]);
+      [160, 128, 144, 144, 144, 144, 160, 128, 176, 128, 144,	176]);
+    });
+    test("2x16H hours by month in 2013", () {
+      expect(countByMonth(2013, Nepool.bucket2x16H),
+      [144,	128,	160,	128,	144,	160,	144,	144,	160,	128,	160,	160]);
     });
   });
+
+
+  group("Test the 7x8 bucket NEPOOL", () {
+    test("7x8 hours by month in 2012", () {
+      expect(countByMonth(2012, Nepool.bucket7x8),
+      [248,	232,	247,	240,	248,	240,	248,	248,	240,	248,	241,	248]);
+    });
+    test("7x8 hours by month in 2013", () {
+      expect(countByMonth(2013, Nepool.bucket7x8),
+      [248,	224,	247,	240,	248,	240,	248,	248,	240,	248,	241,	248]);
+    });
+  });
+
+  group("Test the Offpeak bucket NEPOOL", () {
+    test("Offpeak hours by month in 2012", () {
+      expect(countByMonth(2012, Nepool.bucketOffpeak),
+      [408,	360,	391,	384,	392,	384,	408,	376,	416,	376,	385,	424]);
+    });
+    test("Offpeak hours by month in 2013", () {
+      expect(countByMonth(2013, Nepool.bucketOffpeak),
+      [392,	352,	407,	368,	392,	400,	392,	392,	400,	376,	401,	408]);
+    });
+  });
+
 
 }
 

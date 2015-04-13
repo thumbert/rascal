@@ -8,6 +8,11 @@ testNercCalendar() {
   /// see http://www.nerc.com/comm/OC/RS%20Agendas%20Highlights%20and%20Minutes%20DL/Additional_Off-peak_Days.pdf
   Calendar cal = new NercCalendar();
   group("Test the NERC Calendar", () {
+    test("For 2012", () {
+      List days = [new Date(2012,1,2), new Date(2012, 5, 28), new Date(2012,7,4),
+      new Date(2012,9,3), new Date(2012,11,22), new Date(2012,12,25)];
+      expect(days.map((day) => cal.isHoliday(day)).toList(), new List.filled(6, true));
+    });
     test("For 2014", () {
       List days = [new Date(2014,1,1), new Date(2014, 5, 26), new Date(2014,7,4),
         new Date(2014,9,1), new Date(2014,11,27), new Date(2014,12,25)];
@@ -24,7 +29,7 @@ testNercCalendar() {
       expect(days.map((day) => cal.isHoliday(day)).toList(), new List.filled(6, true));
     });
     test("For 2017", () {
-      List days = [new Date(2017,1,1), new Date(2017, 5, 29), new Date(2017,7,4),
+      List days = [new Date(2017,1,2), new Date(2017, 5, 29), new Date(2017,7,4),
       new Date(2017,9,4), new Date(2017,11,23), new Date(2017,12,25)];
       expect(days.map((day) => cal.isHoliday(day)).toList(), new List.filled(6, true));
     });
@@ -54,7 +59,7 @@ testNercCalendar() {
       expect(days.map((day) => cal.isHoliday(day)).toList(), new List.filled(6, true));
     });
     test("For 2023", () {
-      List days = [new Date(2023,1,1), new Date(2023, 5, 29), new Date(2023,7,4),
+      List days = [new Date(2023,1,2), new Date(2023, 5, 29), new Date(2023,7,4),
       new Date(2023,9,4), new Date(2023,11,23), new Date(2023,12,25)];
       expect(days.map((day) => cal.isHoliday(day)).toList(), new List.filled(6, true));
     });

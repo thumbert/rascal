@@ -12,7 +12,7 @@ class NercCalendar extends Calendar {
   bool isHoliday(Date date) {
     switch (date.month) {
       case 1:
-        if (Holiday.isNewYearsEve(date)) return true;
+        if (Holiday.isNercNewYearsEve(date)) return true;
         break;
       case 5:
         if (Holiday.isMemorialDay(date)) return true;
