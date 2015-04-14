@@ -90,7 +90,8 @@ class Date extends Comparable<Date> {
   bool operator >=(Date other) => this.value >= other.value;
   bool operator ==(Date other) => other != null && other._value == _value;
   int compareTo(Date other)    => this.value.compareTo(other.value);
-  
+  int get hashCode => _value;
+
   /**
    * Return the day of the week.  Mon=1, ... Sat=6, Sun=7.
    */

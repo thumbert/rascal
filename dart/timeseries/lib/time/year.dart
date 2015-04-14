@@ -50,7 +50,8 @@ class Year extends Comparable<Year> {
   bool operator >(Year other)  => _value > other._value;
   bool operator >=(Year other) => _value >= other._value;
   bool operator ==(Year other) => (other != null) &&_value == other._value;
-  
+  int get hashCode => _value;
+
   int compareTo(Year other) {
     int res;
     if (this._value < other._value) {

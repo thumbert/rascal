@@ -36,10 +36,7 @@ test_holiday() {
       expect("2014-09-01", Holiday.laborDay(2014).day.toString() );
       expect(Holiday.laborDay(2014).name, "Labor Day");
     });
-   
-    
-    
-    
+
   });
   
   

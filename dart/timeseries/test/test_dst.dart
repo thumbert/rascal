@@ -30,4 +30,4 @@ test_dst() {
   });
 }
 
-//main() => test_dst();
+main() => test_dst();

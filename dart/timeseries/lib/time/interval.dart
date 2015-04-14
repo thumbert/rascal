@@ -22,7 +22,7 @@ abstract class RegularInterval {
 
 /**
  * An Interval class to represent the time interval between [[start] and [end]).  
- * Start and end DateTimes need to be different.
+ * The start DateTime needs to be before the end DateTimes.
  */
 class Interval {
   DateTime start;

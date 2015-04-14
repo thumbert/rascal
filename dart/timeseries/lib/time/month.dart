@@ -59,7 +59,8 @@ class Month extends Comparable<Month> {
   bool operator >(Month other)  => _value > other._value;
   bool operator >=(Month other) => _value >= other._value;
   bool operator ==(Month other) => _value == other._value;
-  
+  int get hashCode => _value;
+
   int get year => _year;
   int get month => _month;
   Period get period => Period.MONTH;
