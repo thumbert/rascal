@@ -62,35 +62,30 @@ main() {
   print('plot area width=${plotArea.width} and plot area heigth=${plotArea.height}');
   print('After adding PlotArea, stage width: ${stage.width}, stage height: ${stage.height}'); /// OK
 
-//  var line = new HorizontalLine()
-//    ..y = 10
-//    ..addTo(plotArea)
-//    ..draw();
-//  print('After adding HLine, plot area width=${plotArea.width} and plot area height=${plotArea.height}');
 
-  new NumericAxis(0, 1)
+  new NumericAxis(0, 1, 400)
     //..width = area.width
     ..addTo(plotArea)
     ..draw()
     ..y = 25;
 
-  var ax2 = new NumericAxis(0, 100)
+  var ax2 = new NumericAxis(0, 100, 400)
     ..addTo(plotArea)
     ..draw()
     ..y = 100;
-  ax2.scaleX = 400/ax2.width;
+  //ax2.scaleX = 400/ax2.width;
 
-  var ax3 = new NumericAxis(0, 3)
+  var ax3 = new NumericAxis(0, 3, 400)
     ..addTo(plotArea)
     ..draw()
     ..y = 175;
-  ax3.scaleX = 400/ax3.width;
+  //ax3.scaleX = 400/ax3.width;
 
-  var ax4 = new NumericAxis(1, 3000)
+  var ax4 = new NumericAxis(1, 3000, 400)
     ..addTo(plotArea)
     ..draw()
     ..y = 250;
-  ax4.scaleX = 400/ax4.width;
+  //ax4.scaleX = 400/ax4.width;
 
 
   print('stage width: ${stage.width}, stage height: ${stage.height}');
@@ -98,3 +93,10 @@ main() {
 }
 
 
+
+
+//  var line = new HorizontalLine()
+//    ..y = 10
+//    ..addTo(plotArea)
+//    ..draw();
+//  print('After adding HLine, plot area width=${plotArea.width} and plot area height=${plotArea.height}');

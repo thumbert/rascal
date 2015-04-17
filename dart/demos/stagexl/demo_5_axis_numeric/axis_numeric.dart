@@ -1,7 +1,6 @@
 library axis_numeric;
 
 import 'dart:math' as math;
-import 'package:intl/intl.dart';
 import 'package:stagexl/stagexl.dart';
 import 'package:demos/graphics/ticks_numeric.dart';
 import 'package:demos/graphics/tick.dart';
@@ -16,6 +15,7 @@ class NumericAxis extends Sprite {
   List<num> ticks;
   List<String> tickLabels;
   TextFormat fmt;
+  num screenLength;
 
   /// go from a num to a screen coordinate;
   Function scale;
@@ -33,7 +33,7 @@ class NumericAxis extends Sprite {
    * [margin]  margin in points from the edges of the parent.  If margin is too little, labels may
    *  push the axis
    */
-  NumericAxis(num this.min, num this.max, {List<num> this.ticks, List<String> this.tickLabels, String this.label: '',
+  NumericAxis(num this.min, num this.max, num this.screenLength, {List<num> this.ticks, List<String> this.tickLabels, String this.label: '',
     int this.margin: 10}) {
     assert(min <= max);
 
@@ -46,9 +46,10 @@ class NumericAxis extends Sprite {
   }
 
   draw() {
-    var _width = parent.width;
     var range = max - min;
-    scale = (num x) => ((x - min) * (_width - 2 * margin) / range + margin).round();
+    /// construct the scale function after you have the tick widths, i.e. determine the
+    /// margin such that the axis fits inside the parent.
+    scale = (num x) => ((x - min) * (screenLength - 2*margin) / range + margin).round();
     Function fmtLabel;
 
     if (tickLabels == null) {
@@ -67,7 +68,7 @@ class NumericAxis extends Sprite {
     }
 
     graphics.moveTo(0, y);
-    graphics.lineTo(_width, y);
+    graphics.lineTo(screenLength, y);
     for (int i = 0; i < ticks.length; i++) {
       //print('i: $i, ${scale(ticks[i])}');
       Tick tick = new Tick(tickLabels[i], Direction.DOWN)
