@@ -15,7 +15,6 @@ class NumericAxis extends Sprite {
   List<num> ticks;
   List<String> tickLabels;
   TextFormat fmt;
-  num screenLength;
 
   /// go from a num to a screen coordinate;
   Function scale;
@@ -24,21 +23,44 @@ class NumericAxis extends Sprite {
   String label;
 
   /// margin in points from the edges of the parent
-  int margin = 10;
+  int margin;
+  /// margin in points from the left edge of the parent to the first tick
+  int leftMargin;
+  /// margin in points from the right edge of the parent to the last tick
+  int rightMargin;
+
+  /// the actual length of the axis in pixels
+  num axisLength;
+
+  /// strict == true guarantees that tick labels don't overflow the boundaries of the axis parent.
+  bool strict;
+
+  bool _haveDefaultTicks = false;
+  bool _haveDefaultLabels = false;
+  Function _maxMargin;
+
 
   /**
    * A numeric axis.
    *
    * [min] lowest value to represent
-   * [margin]  margin in points from the edges of the parent.  If margin is too little, labels may
-   *  push the axis
+   * [margin] margin in points from the edges of the parent.
+   *   if ticks are specified
+   *   if the tickLabels are specified, then the margin is adjusted to make room (if possible)
    */
-  NumericAxis(num this.min, num this.max, num this.screenLength, {List<num> this.ticks, List<String> this.tickLabels, String this.label: '',
-    int this.margin: 10}) {
+  NumericAxis(num this.min, num this.max, {List<num> this.ticks, List<String> this.tickLabels, String this.label: '',
+    int this.margin: 10, bool this.strict: true}) {
     assert(min <= max);
 
-    if (ticks == null)
+    _maxMargin = () => axisLength ~/ 10;
+
+    if (ticks == null) {
+      _haveDefaultTicks = true;
       ticks = calculateTicks(min, max);
+    }
+
+    if (tickLabels == null)
+      _haveDefaultLabels = true;
 
     ///print('ticks are: ${ticks.join(',')}');
     fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
@@ -46,10 +68,18 @@ class NumericAxis extends Sprite {
   }
 
   draw() {
+    if (axisLength == null) {
+      if (parent != null) {
+        axisLength = parent.width;
+      } else {
+        print('axisLength is null and parent is not set yet!');
+      }
+    }
+
     var range = max - min;
     /// construct the scale function after you have the tick widths, i.e. determine the
     /// margin such that the axis fits inside the parent.
-    scale = (num x) => ((x - min) * (screenLength - 2*margin) / range + margin).round();
+    scale = (num x) => ((x - min) * (axisLength - 2*margin) / range + margin).round();
     Function fmtLabel;
 
     if (tickLabels == null) {
@@ -68,11 +98,28 @@ class NumericAxis extends Sprite {
     }
 
     graphics.moveTo(0, y);
-    graphics.lineTo(screenLength, y);
+    graphics.lineTo(axisLength, y);
+
+    // see if the first tickLabel fits, if it doesn't by how much you need to adjust
+    Tick tick = new Tick(tickLabels[0], Direction.DOWN);
+    var leftEdge = tick.x - tick.width/2;
+    if (leftEdge < 0) {
+
+    }
+
+
     for (int i = 0; i < ticks.length; i++) {
       //print('i: $i, ${scale(ticks[i])}');
-      Tick tick = new Tick(tickLabels[i], Direction.DOWN)
-        ..x = scale(ticks[i]);
+      var x = scale(ticks[i]);
+      Tick tick = new Tick(tickLabels[i], Direction.DOWN);
+
+      // label does not fit
+      if (x - tick.width/2 < 0 && strict)
+        tick = new Tick('', Direction.DOWN);
+      if (x + tick.width/2 > parent.width && strict)
+        tick = new Tick('', Direction.DOWN);
+
+      tick.x = x;
       addChild(tick);
     }
     graphics.strokeColor(Color.Black);

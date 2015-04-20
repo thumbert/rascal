@@ -12,7 +12,6 @@ class Direction {
 
 /**
  * An axis tick.  Draws the line tick and the text label.
- * Can check if there is enough room for the text label.
  *
  * [text] is the tick label.
  * [direction] is one of Direction.UP, etc.
