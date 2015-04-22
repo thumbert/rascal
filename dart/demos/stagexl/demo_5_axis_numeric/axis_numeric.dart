@@ -100,6 +100,22 @@ class NumericAxis extends Sprite {
     graphics.moveTo(0, y);
     graphics.lineTo(axisLength, y);
 
+    /// generate the ticks, place them at the default location
+    var _ticks = new List.generate(ticks.length,
+        (i) => new Tick(tickLabels[i], Direction.DOWN)..x = scale(ticks[i]));
+    var _sum = _ticks.fold(0, (num a, Tick tick) => a + tick.width);
+    if (_sum > axisLength) {
+      /// labels don't fit at all, so make every other label = ''
+      _ticks = new List.generate(ticks.length, (i) {
+        var lab = '';
+        if (i % 2 == 1)
+          lab = tickLabels[i];
+        return new Tick(lab, Direction.DOWN)..x = scale(ticks[i]);
+      });
+    }
+
+    /// do the labels overlap?  Have to go one by one and check.
+
     // see if the first tickLabel fits, if it doesn't by how much you need to adjust
     Tick tick = new Tick(tickLabels[0], Direction.DOWN);
     var leftEdge = tick.x - tick.width/2;
@@ -122,6 +138,8 @@ class NumericAxis extends Sprite {
       tick.x = x;
       addChild(tick);
     }
+
+    _ticks.forEach((tick) => addChild(tick));
     graphics.strokeColor(Color.Black);
 
   }
