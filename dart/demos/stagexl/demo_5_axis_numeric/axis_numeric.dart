@@ -49,7 +49,7 @@ class NumericAxis extends Sprite {
    *   if the tickLabels are specified, then the margin is adjusted to make room (if possible)
    */
   NumericAxis(num this.min, num this.max, {List<num> this.ticks, List<String> this.tickLabels, String this.label: '',
-    int this.margin: 10, bool this.strict: true}) {
+    int this.margin: 30, bool this.strict: true}) {
     assert(min <= max);
 
     if (ticks == null) {
@@ -60,7 +60,7 @@ class NumericAxis extends Sprite {
     if (tickLabels == null)
     _haveDefaultLabels = true;
 
-    ///print('ticks are: ${ticks.join(',')}');
+    print('ticks are: ${ticks.join(',')}');
     fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
 
   }
@@ -70,16 +70,17 @@ class NumericAxis extends Sprite {
       if (parent != null) {
         axisLength = parent.width;
       } else {
-        print('axisLength is null and parent is not set yet!');
+        throw('axisLength is null and parent is not set yet!');
       }
     }
 
+    //print('axisLength: $axisLength');
     _maxMargin = () => axisLength ~/ 10;
 
     var range = max - min;
     /// construct the scale function after you have the tick widths, i.e. determine the
     /// margin such that the axis fits inside the parent.
-    scale = (num x) => ((x - min) * (axisLength - 2*margin) / range + margin).round();
+    scale = (num x) => ((x - min) * (axisLength - 2*margin) / range + margin).truncate();
     Function fmtLabel;
 
     if (tickLabels == null) {
@@ -97,8 +98,8 @@ class NumericAxis extends Sprite {
       assert(tickLabels.length == ticks.length);
     }
 
-    graphics.moveTo(0, y);
-    graphics.lineTo(axisLength, y);
+    graphics.moveTo(0.5, y);
+    graphics.lineTo(axisLength-0.5, y);
 
     /// generate the ticks, place them at the default location
     var _ticks = new List.generate(ticks.length,
@@ -116,15 +117,15 @@ class NumericAxis extends Sprite {
 
     num _left = 0;
     for (int i = 0; i < ticks.length; i++) {
-      print('i: $i, ${scale(ticks[i])}');
+      //print('i: $i, ${scale(ticks[i])}');
       var x = scale(ticks[i]);
       Tick tick = new Tick(tickLabels[i], Direction.DOWN);
 
       // if the label doesn't fit, remove the label
-      if (x - tick.width/2 < _left)
+      if (x - tick.width/2 < _left) {
         tick = new Tick('', Direction.DOWN);
+      }
       if (x + tick.width/2 > axisLength) {
-        print('too long!');
         tick = new Tick('', Direction.DOWN);
       }
 
