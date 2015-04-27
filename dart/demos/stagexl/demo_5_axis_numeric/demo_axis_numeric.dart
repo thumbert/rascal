@@ -63,24 +63,24 @@ main() {
   print('After adding PlotArea, stage width: ${stage.width}, stage height: ${stage.height}'); /// OK
 
 
-  new NumericAxis(0, 1)
-    ..axisLength = 400
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 25;
-
-  new NumericAxis(0, 100)
-    ..axisLength = 400
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 100;
-  //ax2.scaleX = 400/ax2.width;
-
-  new NumericAxis(0, 3)
-    ..axisLength = 400
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 175;
+//  new NumericAxis(0, 1)
+//    ..axisLength = 400
+//    ..addTo(plotArea)
+//    ..draw()
+//    ..y = 25;
+//
+//  new NumericAxis(0, 100)
+//    ..axisLength = 400
+//    ..addTo(plotArea)
+//    ..draw()
+//    ..y = 100;
+//  //ax2.scaleX = 400/ax2.width;
+//
+//  new NumericAxis(0, 3)
+//    ..axisLength = 400
+//    ..addTo(plotArea)
+//    ..draw()
+//    ..y = 175;
   //ax3.scaleX = 400/ax3.width;
 
   new NumericAxis(1, 3000)

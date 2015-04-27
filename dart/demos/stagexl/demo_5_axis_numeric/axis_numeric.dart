@@ -52,15 +52,13 @@ class NumericAxis extends Sprite {
     int this.margin: 10, bool this.strict: true}) {
     assert(min <= max);
 
-    _maxMargin = () => axisLength ~/ 10;
-
     if (ticks == null) {
       _haveDefaultTicks = true;
       ticks = calculateTicks(min, max);
     }
 
     if (tickLabels == null)
-      _haveDefaultLabels = true;
+    _haveDefaultLabels = true;
 
     ///print('ticks are: ${ticks.join(',')}');
     fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
@@ -75,6 +73,8 @@ class NumericAxis extends Sprite {
         print('axisLength is null and parent is not set yet!');
       }
     }
+
+    _maxMargin = () => axisLength ~/ 10;
 
     var range = max - min;
     /// construct the scale function after you have the tick widths, i.e. determine the
@@ -114,35 +114,39 @@ class NumericAxis extends Sprite {
       });
     }
 
-    /// do the labels overlap?  Have to go one by one and check.
-
-    // see if the first tickLabel fits, if it doesn't by how much you need to adjust
-    Tick tick = new Tick(tickLabels[0], Direction.DOWN);
-    var leftEdge = tick.x - tick.width/2;
-    if (leftEdge < 0) {
-
-    }
-
-
+    num _left = 0;
     for (int i = 0; i < ticks.length; i++) {
-      //print('i: $i, ${scale(ticks[i])}');
+      print('i: $i, ${scale(ticks[i])}');
       var x = scale(ticks[i]);
       Tick tick = new Tick(tickLabels[i], Direction.DOWN);
 
-      // label does not fit
-      if (x - tick.width/2 < 0 && strict)
+      // if the label doesn't fit, remove the label
+      if (x - tick.width/2 < _left)
         tick = new Tick('', Direction.DOWN);
-      if (x + tick.width/2 > parent.width && strict)
+      if (x + tick.width/2 > axisLength) {
+        print('too long!');
         tick = new Tick('', Direction.DOWN);
+      }
 
       tick.x = x;
       addChild(tick);
+
+      _left = x + tick.width/2;
     }
 
-    _ticks.forEach((tick) => addChild(tick));
     graphics.strokeColor(Color.Black);
 
+
+
+
   }
+
+//  // see if the first tickLabel fits, if it doesn't by how much you need to adjust
+//  Tick tick = new Tick(tickLabels[0], Direction.DOWN);
+//  var leftEdge = tick.x - tick.width/2;
+//  if (leftEdge < 0) {
+//
+//  }
 
 
 }
