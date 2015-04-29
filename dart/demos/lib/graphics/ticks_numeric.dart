@@ -13,9 +13,6 @@ List<num> calculateTicks(num min, num max) {
   //print("range10 is " + range10.toString());
   num step;
 
-  // TODO: should break this massive if into a binary search
-  // in an ordered structure.
-
   if (range10 < 0.0) {
     // a small range
     int multiple10 = log10(min).ceil();
@@ -84,8 +81,9 @@ num _getCustomStep(num range10) {
  *  the interval (x1,x2).  The first generated value rounds down x1
  *  and the last generated value rounds up x2.
  */
-List<num> _coverWithStep(num step, x1, x2) {
-  int xLow  = (x1/step).floor();
-  int xHigh = (x2/step).ceil();
-  return seqNum(step*xLow, step*xHigh, step);
+List<num> _coverWithStep(num step, num x1, num x2) {
+  num xLow  = (x1/step).floor()*step;
+  num xHigh = (x2/step).ceil()*step;
+  //print('xLow: $xLow, xHigh: $xHigh, step: $step');
+  return seqNum(xLow, xHigh, step);
 }

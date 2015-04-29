@@ -2,9 +2,8 @@ library demo_axis_datetime;
 
 import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart';
-import 'dart:math';
 import 'dart:html';
-import 'axis_datetime.dart';
+import 'package:demos/graphics/axis_datetime.dart';
 
 CanvasElement canvas = html.querySelector('#stage');
 Stage stage = new Stage(canvas);

@@ -24,7 +24,7 @@ class Tick extends Sprite {
   Shape line;
   TextField textField;
 
-  Tick(String text, int direction, {int length: 14, int padding: 10}) {
+  Tick(String text, int direction, {int length: 14, int padding: 3}) {
     line = new Shape();
     line.graphics.moveTo(0, 0);
     var fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);

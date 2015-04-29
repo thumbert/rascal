@@ -18,7 +18,10 @@ testAxisNumeric() {
       List ticks = calculateTicks(0, 1);
       expect(roundList(ticks, 1), [0, 0.2, 0.4, 0.6, 0.8, 1]);
     });
-
+    test("(65,66) = [65.0, 65.2, 65.4, 65.6, 65.8, 66.0]", () {
+      expect(calculateTicks(65, 66).map((num e) => num.parse(e.toStringAsPrecision(3))).toList(),
+      [65.0, 65.2, 65.4, 65.6, 65.8, 66.0]);
+    });
     test("(0,3) = [0, 0.5, 1, 1.5, 2, 2.5, 3]", () {
       expect(calculateTicks(0, 3), [0, 0.5, 1, 1.5, 2, 2.5, 3]);
     });

@@ -23,8 +23,9 @@ double round(double value, [int digit=1]) {
  *
  */
 List<num> seqNum(num start, num end, [num step=1]) {
+  final epsilon = 1.0E-14;
   List<num> res=[];
-  for(num i=start; i<=end; i+=step) {
+  for(num i=start; i<=end+epsilon; i+=step) {
     res.add(i);
   }
 

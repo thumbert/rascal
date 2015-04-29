@@ -1,4 +1,4 @@
-library axis_datetime;
+library graphics.axis_datetime;
 
 import 'package:intl/intl.dart';
 import 'package:stagexl/stagexl.dart';
@@ -14,23 +14,22 @@ class DateTimeAxis extends Sprite {
   static DateFormat ddMMMyyyy = new DateFormat('dd MMM yyyy');
   static DateFormat MMMyy = new DateFormat('MMMyy');
 
+  DateTime start, end;
   List<DateTime> ticks;
   List<String> tickLabels;
-  DateTime start, end;
-  // may need to move the start earlier and the end later for the axis ticks
+  /// may need to move the start earlier and the end later for the axis ticks
   DateTime extStart, extEnd;
 
-  // go from a DateTime to a screen coordinate;
+  /// go from a DateTime to a screen coordinate;
   Function scale;
-  // the label gets under the ticks to clarify the meaning of the ticks
+  /// the label gets under the ticks to clarify the meaning of the ticks
   String label;
 
-  // the header are the categorical groups that have meaning
-  List<String> header = [];
+  /// margin in points from the edges of the parent
+  num margin = 10;
 
-  // margin in points from the edges of the parent
-  int _margin = 10;
-
+  /// the headers are the categorical groups that have meaning
+  List<String> _header = [];
 
 
   DateTimeAxis(this.start, this.end) {
@@ -45,14 +44,15 @@ class DateTimeAxis extends Sprite {
     Duration duration = end.difference(start);
     int _nDays = duration.inDays;
     int _nMths = (12 * end.year + end.month) - (12 * start.year + start.month);
+    int _nYears = end.year - start.year + 1;
 
-    print('nDays: $_nDays, nMths: $_nMths');
+    print('nDays: $_nDays, nMths: $_nMths, nYears: $_nYears');
     if (_nDays <= 1) {
       _intraDayTicks();
       return;
-    }
+    } else if (_nMths <= 24) {
 
-    if (_nMths > 24) {
+    } else {
       _yearTicks();
       return;
 
@@ -99,7 +99,7 @@ class DateTimeAxis extends Sprite {
     else
       extEnd = end;
 
-    header = [ddMMMyyyy.format(start)];
+    _header = [ddMMMyyyy.format(start)];
     ticks = seqBy(extStart, extEnd, new Duration(hours: 1));
     tickLabels = ticks.map((DateTime dt) => dt.hour.toString()).toList();
     print('ticks: $ticks');

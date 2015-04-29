@@ -21,28 +21,13 @@ class FigureArea extends DisplayObjectContainer {
 class PlotArea extends DisplayObjectContainer {
   PlotArea(int width, int height) {
     Shape background = new Shape()
-      ..graphics.rect(0, 0, width - 1, height - 1)
+      ..graphics.rect(0, 0, width, height)
     //..graphics.strokeColor(Color.Black, 1, JointStyle.MITER)
       ..graphics.fillColor(Color.White);
     addChild(background);
   }
 }
 
-/// draw a horizontal line inside the PlotArea
-class HorizontalLine extends Sprite {
-  HorizontalLine();
-
-  draw() {
-    print('width is $width, parent width is ${parent.width}, parentName is ${parent.name}');
-    graphics.moveTo(0, y);
-    graphics.lineTo(parent.width, y); /// parent.width=400, why this line extends outside the PlotArea?!
-
-    graphics.moveTo(0, y + 100);
-    graphics.lineTo(400, y + 100); /// this line does not overextend.
-
-    graphics.strokeColor(Color.Black);
-  }
-}
 
 
 main() {
@@ -59,7 +44,7 @@ main() {
     ..y = 25
     ..name = 'PlotArea'
     ..addTo(figure);
-//  print('plot area width=${plotArea.width} and plot area height=${plotArea.height}');
+  print('plot area width=${plotArea.width} and plot area height=${plotArea.height}');
 //  print('After adding PlotArea, stage width: ${stage.width}, stage height: ${stage.height}'); /// OK
 
 
@@ -73,28 +58,44 @@ main() {
   new NumericAxis(0, 100)
     ..addTo(plotArea)
     ..draw()
-    ..y = 100;
+    ..y = 75;
   print(plotArea.width);
 
   new NumericAxis(0, 3)
     ..addTo(plotArea)
     ..draw()
-    ..y = 175;
+    ..y = 125;
   print(plotArea.width);
 
   new NumericAxis(1, 3000)
     ..addTo(plotArea)
     ..draw()
-    ..y = 250;
+    ..y = 175;
   print(plotArea.width);
 
-  // an issue with the 66 tick not being generated because of overflow
   new NumericAxis(65, 66)
+    ..addTo(plotArea)
+    ..draw()
+    ..y = 225;
+  print(plotArea.width);
+
+  new NumericAxis(1000, 1000000)
+    ..addTo(plotArea)
+    ..draw()
+    ..y = 275;
+  print(plotArea.width);
+
+  new NumericAxis(100000, 100000000)
     ..addTo(plotArea)
     ..draw()
     ..y = 325;
   print(plotArea.width);
 
+  new NumericAxis(-1000000, 1000000)
+    ..addTo(plotArea)
+    ..draw()
+    ..y = 375;
+  print(plotArea.width);
 
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
