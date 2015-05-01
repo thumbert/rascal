@@ -5,7 +5,6 @@ import 'package:stagexl/stagexl.dart';
 import 'package:demos/datetime/utils.dart';
 
 
-
 /**
  * A DateTime axis for the x axis.
  */
@@ -52,7 +51,7 @@ class DateTimeAxis extends Sprite {
       return;
     } else if (_nMths <= 24) {
 
-    } else {
+    } else if ('') {
       _yearTicks();
       return;
 

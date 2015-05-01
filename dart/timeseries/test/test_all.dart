@@ -1,5 +1,7 @@
 library test;
 
+import 'package:timezone/standalone.dart';
+
 import 'test_seq.dart';
 import 'test_timeseries.dart';
 import 'test_bucket.dart' as test_bucket;
@@ -13,7 +15,8 @@ import 'test_period.dart' as test_period;
 
 
 main () {
-  test_bucket.main();
+  //initializeTimeZone().then((_) => test_bucket.test_bucket());
+//  test_bucket.main();
   test_calendar.main();
   test_date.main();
   test_dst.main();

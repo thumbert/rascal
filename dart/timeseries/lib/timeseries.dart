@@ -45,7 +45,7 @@ class Obs<V> {
  *   
  */
 class TimeSeries<V> extends ListBase<Obs<V>> {
-  List<Obs<V>> data = [];  //TODO: do I need this?!  I don't think so!
+  List<Obs<V>> data = [];
   final Period period;
   bool _isUtc;
 

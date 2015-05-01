@@ -12,12 +12,9 @@ dependencies:
   intl: ">=0.1.0 <0.13.0"
   mongo_dart: any
   more: any
-  msgpack: any
   petitparser: ">=1.0.0 <2.0.0"
-  polymer: any
-  polymer_elements: any
-  polymer_expressions: any
-  polymer_ui_elements: any
-  stagexl: ">=0.11.0 <1.0.0"
+  intl: any
+  stagexl: any
+  test: ">=0.12.0 <0.13.0"
   timezone: any
-  unittest: any
+  unittest: "<0.13.0"
