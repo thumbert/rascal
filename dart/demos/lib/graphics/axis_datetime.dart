@@ -1,19 +1,20 @@
 library graphics.axis_datetime;
 
 import 'package:intl/intl.dart';
-import 'package:stagexl/stagexl.dart';
 import 'package:demos/datetime/utils.dart';
+import 'package:demos/math/utils.dart';
 
 
 /**
  * A DateTime axis for the x axis.
  */
-class DateTimeAxis extends Sprite {
+class DateTimeAxis {
 
   static DateFormat ddMMMyyyy = new DateFormat('dd MMM yyyy');
   static DateFormat MMMyy = new DateFormat('MMMyy');
 
   DateTime start, end;
+  /// location of the ticks
   List<DateTime> ticks;
   List<String> tickLabels;
   /// may need to move the start earlier and the end later for the axis ticks
@@ -27,107 +28,71 @@ class DateTimeAxis extends Sprite {
   /// margin in points from the edges of the parent
   num margin = 10;
 
-  /// the headers are the categorical groups that have meaning
+  /// the headers are the categorical groups one level higher than the ticks.
+  /// e.g. if the ticks are days, the headers are months, etc.
   List<String> _header = [];
 
-
-  DateTimeAxis(this.start, this.end) {
-    assert(start.isBefore(end));
-    calculateTicks();
-  }
 
   /**
    * Calculate the ticks, the panel and the label.
    */
   calculateTicks() {
+    String _headerType;
+    List<num> _defaultTicks;
+
     Duration duration = end.difference(start);
     int _nDays = duration.inDays;
     int _nMths = (12 * end.year + end.month) - (12 * start.year + start.month);
     int _nYears = end.year - start.year + 1;
 
     print('nDays: $_nDays, nMths: $_nMths, nYears: $_nYears');
-    if (_nDays <= 1) {
-      _intraDayTicks();
-      return;
-    } else if (_nMths <= 24) {
-
-    } else if ('') {
-      _yearTicks();
-      return;
-
-    } else {
-
-      if (!isBeginningOfMonth(start))
-        extStart = currentMonth(asOf: start);
-      else
-        extStart = start;
-      if (!isBeginningOfMonth(end))
-        extEnd = nextMonth(asOf: end);
-      else
-        extEnd = end;
-
-
-
-    }
-
-    if (_nMths <= 3) {
-      // between 1 to 3 months
-
-
+    if (_nDays <= 3) {
+      _headerType = "DAY";
     } else if (_nMths <= 6) {
-      // between 3 to 6 months
-
-    } else if (_nMths <= 12) {
-      // between 6 to 12 months
-
-    } else {
-      // more than one year of data
-
+      _headerType = "MONTH";
+    } else if (_nYears <= 1) {
+      _headerType = "YEAR";
     }
 
-  }
-
-  _intraDayTicks() {
-    // TODO: deal with sub-hourly frequency
-    if (!isBeginningOfDay(start))
-      extStart = new DateTime(start.year, start.month, start.day, start.hour);
-    else
-      extStart = start;
-    if (!isBeginningOfDay(end))
-      extEnd = new DateTime(end.year, end.month, end.day, end.hour).add(new Duration(hours: 1));
-    else
-      extEnd = end;
-
-    _header = [ddMMMyyyy.format(start)];
-    ticks = seqBy(extStart, extEnd, new Duration(hours: 1));
-    tickLabels = ticks.map((DateTime dt) => dt.hour.toString()).toList();
-    print('ticks: $ticks');
-    print('tick labels: $tickLabels');
-  }
-
-  _yearTicks() {
-
-  }
-
-  draw() {
-    var _width = parent.width;
-    print('width is $width, parent width is $_width, parentName is ${parent.name}');
-    var range = extEnd.millisecondsSinceEpoch - extStart.millisecondsSinceEpoch;
-    scale = (DateTime x) => ((x.millisecondsSinceEpoch - extStart.millisecondsSinceEpoch) * (_width-2*_margin) / range + _margin).round();
-
-    graphics.rect(scale(ticks[0]), y, scale(ticks.last)-scale(ticks[0]), y+24);
-    graphics.strokeColor(Color.Black, 1, JointStyle.MITER);
-    graphics.fillColor(Color.Wheat);
-
-    for (int i=0; i<ticks.length; i++) {
-      print(scale(ticks[i]));
-      graphics.moveTo(scale(ticks[i]), y+24);
-      graphics.lineTo(scale(ticks[i]), y+34);
+    switch (_headerType) {
+      case 'DAY':
+        List days = seqDays(start, end);
+        if (_nDays < 1) {
+          _defaultTicks = [1, 8, 15, 22];
+        } else if (_nDays == 1) {
+          _defaultTicks = [0, 6, 12, 18, 24];
+        } else if (_nDays <= 3) {
+          _defaultTicks = [0, 8, 16];
+        }
+        ticks = days.expand((day) => _defaultTicks
+        .map((hour) => new DateTime(day.year, day.month, day.day, hour)));
+        break;
+      case 'MONTH':
+        List mths = seqMonths(start, end);
+        if (_nMths <= 3) {
+          _defaultTicks = [1, 8, 15, 22];
+        } else {
+          _defaultTicks = [1, 15];
+        }
+        ticks = mths.expand((mth) => _defaultTicks
+        .map((day) => new DateTime(mth.year, mth.month, day)));
+        break;
+      case 'YEAR':
+        if (_nYears <= 2) {
+          ticks = seqMonths(new DateTime(start.year, start.month),
+            nextMonth(new DateTime(end.year, end.month)));
+        } else if (_nYears <= 5) {
+          ticks = seqMonths(new DateTime(start.year, start.month),
+            nextMonth(new DateTime(end.year, end.month)), step: 6);
+        } else {
+          ticks = seqNum(start.year, end.year+1).map((year) => new DateTime(year)).toList();
+        }
+        break;
     }
-    graphics.strokeColor(Color.Black);
 
 
   }
+
 
 
 }

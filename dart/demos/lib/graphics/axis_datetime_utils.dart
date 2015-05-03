@@ -14,7 +14,8 @@ bool isBeginningOfYear(DateTime datetime) => isBeginningOfMonth(datetime) && dat
 enum HeaderType {
   YEAR,
   MONTH,
-  DAY
+  DAY,
+  HOUR
 }
 
 /**
@@ -46,5 +47,5 @@ class Header {
         throw('unknown type $type');
     }
   }
-
 }
+

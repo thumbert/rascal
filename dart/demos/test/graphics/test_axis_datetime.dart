@@ -2,6 +2,8 @@ library graphics.test_axis_datetime;
 
 import 'package:test/test.dart';
 import 'package:demos/graphics/axis_datetime_utils.dart';
+import 'package:demos/graphics/axis_datetime.dart';
+
 
 test_header() {
   group('datetime axis headers', () {
@@ -19,7 +21,14 @@ test_header() {
 }
 
 test_axis_datetime() {
+  test('monthly headers, daily ticks', (){
+    DateTimeAxis ax = new DateTimeAxis()
+      ..start = new DateTime(2015,1)
+      ..end = new DateTime(2015,3)
+      ..calculateTicks();
+    print(ax.ticks);
 
+  });
 }
 
 main() {
