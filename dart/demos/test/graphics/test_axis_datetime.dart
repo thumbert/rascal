@@ -21,14 +21,38 @@ test_header() {
 }
 
 test_axis_datetime() {
-  test('monthly headers, daily ticks', (){
-    DateTimeAxis ax = new DateTimeAxis()
-      ..start = new DateTime(2015,1)
-      ..end = new DateTime(2015,3)
-      ..calculateTicks();
-    print(ax.ticks);
+  group('datetime axis ticks', () {
+    test('2 monthly headers, daily ticks (2015-01-01 to 2015-03-01), 7 days ticks', (){
+      DateTimeAxis ax = new DateTimeAxis()
+        ..start = new DateTime(2015,1)
+        ..end = new DateTime(2015,3)
+        ..calculateTicks();
+      expect(ax.headerLabels, ['Jan15', 'Feb15']);
+      print(ax.ticks);
+      expect(ax.ticks.length, 9);
+    });
+    test('2 monthly headers, daily ticks (2015-01-16 to 2015-02-10), 7 days ticks', (){
+      DateTimeAxis ax = new DateTimeAxis()
+        ..start = new DateTime(2015,1,16)
+        ..end = new DateTime(2015,2,10)
+        ..calculateTicks();
+      expect(ax.headerLabels, ['Jan15', 'Feb15']);
+      print(ax.ticks);
+      expect(ax.ticks.length, 5);
+    });
+
+    test('4 monthly headers (2015-01-01 to 2015-05-01), 14 days ticks', (){
+      DateTimeAxis ax = new DateTimeAxis()
+        ..start = new DateTime(2015,1)
+        ..end = new DateTime(2015,5)
+        ..calculateTicks();
+      expect(ax.headerLabels, ['Jan15', 'Feb15', 'Mar15', 'Apr15']);
+      print(ax.ticks);
+      expect(ax.ticks.length, 9);
+    });
 
   });
+
 }
 
 main() {

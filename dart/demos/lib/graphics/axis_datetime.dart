@@ -1,5 +1,6 @@
 library graphics.axis_datetime;
 
+import 'dart:math' as math;
 import 'package:intl/intl.dart';
 import 'package:demos/datetime/utils.dart';
 import 'package:demos/math/utils.dart';
@@ -10,53 +11,58 @@ import 'package:demos/math/utils.dart';
  */
 class DateTimeAxis {
 
-  static DateFormat ddMMMyyyy = new DateFormat('dd MMM yyyy');
+  static DateFormat dMMMyy = new DateFormat('dMMMyy');
   static DateFormat MMMyy = new DateFormat('MMMyy');
 
   DateTime start, end;
+
   /// location of the ticks
-  List<DateTime> ticks;
-  List<String> tickLabels;
+  List<DateTime> ticks = [];
+  List<String> tickLabels = [];
+
   /// may need to move the start earlier and the end later for the axis ticks
   DateTime extStart, extEnd;
 
   /// go from a DateTime to a screen coordinate;
   Function scale;
+
   /// the label gets under the ticks to clarify the meaning of the ticks
-  String label;
+  String label = '';
 
   /// margin in points from the edges of the parent
   num margin = 10;
 
   /// the headers are the categorical groups one level higher than the ticks.
   /// e.g. if the ticks are days, the headers are months, etc.
-  List<String> _header = [];
-
+  List<DateTime> headers = [];
+  List<String> headerLabels = [];
+  String headerType;
 
   /**
    * Calculate the ticks, the panel and the label.
    */
   calculateTicks() {
-    String _headerType;
     List<num> _defaultTicks;
 
     Duration duration = end.difference(start);
     int _nDays = duration.inDays;
-    int _nMths = (12 * end.year + end.month) - (12 * start.year + start.month);
+    int _nMths = (12 * end.year + end.month) - (12 * start.year + start.month) + 1;
     int _nYears = end.year - start.year + 1;
+    DateTime current;
 
-    print('nDays: $_nDays, nMths: $_nMths, nYears: $_nYears');
+    //print('nDays: $_nDays, nMths: $_nMths, nYears: $_nYears');
     if (_nDays <= 3) {
-      _headerType = "DAY";
+      headerType = "DAY";
     } else if (_nMths <= 6) {
-      _headerType = "MONTH";
+      headerType = "MONTH";
     } else if (_nYears <= 1) {
-      _headerType = "YEAR";
+      headerType = "YEAR";
     }
 
-    switch (_headerType) {
+    switch (headerType) {
       case 'DAY':
-        List days = seqDays(start, end);
+        headers = seqDays(start, end);
+        headerLabels = headers.map((dt) => dMMMyy.format(dt)).toList();
         if (_nDays < 1) {
           _defaultTicks = [1, 8, 15, 22];
         } else if (_nDays == 1) {
@@ -64,35 +70,73 @@ class DateTimeAxis {
         } else if (_nDays <= 3) {
           _defaultTicks = [0, 8, 16];
         }
-        ticks = days.expand((day) => _defaultTicks
-        .map((hour) => new DateTime(day.year, day.month, day.day, hour)));
+        ticks = headers.expand((day) => _defaultTicks
+        .map((hour) => new DateTime(day.year, day.month, day.day, hour)))
+        .where((dt) => !dt.isAfter(end))
+        .toList();
         break;
       case 'MONTH':
-        List mths = seqMonths(start, end);
+        headers = seqMonths(start, end);
+        if (isBeginningOfMonth(end))
+          headers.removeLast();
+        headerLabels = headers.map((dt) => MMMyy.format(dt)).toList();
         if (_nMths <= 3) {
-          _defaultTicks = [1, 8, 15, 22];
+          current = new DateTime(start.year, start.month, (start.day~/7)*7+1);
+          DateTime to = new DateTime(end.year, end.month, (end.day~/7+1)*7+1);
+          if (isBeginningOfMonth(end))
+            to = end;
+          for (DateTime header in headers) {
+            print('header = $header');
+            while ((current.isBefore(to) || current.isAtSameMomentAs(to)) && current.day < 23) {
+              ticks.add(current);
+              current = current.add(new Duration(days: 7));
+            }
+            current = nextMonth(header);
+          }
+
+
+        } else if (_nMths <= 5){
+          current = new DateTime(start.year, start.month, (start.day~/14)*14+1);
+          DateTime to = new DateTime(end.year, end.month, (end.day~/14+1)*14+1);
+          if (isBeginningOfMonth(end))
+            to = end;
+          for (DateTime header in headers) {
+            print('header = $header');
+            while ((current.isBefore(to) || current.isAtSameMomentAs(to)) && current.day < 16) {
+              ticks.add(current);
+              current = current.add(new Duration(days: 14));
+              if (currentMonth(current) != header)
+                break;
+            }
+            current = nextMonth(header);
+          }
+
+
         } else {
-          _defaultTicks = [1, 15];
+          current = new DateTime(start.year, start.month, 1);
+          while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
+            ticks.add(current);
+            current = nextMonth(current);
+          }
         }
-        ticks = mths.expand((mth) => _defaultTicks
-        .map((day) => new DateTime(mth.year, mth.month, day)));
+//        if (isBeginningOfMonth(end))
+//          ticks.add(end);
         break;
       case 'YEAR':
         if (_nYears <= 2) {
           ticks = seqMonths(new DateTime(start.year, start.month),
-            nextMonth(new DateTime(end.year, end.month)));
+          nextMonth(new DateTime(end.year, end.month)));
         } else if (_nYears <= 5) {
           ticks = seqMonths(new DateTime(start.year, start.month),
-            nextMonth(new DateTime(end.year, end.month)), step: 6);
+          nextMonth(new DateTime(end.year, end.month)), step: 6);
         } else {
-          ticks = seqNum(start.year, end.year+1).map((year) => new DateTime(year)).toList();
+          ticks = seqNum(start.year, end.year + 1).map((year) => new DateTime(year)).toList();
         }
         break;
     }
 
 
   }
-
 
 
 }
