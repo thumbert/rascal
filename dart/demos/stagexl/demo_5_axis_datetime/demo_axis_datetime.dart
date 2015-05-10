@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart';
 import 'dart:html';
 import 'package:demos/graphics/axis_datetime.dart';
+import 'package:demos/graphics/axis_datetime_xl.dart';
 
 CanvasElement canvas = html.querySelector('#stage');
 Stage stage = new Stage(canvas);
@@ -37,12 +38,11 @@ main() {
     ..addTo(stage);
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
-  DateTimeAxis ax1 = new DateTimeAxis(new DateTime(2015, 1, 1), new DateTime(2015, 1, 2))
-    ..calculateTicks()
+  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 1, 2))
+    ..defaultTicks()
     ..addTo(area)
     ..draw();
 
-  print(ax1.scale(new DateTime(2015, 1, 2)));
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
 }

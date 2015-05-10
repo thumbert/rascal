@@ -1,9 +1,8 @@
 library demo_axis_numeric;
 
-//import 'dart:html' as html;
-import 'package:stagexl/stagexl.dart';
 import 'dart:html';
-import 'axis_numeric.dart';
+import 'package:stagexl/stagexl.dart';
+import 'package:demos/graphics/axis_numeric.dart';
 
 CanvasElement canvas = querySelector('#stage');
 Stage stage = new Stage(canvas);

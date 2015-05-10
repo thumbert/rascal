@@ -3,13 +3,15 @@ library graphics.axis_datetime_xl;
 import 'dart:math';
 import 'package:stagexl/stagexl.dart';
 import 'package:demos/graphics/axis_datetime.dart';
+import 'package:demos/graphics/axis_datetime_utils.dart';
 
 /**
  * An implementation of a DateTime axis that should be used from StageXL.
  */
 class DateTimeAxisXl extends Sprite with DateTimeAxis {
-  DateTimeAxisXL(
-      DateTime start, DateTime end, List<DateTime> ticks, String label) {
+
+  DateTimeAxisXl(
+      DateTime start, DateTime end, {List<DateTime> ticks, String label}) {
     this.start = start;
     this.end = end;
     assert(start.isBefore(end));
@@ -33,7 +35,7 @@ class DateTimeAxisXl extends Sprite with DateTimeAxis {
     for (int h = 0; h < headers.length; h++) {
       num xS = max(scale(headers[h].start), 0);
       num xE = min(scale(headers[h].end), _width);
-      addChild(new HeaderXl(headers[h].text, xE - xS, 20)..x = xS);
+      addChild(new HeaderXl(headers[h], xE - xS, 20)..x = xS);
     }
 
     for (int i = 0; i < ticks.length; i++) {
@@ -49,7 +51,12 @@ class HeaderXl extends Sprite {
   final fmt =
       new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
 
-  HeaderXl(String label, int width, int height) {
+  /**
+   * Draw the header.
+   * [width] is the screen width in pixels
+   * [height] is the screen height in pixels
+   */
+  HeaderXl(DateTimeAxisHeader header, num width, num height) {
     graphics.rect(0, 0, width, height);
     graphics.strokeColor(Color.Black, 1, JointStyle.MITER);
     graphics.fillColor(Color.Wheat);
@@ -57,8 +64,9 @@ class HeaderXl extends Sprite {
     TextField text = new TextField()
       ..defaultTextFormat = fmt
       ..autoSize = TextFieldAutoSize.CENTER
-      ..text = label;
-    //TODO:  check if the label fits!
-    addChild(text);
+      ..text = header.text;
+    /// check if the label fits before adding it
+    if (width > text.width)
+      addChild(text);
   }
 }
