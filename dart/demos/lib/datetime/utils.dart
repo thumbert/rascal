@@ -175,18 +175,23 @@ List<DateTime> coverDays(DateTime start, DateTime end, int days) {
 
 /**
  * Cover a [start,end] DateTime interval with full months.
- * Rule is to respect the year boundaries, so Jan of the year will need to
- * show up when you cross the year boundaries.
  * [months] is the number of days to skip, e.g. months=3 skip by quarter
+ * [showJan] if you want to respect the year boundaries, so Jan of the year will
+ * show up when you cross the year boundaries.  May not make much sense as people
+ * can follow sequence of numbers up to 12.
  */
-List<DateTime> coverMonths(DateTime start, DateTime end, int months) {
+List<DateTime> coverMonths(DateTime start, DateTime end, int months, {bool showJan: false}) {
   List<DateTime> res = [new DateTime(start.year, start.month)];
   while (res.last.isBefore(end)) {
     DateTime aux = addMonths(res.last, step: months);
-    if (aux.year == res.last.year)
+    if (showJan) {
+      if (aux.year == res.last.year)
+        res.add(aux);
+      else
+        res.add(new DateTime(res.last.year+1));
+    } else {
       res.add(aux);
-    else
-      res.add(new DateTime(res.last.year+1));
+    }
   }
 
   return res;

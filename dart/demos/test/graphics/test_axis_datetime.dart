@@ -26,7 +26,7 @@ test_axis_datetime() {
       DateTimeAxis ax = new DateTimeAxis()
         ..start = new DateTime(2015,1)
         ..end = new DateTime(2015,3)
-        ..calculateTicks();
+        ..defaultTicks();
       expect(ax.headers.map((h) => h.text).toList(), ['Jan15', 'Feb15']);
       //print(ax.ticks);
       expect(ax.ticks.length, 10);
@@ -36,7 +36,7 @@ test_axis_datetime() {
       DateTimeAxis ax = new DateTimeAxis()
         ..start = new DateTime(2015,1,16)
         ..end = new DateTime(2015,2,10)
-        ..calculateTicks();
+        ..defaultTicks();
       expect(ax.headers.map((h) => h.text).toList(), ['Jan15', 'Feb15']);
       //print(ax.ticks);
       expect(ax.ticks.length, 6);
@@ -47,9 +47,9 @@ test_axis_datetime() {
       DateTimeAxis ax = new DateTimeAxis()
         ..start = new DateTime(2015,1)
         ..end = new DateTime(2015,5)
-        ..calculateTicks();
+        ..defaultTicks();
       expect(ax.headers.map((h) => h.text).toList(), ['Jan15', 'Feb15', 'Mar15', 'Apr15']);
-      print(ax.ticks);
+      //print(ax.ticks);
       expect(ax.ticks.length, 12);
       expect(ax.ticks.map((dt) => dt.day).toList(), [1,15,29,1,15,1,15,29,1,15,29,1]);
     });
@@ -57,7 +57,7 @@ test_axis_datetime() {
       DateTimeAxis ax = new DateTimeAxis()
         ..start = new DateTime(2015,1)
         ..end = new DateTime(2015,7)
-        ..calculateTicks();
+        ..defaultTicks();
       expect(ax.headers.map((h) => h.text).toList(), ['2015']);
       //print(ax.ticks);
       expect(ax.ticks.length, 7);
@@ -67,7 +67,7 @@ test_axis_datetime() {
       DateTimeAxis ax = new DateTimeAxis()
         ..start = new DateTime(2014,10,10)
         ..end = new DateTime(2015,3,15)
-        ..calculateTicks();
+        ..defaultTicks();
       expect(ax.headers.map((h) => h.text).toList(), ['2014', '2015']);
       //print(ax.ticks);
       expect(ax.ticks.length, 7);
@@ -77,19 +77,29 @@ test_axis_datetime() {
       DateTimeAxis ax = new DateTimeAxis()
         ..start = new DateTime(2014,1,10)
         ..end = new DateTime(2015,3,15)
-        ..calculateTicks();
+        ..defaultTicks();
       expect(ax.headers.map((h) => h.text).toList(), ['2014', '2015']);
       //print(ax.ticks);
       expect(ax.ticks.length, 6);
       expect(ax.ticks.map((dt) => dt.month).toList(), [1,4,7,10,1,4]);
     });
+    test('13 months (2014-03-10 to 2015-03-15), 3 month tick separation', (){
+      DateTimeAxis ax = new DateTimeAxis()
+        ..start = new DateTime(2014,3,10)
+        ..end = new DateTime(2015,3,15)
+        ..defaultTicks();
+      expect(ax.headers.map((h) => h.text).toList(), ['2014', '2015']);
+      //print(ax.ticks);
+      expect(ax.ticks.length, 5);
+      expect(ax.ticks.map((dt) => dt.month).toList(), [3,6,9,12,3]);
+    });
     test('4 years (2012-01-10 to 2015-03-15), 6 month tick separation', (){
       DateTimeAxis ax = new DateTimeAxis()
         ..start = new DateTime(2012,1,10)
         ..end = new DateTime(2015,3,15)
-        ..calculateTicks();
+        ..defaultTicks();
       expect(ax.headers.map((h) => h.text).toList(), ['2012', '2013', '2014', '2015']);
-      print(ax.ticks);
+      //print(ax.ticks);
       expect(ax.ticks.length, 8);
       expect(ax.ticks.map((dt) => dt.month).toList(), [1,7,1,7,1,7,1,7]);
     });

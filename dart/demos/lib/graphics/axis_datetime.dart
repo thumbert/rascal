@@ -34,12 +34,12 @@ class DateTimeAxis {
   /// the headers are the categorical groups one level higher than the ticks.
   /// e.g. if the ticks are days, the headers are months, etc.
   List<DateTimeAxisHeader> headers = [];
-  String _headerType;
+  HeaderType headerType;
 
   /**
-   * Calculate the ticks, the panel and the label.
+   * Calculate the ticks, the headers and the label.
    */
-  calculateTicks() {
+  defaultTicks() {
     Duration duration = end.difference(start);
     int _nDays = duration.inDays;
     int _nMths = (12 * end.year + end.month) - (12 * start.year + start.month) + 1;
@@ -47,17 +47,20 @@ class DateTimeAxis {
 
     //print('nDays: $_nDays, nMths: $_nMths, nYears: $_nYears');
     if (_nDays <= 6) {
-      _headerType = 'DAY';
+      headerType = HeaderType.DAY;
+      label = 'Hour of day';
     } else if (_nMths <= 5) {
-      _headerType = 'MONTH';
+      headerType = HeaderType.MONTH;
+      label = 'Day of month';
     } else if (_nYears <= 5) {
-      _headerType = 'YEAR';
+      headerType = HeaderType.YEAR;
+      label = 'Month of year';
     } else {
-      _headerType = '';
+      throw('Unknown header type!');
     }
 
-    switch (_headerType) {
-      case 'DAY':
+    switch (headerType) {
+      case HeaderType.DAY:
         headers = seqDays(start, end)
           .map((dt) => new DateTimeAxisHeader(dt, HeaderType.DAY)).toList();
         if (isBeginningOfDay(end))
@@ -74,7 +77,7 @@ class DateTimeAxis {
         break;
 
 
-      case 'MONTH':
+      case HeaderType.MONTH:
         headers = seqMonths(start, end)
           .map((dt) => new DateTimeAxisHeader(dt, HeaderType.MONTH)).toList();;
         if (isBeginningOfMonth(end))
@@ -87,25 +90,30 @@ class DateTimeAxis {
         break;
 
 
-      case 'YEAR':
+      case HeaderType.YEAR:
         headers = seqNum(start.year, end.year)
           .map((yr) => new DateTimeAxisHeader(new DateTime(yr), HeaderType.YEAR)).toList();
         DateTime to = end;
         if (!isBeginningOfMonth(end))
           to = nextMonth(end);
         if (_nMths <= 12) {
+          /// 1 month ticks
           ticks = seqMonths(new DateTime(start.year, start.month),
           new DateTime(to.year, to.month));
         } else if (_nYears <= 3) {
+          /// ticks separated by 3 months
           ticks = seqMonths(new DateTime(start.year, start.month),
           new DateTime(to.year, to.month), step: 3);
         } else if (_nYears <= 5) {
-          ticks = seqMonths(new DateTime(start.year, start.month),
-          new DateTime(to.year, to.month), step: 6);
+          /// ticks separated by 6 months
+          ticks = coverMonths(start, end, 6);
         } else {
           ticks = seqNum(start.year, end.year + 1).map((year) => new DateTime(year)).toList();
         }
         break;
+
+      default:
+        throw('Unknown header!');
     }
 
 

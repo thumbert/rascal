@@ -15,7 +15,10 @@ enum HeaderType {
  */
 class DateTimeAxisHeader {
   HeaderType type;
-  DateTime start, end;
+  /// the start of the header.  It has no knowledge of the start/end of the data.  Deal with that later.
+  DateTime start;
+  /// the end of the header.  It has no knowledge of the start/end of the data.  Deal with that later.
+  DateTime end;
   String text;
 
   static DateFormat ddMMMyy = new DateFormat('dMMMyy');
