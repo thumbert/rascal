@@ -9,6 +9,8 @@ import 'package:demos/graphics/axis_datetime_utils.dart';
  * An implementation of a DateTime axis that should be used from StageXL.
  */
 class DateTimeAxisXl extends Sprite with DateTimeAxis {
+  final fmt =
+    new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
 
   DateTimeAxisXl(
       DateTime start, DateTime end, {List<DateTime> ticks, String label}) {
@@ -25,25 +27,42 @@ class DateTimeAxisXl extends Sprite with DateTimeAxis {
     var _width = parent.width;
     print(
         'width is $width, parent width is $_width, parentName is ${parent.name}');
-    var range = extEnd.millisecondsSinceEpoch - extStart.millisecondsSinceEpoch;
+    var range = end.millisecondsSinceEpoch - start.millisecondsSinceEpoch;
     scale = (DateTime x) => ((x.millisecondsSinceEpoch -
-                extStart.millisecondsSinceEpoch) *
+                start.millisecondsSinceEpoch) *
             (_width - 2 * margin) /
             range +
         margin).round();
 
+    print(ticks);
+    print(tickLabels);
+
+    /// draw the headers
     for (int h = 0; h < headers.length; h++) {
       num xS = max(scale(headers[h].start), 0);
       num xE = min(scale(headers[h].end), _width);
-      addChild(new HeaderXl(headers[h], xE - xS, 20)..x = xS);
+      addChild(new HeaderXl(headers[h], xE - xS, headerHeight)..x = xS);
     }
 
+    /// draw the ticks
     for (int i = 0; i < ticks.length; i++) {
-      print(scale(ticks[i]));
-      graphics.moveTo(scale(ticks[i]), y + 24);
-      graphics.lineTo(scale(ticks[i]), y + 34);
+      //print(scale(ticks[i]));
+      graphics.moveTo(scale(ticks[i]), headerHeight);
+      graphics.lineTo(scale(ticks[i]), headerHeight + 10);
     }
     graphics.strokeColor(Color.Black);
+
+    /// draw the tick labels
+    //print(tickLabels);
+    for (int i = 0; i < ticks.length; i++) {
+      TextField text = new TextField()
+        ..defaultTextFormat = fmt
+        ..autoSize = TextFieldAutoSize.CENTER
+        ..text = tickLabels[i]
+        ..y = headerHeight + 10;
+      text.x = scale(ticks[i]) - text.width/2;
+      addChild(text);
+    }
   }
 }
 
@@ -65,6 +84,7 @@ class HeaderXl extends Sprite {
       ..defaultTextFormat = fmt
       ..autoSize = TextFieldAutoSize.CENTER
       ..text = header.text;
+    text.x = width/2 - text.width/2;
     /// check if the label fits before adding it
     if (width > text.width)
       addChild(text);

@@ -38,10 +38,21 @@ main() {
     ..addTo(stage);
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
-  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 1, 2))
-    ..defaultTicks()
+//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 1, 2))
+//    ..addTo(area)
+//    ..draw();
+//
+//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 2, 1))
+//    ..y = 75
+//    ..addTo(area)
+//    ..draw();
+
+  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 4, 1))
+    ..y = 150
     ..addTo(area)
     ..draw();
+
+
 
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
