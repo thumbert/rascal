@@ -8,7 +8,7 @@ dependencies:
   charted: any
   crypto: any
   csv: any
-  html5lib: any
+  either: "<= 0.1.8"
   intl: ">=0.1.0 <0.13.0"
   mongo_dart: any
   more: any
