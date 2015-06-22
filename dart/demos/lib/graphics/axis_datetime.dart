@@ -20,7 +20,7 @@ class DateTimeAxis {
   List<String> tickLabels = [];
 
   /// may need to move the start earlier and the end later for the axis ticks
-  DateTime extStart, extEnd;
+  //DateTime extStart, extEnd;
 
   /// go from a DateTime to a screen coordinate;
   Function scale;
@@ -35,6 +35,9 @@ class DateTimeAxis {
   /// e.g. if the ticks are days, the headers are months, etc.
   List<DateTimeAxisHeader> headers = [];
   HeaderType headerType;
+
+  /// header height in px
+  num headerHeight = 20;
 
   /**
    * Calculate the ticks, the headers and the label.
@@ -74,6 +77,7 @@ class DateTimeAxis {
         } else if (_nDays <= 6) {
           ticks = coverHours(start, end, 12);
         }
+        tickLabels = ticks.map((DateTime tick) => tick.hour.toString()).toList();
         break;
 
 
@@ -87,6 +91,7 @@ class DateTimeAxis {
         } else {
           ticks = coverDays(start, end, 14);
         }
+        tickLabels = ticks.map((DateTime tick) => tick.day.toString()).toList();
         break;
 
 
@@ -110,6 +115,7 @@ class DateTimeAxis {
         } else {
           ticks = seqNum(start.year, end.year + 1).map((year) => new DateTime(year)).toList();
         }
+        tickLabels = ticks.map((DateTime tick) => tick.month.toString()).toList();
         break;
 
       default:

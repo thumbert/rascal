@@ -160,14 +160,18 @@ List<DateTime> coverHours(DateTime start, DateTime end, int hours) {
  * show up when you cross the month boundaries.
  * [days] is the number of days to skip, e.g. days=7 for a week
  */
-List<DateTime> coverDays(DateTime start, DateTime end, int days) {
+List<DateTime> coverDays(DateTime start, DateTime end, int days, {bool show1st: false}) {
   List<DateTime> res = [new DateTime(start.year, start.month, (start.day~/days)*days+1)];
   while (res.last.isBefore(end)) {
     DateTime aux = res.last.add(new Duration(days: days));
-    if (currentMonth(aux) == currentMonth(res.last))
+    if (show1st) {
+      if (currentMonth(aux) == currentMonth(res.last))
+        res.add(aux);
+      else
+        res.add(nextMonth(res.last));
+    } else {
       res.add(aux);
-    else
-      res.add(nextMonth(res.last));
+    }
   }
 
   return res;
