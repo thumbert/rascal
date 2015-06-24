@@ -9,9 +9,10 @@ import 'dart:async';
 
 final _log = new Logger("ingestor");
 
+Db db = new Db('mongodb://127.0.0.1/nepool');
+DbCollection coll = db.collection('energy_offers');
 
-
-/*
+/**
 * If you need to wipe out the entire data.  Be kind!
 */
 clearTable() {
@@ -25,8 +26,35 @@ clearTable() {
   });
 }
 
+setup() async {
+  await db.open();
+  List<String> collections = await db.listCollections();
+  if (collections.contains('energy_offers'))
+    await coll.drop();
+
+  await db.ensureIndex('energy_offers', keys: {'maskedAssetId': 1, 'beginDate': 1},
+    unique: true);
+  await db.close();
+}
+
+
+/**
+ * Return the last inserted day in the archive as a String in the format yyyy-mm-dd.
+ */
+Future<String> lastDayInArchive() async {
+  List pipeline = [];
+  var group = {
+    '\$group': {'_id': null,
+      'lastHour': {'\$max': '\$beginDate'}}
+  };
+  pipeline.add(group);
+  Map res = await coll.aggregate(pipeline);
+  print(res);
+  String aux = res['result'].first['lastHour'];
+  return new Future.value(aux.substring(0,10));
+}
+
 Future<List<String>> getDaysInArchive() {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
   return db.open().then((_) {
     DbCollection coll = db.collection('masked_energy_offers');
     return coll.distinct('day');
@@ -56,15 +84,13 @@ Future<List<String>> getMonthsInArchive() {
   });
 }
 
-/*
-* Aggregate the MustTake Energy and EcoMax by day for a given hour accross
+/**
+* Aggregate the MustTake Energy and EcoMax by day for a given hour across
 * all the units in the pool.
 */
 Future agg_byDay_mustTake_ecoMax({String hourEnding: "16", String day}) {
   Db db = new Db('mongodb://127.0.0.1/nepool');
   return db.open().then((_) {
-    DbCollection coll = db.collection('masked_energy_offers');
-
     List pipeline = new List();
     var p1 = {
       "\$match": {
@@ -167,6 +193,14 @@ class Archiver {
     coll = db.collection('energy_offers');
     env = Platform.environment;
   }
+
+  updateDb({DateTime from, DateTime to}) {
+    if (from == null) {
+      //from =
+    }
+
+  }
+
 
   /**
    * Read the files in the json format
@@ -275,13 +309,6 @@ class Archiver {
 
   }
 
-
-  setup() async {
-    await db.open();
-    await db.ensureIndex('energy_offers', keys: {'maskedAssetId': 1, 'localDate': 1},
-        unique: true);
-    await db.close();
-  }
 }
 
 

@@ -41,7 +41,7 @@ DateTime nextDay(DateTime from) {
 
 
 /**
- * Return a sequence of day between [start, end] inclusive.
+ * Return a sequence of days between [start, end] inclusive.
  */
 List<DateTime> seqDays(DateTime start, DateTime end, {int step: 1}) {
   var d1 = new Duration(days: step);
