@@ -2,7 +2,7 @@ library elec.energy_offers;
 
 import 'dart:io';
 import 'dart:convert';
-//import 'package:either';
+import 'package:either/either.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:async';
@@ -116,25 +116,25 @@ Future filterByDayHourAsset(
   });
 }
 
-/*
-* String month is in the format "yyyymm", e.g. "201401".
-*/
-ingestOneMonth(String month) {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
-  db.open().then((_) {
-    DbCollection coll = db.collection('masked_energy_offers');
-    var ingestor = new Ingestor();
-    return ingestor.ingestMonth(month, coll);
-  }).then((_) {
-    _log.info("Finished ingesting the month " + month);
-    db.close();
-  });
-}
+///*
+//* String month is in the format "yyyymm", e.g. "201401".
+//*/
+//ingestOneMonth(String month) {
+//  Db db = new Db('mongodb://127.0.0.1/nepool');
+//  db.open().then((_) {
+//    DbCollection coll = db.collection('masked_energy_offers');
+//    var ingestor = new Ingestor();
+//    return ingestor.ingestMonth(month, coll);
+//  }).then((_) {
+//    _log.info("Finished ingesting the month " + month);
+//    db.close();
+//  });
+//}
 
 makeIndex() {
   Db db = new Db('mongodb://127.0.0.1/nepool');
   return db.open().then((_) {
-    Map keys = {"market": 1, "day": 1, "maskedAssetId": 1};
+    //Map keys = {"market": 1, "day": 1, "maskedAssetId": 1};
     return db
     .createIndex("masked_energy_offers",
     keys: {"market": 1, "maskedAssetId": 1, "day": 1, "hourEnding": 1},
@@ -159,26 +159,11 @@ class Archiver {
   DbCollection coll;
   Map<String,String> env;
 
-  List<String> entryKeys = [
-    'localDate',
-    'hourBeginning',
-    'MaskedParticipantId',
-    'MaskedAssetId',
-    'MustTakeEnergy',
-    'MaxDialyEnergy',
-    'EconomicMax',
-    'EconomicMin',
-    'ColdStartPrice',
-    'IntermediateStartPrice',
-    'HotStartPrice',
-    'NoLoadPrice',
-    'pqPairs',
-    'claim10Mw',
-    'claim30Mw',
-    'UnitStatus'
-  ];
 
   Archiver() {
+    if (db == null)
+      db = new Db('mongodb://127.0.0.1/nepool');
+
     coll = db.collection('energy_offers');
     env = Platform.environment;
   }
@@ -186,7 +171,8 @@ class Archiver {
   /**
    * Read the files in the json format
    */
-  Either<List<Map>, String> oneDayJsonRead(String yyyymmdd) {
+  List<Map> oneDayJsonRead(String yyyymmdd, {String version: "1.1"}) {
+
     String filename = env['HOME'] + DIR + "/da_energy_offers_$yyyymmdd.json";
     File file = new File(filename);
     if (file.existsSync()) {
@@ -194,95 +180,108 @@ class Archiver {
       List<Map> input =
       JSON.decode(aux)['HbDayAheadEnergyOffers']['HbDayAheadEnergyOffer'];
       //print(res.first);
-      List<Map> res = input.map((Map entry) => processOneEntry(entry)).toList();
-      return new Right(res);
+      return input.map((Map entry) => processOneEntry(entry)).toList();
     } else {
-      return new Left('file $file does not exist!');
+      throw 'Could not find file $filename';
     }
   }
 
   /**
    * Ingest one day offers of all generators in mongo
    */
-  oneDayMongoInsert(String yyyymmdd) {}
+  Future oneDayMongoInsert(String yyyymmdd) {
+    List data;
+    try {
+      data = oneDayJsonRead(yyyymmdd);
+    } catch (e) {
+      return new Future.value(print('ERROR:  No energy offers for $yyyymmdd'));
+    }
+
+    print('Inserting $yyyymmdd into db');
+    return coll.insertAll(data)
+    .then((_) => print('--->  SUCCESS'))
+    .catchError((e) => print('   ' + e.toString()));
+  }
 
   /**
    * Process one entry corresponding to one unit, one hour.  Prepare the data for mongo.
    * Make fields:  hourBeginning, localDate, pqPairs=[p1,q1,p2,q2,...]
    */
-  processOneEntry(Map entry) {
-    List entryValues = [
+  Map processOneEntry(Map entry) {
+    List prices = [];
+    List quantities = [];
+    List segments = entry['Segments'];
 
-    ];
+    // if no segments -- Segments: []
+    if (segments.first != '') {
+      // multiple segments -- "Segments":[{"Segment":[{"@Number":"1","Price":204.02,"Mw":149.9},{"@Number":"2","Price":221.28,"Mw":104.6}]}]
+      var aux = segments.first['Segment'];
+      // only one segment -- Segments: [{Segment: {@Number: 1, Price: 0, Mw: 99}}]
+      if (aux is Map)
+        aux = [aux];  // wrap it in a List
 
-    return new Map.fromIterables(entryKeys, entryValues);
+      aux.forEach((Map e) {
+        prices.add(e['Price']);
+        quantities.add(e['Mw']);
+      });
+    }
+
+    Map mongoEntry = {
+      'beginDate': entry['BeginDate'],        // String
+      'maskedParticipantId': entry['MaskedParticipantId'],
+      'maskedAssetId': entry['MaskedAssetId'],
+      'mustTakeEnergy': entry['MustTakeEnergy'],
+      'maxDailyEnergy': entry['MaxDailyEnergy'],
+      'economicMax': entry['EconomicMax'],
+      'economicMin': entry['EconomicMin'],
+      'coldStartPrice': entry['ColdStartPrice'],
+      'intermediateStartPrice': entry['IntermediateStartPrice'],
+      'hotStartPrice': entry['HotStartPrice'],
+      'noLoadPrice': entry['NoLoadPrice'],
+      'price': prices,
+      'quantity': quantities,
+      'claim10Mw': entry['Claim10Mw'],
+      'claim30Mw': entry['Claim30Mw']
+    };
+
+    if (entry.containsKey('UnitStatus'))  // introduced sometimes in 2014?
+      mongoEntry['unitStatus'] = entry['UnitStatus'];
+
+    return mongoEntry;
   }
 
 
+  Future oneDayDownload(String yyyymmdd) {
+    File fileout = new File(env['HOME'] + DIR + "/da_energy_offers_$yyyymmdd.json");
 
-  Map parseLine(String line) {
-    Map entry = {};
-    var x = line.split(",");
-    entry["hourEnding"] = _unquote(x[1]);
-    entry["maskedLeadParticipantId"] = _toNum(x[2]);
-    entry["maskedAssetId"] = _toNum(x[3]);
-    if (x[4] != '') entry["mustTakeEnergy"] = num.parse(x[4]);
-    if (x[5] != '') entry["maximumDailyEnergy"] = num.parse(x[5]);
-    if (x[6] != '') entry["ecoMax"] = num.parse(x[6]);
-    if (x[7] != '') entry["ecoMin"] = num.parse(x[7]);
-    if (x[8] != '') entry["coldStartupPrice"] = num.parse(x[8]);
-    if (x[9] != '') entry["intermediateStartupPrice"] = num.parse(x[9]);
-    if (x[10] != '') entry["hotStartupPrice"] = num.parse(x[10]);
-    if (x[11] != '') entry["noLoadPrice"] = num.parse(x[11]);
-    if (x[12] != '') {
-      entry["offerPrice"] = [num.parse(x[12])]; // block 1
-      entry["offerMW"] = [num.parse(x[13])];
-    }
-    if (x[14] != '') {
-      entry["offerPrice"].add(num.parse(x[14])); // block 2
-      entry["offerMW"].add(num.parse(x[15]));
-    }
-    if (x[16] != '') {
-      entry["offerPrice"].add(num.parse(x[16])); // block 3
-      entry["offerMW"].add(num.parse(x[17]));
-    }
-    if (x[18] != '') {
-      entry["offerPrice"].add(num.parse(x[18])); // block 4
-      entry["offerMW"].add(num.parse(x[19]));
-    }
-    if (x[20] != '') {
-      entry["offerPrice"].add(num.parse(x[20])); // block 5
-      entry["offerMW"].add(num.parse(x[21]));
-    }
-    if (x[22] != '') {
-      entry["offerPrice"].add(num.parse(x[22])); // block 6
-      entry["offerMW"].add(num.parse(x[23]));
-    }
-    if (x[24] != '') {
-      entry["offerPrice"].add(num.parse(x[24])); // block 7
-      entry["offerMW"].add(num.parse(x[25]));
-    }
-    if (x[26] != '') {
-      entry["offerPrice"].add(num.parse(x[26])); // block 8
-      entry["offerMW"].add(num.parse(x[27]));
-    }
-    if (x[28] != '') {
-      entry["offerPrice"].add(num.parse(x[28])); // block 9
-      entry["offerMW"].add(num.parse(x[29]));
-    }
-    if (x[30] != '') {
-      entry["offerPrice"].add(num.parse(x[30])); // block 10
-      entry["offerMW"].add(num.parse(x[31]));
-    }
-    entry["claim10"] = num.parse(x[32]);
-    entry["claim30"] = num.parse(x[33]);
+    if (fileout.existsSync()) {
+      return new Future.value(print('Day $yyyymmdd was already downloaded.'));
 
-    return entry;
+    } else {
+      String URL = "https://webservices.iso-ne.com/api/v1.1/hbdayaheadenergyoffer/day/${yyyymmdd}";
+      HttpClient client = new HttpClient();
+      client.badCertificateCallback = (cert, host, port) => true;
+      client.addCredentials(Uri.parse(URL), "", new HttpClientBasicCredentials(env['ISO1_LOGIN'], env["ISO1_PASSWD"]));
+      client.userAgent = "Mozilla/4.0";
+
+      return client.getUrl(Uri.parse(URL))
+      .then((HttpClientRequest request) {
+        request.headers.set(HttpHeaders.ACCEPT, "application/json");
+        return request.close();
+      })
+      .then((HttpClientResponse response) => response.pipe(fileout.openWrite()))
+      .then((_) => print('Downloaded energy offers for day $yyyymmdd.'));
+    }
+
   }
 
-  _unquote(String x) => x.replaceAll('"', "");
-  _toNum(String x) => num.parse(x);
 
+  setup() async {
+    await db.open();
+    await db.ensureIndex('energy_offers', keys: {'maskedAssetId': 1, 'localDate': 1},
+        unique: true);
+    await db.close();
+  }
 }
 
 
