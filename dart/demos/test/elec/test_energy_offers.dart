@@ -17,7 +17,7 @@ test_ingestor_read() {
 }
 
 test_ingest_cycle() async {
-  String yyyymmdd = '20140102';
+  String yyyymmdd = '20150101';
 
   Archiver arch = new Archiver();
   await arch.oneDayDownload(yyyymmdd);
@@ -37,16 +37,21 @@ test_filterBy() async {
 
 test_getStack() async {
   EnergyOffers eo = new EnergyOffers();
-
-  var res = await eo.getStack('2014-01-01T00:00:00.000-05:00');
-
-  //print(res);
-  res['result'].forEach((e) => print(e));
+  List<Map> res = await eo.getStack('2015-01-01T00:00:00.000-05:00');
+  res.forEach((e) => print(e));
 }
 
+scratchpad() async {
+  String beginDate = '2015-01-01T00:00:00.000-05:00';
+  EnergyOffers eo = new EnergyOffers();
 
+  //List res = await eo.filterBy(beginDate: beginDate, maskedAssetId: 87105);
+  List res = await eo.ecomaxByAsset(beginDate);
 
-main() {
+  res.forEach((e) => print(e));
+}
+
+main() async {
   //new Archiver().setup();
 
   //test_ingestor_download();
@@ -55,9 +60,11 @@ main() {
 
   //test_filterBy();
 
-  test_getStack();
-
   //test_ingest_cycle();
+
+  //test_getStack();
+
+  scratchpad();
 
 }
 

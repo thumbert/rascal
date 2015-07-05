@@ -73,7 +73,26 @@ class EnergyOffers {
     return res;
   }
 
-/**
+  /**
+   * Show distinct values the database by beginDate, maskedAssetId or maskedParticipantId.
+   * beginDate is a String in the ISO local time format, e.g.
+   *   '2014-01-01T00:00:00.000-05:00'
+   */
+  Future<List<Map>> distinct(
+      {String beginDate, int maskedAssetId, int maskedParticipantId}) async {
+    Map filter = {};
+    List<Map> res;
+    if (beginDate != null) filter['beginDate'] = beginDate;
+    if (maskedAssetId != null) filter['maskedAssetId'] = maskedAssetId;
+    await arch.db.open();
+    res = await arch.coll.find(filter).toList();
+    await arch.db.close();
+    return res;
+  }
+
+
+
+  /**
  * Return the last inserted day in the archive as a String in the format yyyy-mm-dd.
  */
   Future<String> lastDayInArchive() async {
@@ -101,7 +120,12 @@ class EnergyOffers {
     });
   }
 
-  Future getStack(String beginDate) async {
+  /**
+   * Return the stack for a given timestamp.
+   * beginDate is a String in the ISO local time format, e.g.
+   *   '2014-01-01T00:00:00.000-05:00'
+   */
+  Future<List<Map>> getStack(String beginDate) async {
     var res;
     List pipeline = [];
 
@@ -111,7 +135,9 @@ class EnergyOffers {
 
     //pipeline.add({'\$limit': 100});
     pipeline.add(match);
-    pipeline.add({'\$project': {'_id': 0, 'maskedAssetId': 1, 'offers': 1}});
+    pipeline.add({'\$project': {'_id': 0, 'maskedAssetId': 1,
+      'economicMax': 1,
+      'offers': 1}});
     pipeline.add(unwind);
     pipeline.add({'\$sort': {'offers.price': 1}});
     pipeline.add({
@@ -125,25 +151,60 @@ class EnergyOffers {
     await arch.db.open();
     res = await arch.coll.aggregate(pipeline);
     await arch.db.close();
-    return res;
+    return res['result'];
   }
+
+  /**
+   * Get the units ecomax by assetId
+   * beginDate is a String in the ISO local time format, e.g.
+   *   '2014-01-01T00:00:00.000-05:00'
+   */
+  Future<List<Map>> ecomaxByAsset(String beginDate) async {
+    var res;
+    List pipeline = [];
+
+    // first you filter by datetime
+    pipeline.add({'\$match': {'beginDate': beginDate}});
+    pipeline.add({'\$project': {'_id': 0, 'maskedAssetId': 1,
+    'economicMax': 1, 'unitStatus':1}});
+    pipeline.add({'\$group': {'_id': '\$maskedAssetId',
+      'ecoMax': {'\$first': '\$economicMax'}
+    }});
+    pipeline.add({'\$sort': {'ecoMax': -1}});
+    pipeline.add({'\$project': {'_id': 0,
+      'maskedAssetId': '\$_id',
+      'ecoMax': 1
+    }});
+
+    await arch.db.open();
+    res = await arch.coll.aggregate(pipeline);
+    await arch.db.close();
+    return res['result'];
+  }
+
+
+
+
+
 }
 
 /**
  * Deal with downloading the data, massaging it, and loading it into mongo.
  */
 class Archiver {
-  String DIR = "/Downloads/Archive/DA_EnergyOffers/Json";
+  String DIR;
 
   Db db;
   DbCollection coll;
   Map<String, String> env;
 
-  Archiver() {
+  Archiver({String this.DIR}) {
     if (db == null) db = new Db('mongodb://127.0.0.1/nepool');
 
     coll = db.collection('energy_offers');
     env = Platform.environment;
+    if (DIR == null)
+      DIR = env['HOME'] + '/Downloads/Archive/DA_EnergyOffers/Json';
   }
 
   updateDb({DateTime from, DateTime to}) {
@@ -157,7 +218,7 @@ class Archiver {
    * into mongo.
    */
   List<Map> oneDayJsonRead(String yyyymmdd, {String version: "1.1"}) {
-    String filename = env['HOME'] + DIR + "/da_energy_offers_$yyyymmdd.json";
+    String filename = DIR + "/da_energy_offers_$yyyymmdd.json";
     File file = new File(filename);
     if (file.existsSync()) {
       String aux = file.readAsStringSync();
@@ -231,9 +292,12 @@ class Archiver {
     return mongoEntry;
   }
 
+  /**
+   * Download the file if not in the archive folder.  If file is already downloaded, no nothing.
+   */
   Future oneDayDownload(String yyyymmdd) {
     File fileout =
-        new File(env['HOME'] + DIR + "/da_energy_offers_$yyyymmdd.json");
+        new File(DIR + "/da_energy_offers_$yyyymmdd.json");
 
     if (fileout.existsSync()) {
       return new Future.value(print('Day $yyyymmdd was already downloaded.'));
@@ -260,6 +324,10 @@ class Archiver {
    * Recreate the collection from scratch.
    */
   setup() async {
+    if (!new Directory(DIR).existsSync())
+      new Directory(DIR).createSync(recursive: true);
+    await oneDayDownload('20140101');
+
     await db.open();
     List<String> collections = await db.listCollections();
     print(collections);
