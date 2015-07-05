@@ -1,29 +1,19 @@
 library elec.energy_offers;
 
 import 'dart:io';
+import 'dart:async';
 import 'dart:convert';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:async';
 
 final _log = new Logger("ingestor");
+Db db = new Db('mongodb://127.0.0.1/nepool');
+DbCollection coll = db.collection('energy_offers');
 
 class EnergyOffers {
   Archiver arch = new Archiver();
 
-  Future<List<String>> getDaysInArchive() {
-    Db db = new Db('mongodb://127.0.0.1/nepool');
-    return db.open().then((_) {
-      DbCollection coll = db.collection('masked_energy_offers');
-      return coll.distinct('day');
-    }).then((e) {
-      List<String> days = e['values'];
-      int noDays = days.length;
-      _log.info("Found $noDays days in the archive");
-      db.close();
-      return days;
-    });
-  }
+  EnergyOffers() {}
 
   /**
    * Aggregate the MustTake Energy and EcoMax by day for a given hour across
@@ -83,6 +73,33 @@ class EnergyOffers {
     return res;
   }
 
+/**
+ * Return the last inserted day in the archive as a String in the format yyyy-mm-dd.
+ */
+  Future<String> lastDayInArchive() async {
+    List pipeline = [];
+    var group = {
+      '\$group': {'_id': null, 'lastHour': {'\$max': '\$beginDate'}}
+    };
+    pipeline.add(group);
+    Map res = await coll.aggregate(pipeline);
+    print(res);
+    String aux = res['result'].first['lastHour'];
+    return new Future.value(aux.substring(0, 10));
+  }
+
+  Future<List<String>> getDaysInArchive() {
+    return db.open().then((_) {
+      DbCollection coll = db.collection('masked_energy_offers');
+      return coll.distinct('day');
+    }).then((e) {
+      List<String> days = e['values'];
+      int noDays = days.length;
+      _log.info("Found $noDays days in the archive");
+      db.close();
+      return days;
+    });
+  }
 
   Future getStack(String beginDate) async {
     var res;
@@ -90,25 +107,26 @@ class EnergyOffers {
 
     // first you filter by datetime
     Map match = {'\$match': {'beginDate': beginDate}};
-    Map unwind = {'\$unwind' : '\$offers'};
-
+    Map unwind = {'\$unwind': '\$offers'};
 
     //pipeline.add({'\$limit': 100});
     pipeline.add(match);
     pipeline.add({'\$project': {'_id': 0, 'maskedAssetId': 1, 'offers': 1}});
     pipeline.add(unwind);
     pipeline.add({'\$sort': {'offers.price': 1}});
-    pipeline.add({'\$project': {'maskedAssetId': 1,
-      'price': '\$offers.price',
-      'quantity': '\$offers.quantity'
-    }});
+    pipeline.add({
+      '\$project': {
+        'maskedAssetId': 1,
+        'price': '\$offers.price',
+        'quantity': '\$offers.quantity'
+      }
+    });
 
     await arch.db.open();
     res = await arch.coll.aggregate(pipeline);
     await arch.db.close();
     return res;
   }
-
 }
 
 /**
@@ -126,6 +144,12 @@ class Archiver {
 
     coll = db.collection('energy_offers');
     env = Platform.environment;
+  }
+
+  updateDb({DateTime from, DateTime to}) {
+    if (from == null) {
+      //from =
+    }
   }
 
   /**

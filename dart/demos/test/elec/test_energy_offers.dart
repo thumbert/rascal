@@ -21,8 +21,9 @@ test_ingest_cycle() async {
 
   Archiver arch = new Archiver();
   await arch.oneDayDownload(yyyymmdd);
-  await arch.oneDayJsonRead(yyyymmdd);
-
+  await arch.db.open();
+  await arch.oneDayMongoInsert(yyyymmdd);
+  await arch.db.close();
 }
 
 test_filterBy() async {
@@ -56,4 +57,11 @@ main() {
 
   test_getStack();
 
+  //test_ingest_cycle();
+
 }
+
+//  await db.open();
+//  var dt = await lastDayInArchive();
+//  print(dt);
+//  await db.close();
