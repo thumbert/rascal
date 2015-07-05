@@ -2,183 +2,143 @@ library elec.energy_offers;
 
 import 'dart:io';
 import 'dart:convert';
-import 'package:either/either.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:async';
 
 final _log = new Logger("ingestor");
 
+class EnergyOffers {
+  Archiver arch = new Archiver();
 
-
-/*
-* If you need to wipe out the entire data.  Be kind!
-*/
-clearTable() {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
-  db.open().then((_) {
-    DbCollection coll = db.collection('masked_energy_offers');
-    return coll.drop();
-  }).then((_) {
-    _log.info("Emptied the masked_energy_offers collection!");
-    db.close();
-  });
-}
-
-Future<List<String>> getDaysInArchive() {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
-  return db.open().then((_) {
-    DbCollection coll = db.collection('masked_energy_offers');
-    return coll.distinct('day');
-  }).then((e) {
-    List<String> days = e['values'];
-    int noDays = days.length;
-    _log.info("Found $noDays days in the archive");
-    db.close();
-    return days;
-  });
-}
-
-Future<List<String>> getMonthsInArchive() {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
-  return db.open().then((_) {
-    DbCollection coll = db.collection('masked_energy_offers');
-    return coll.distinct('day');
-  }).then((e) {
-    List<String> days = e['values'];
-    List<String> months = new Set.from(days.map((e) => e.substring(0, 6)))
-    .toList(growable: false);
-    months.sort();
-    int noMonths = months.length;
-    _log.info("Found $noMonths months in the archive");
-    db.close();
-    return months;
-  });
-}
-
-/*
-* Aggregate the MustTake Energy and EcoMax by day for a given hour accross
-* all the units in the pool.
-*/
-Future agg_byDay_mustTake_ecoMax({String hourEnding: "16", String day}) {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
-  return db.open().then((_) {
-    DbCollection coll = db.collection('masked_energy_offers');
-
-    List pipeline = new List();
-    var p1 = {
-      "\$match": {
-        //"day": "20130719",
-        //"maskedAssetId": 60802,
-        "hourEnding": hourEnding
-      }
-    };
-    if (day != null) p1["\$match"]["day"] = day;
-
-    var p2 = {
-      "\$group": {
-        "_id": "\$day",
-        "totalMustTake": {"\$sum": "\$mustTakeEnergy"},
-        "totalEcoMax": {"\$sum": "\$ecoMax"}
-      }
-    };
-    var p3 = {"\$sort": {"_id": 1}};
-    pipeline.add(p1);
-    pipeline.add(p2);
-    pipeline.add(p3);
-
-    return coll.aggregate(pipeline);
-  }).then((res) {
-    List x = res[
-    "result"]; // a List of maps with _id (day), totalMustTake, totalEcoMax
-    //x.forEach((e) => print(e));
-    db.close();
-    return x;
-  });
-}
-
-/*
-* Filter the database by hourEnding, day, maskedAssetId.
-*/
-Future filterByDayHourAsset(
-    {String hourEnding: "20", String day, int maskedAssetId}) {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
-  return db.open().then((_) {
-    DbCollection coll = db.collection('masked_energy_offers');
-    Map filter = {};
-    if (hourEnding != null) filter["hourEnding"] = hourEnding;
-    if (day != null) filter["day"] = day;
-    if (maskedAssetId != null) filter["maskedAssetId"] = maskedAssetId;
-    return coll.find(filter).toList();
-  }).then((res) {
-    db.close();
-    return res;
-  });
-}
-
-///*
-//* String month is in the format "yyyymm", e.g. "201401".
-//*/
-//ingestOneMonth(String month) {
-//  Db db = new Db('mongodb://127.0.0.1/nepool');
-//  db.open().then((_) {
-//    DbCollection coll = db.collection('masked_energy_offers');
-//    var ingestor = new Ingestor();
-//    return ingestor.ingestMonth(month, coll);
-//  }).then((_) {
-//    _log.info("Finished ingesting the month " + month);
-//    db.close();
-//  });
-//}
-
-makeIndex() {
-  Db db = new Db('mongodb://127.0.0.1/nepool');
-  return db.open().then((_) {
-    //Map keys = {"market": 1, "day": 1, "maskedAssetId": 1};
-    return db
-    .createIndex("masked_energy_offers",
-    keys: {"market": 1, "maskedAssetId": 1, "day": 1, "hourEnding": 1},
-    background: true)
-    .then((_) {
-      _log.info("created index");
-    }).then((_) {
+  Future<List<String>> getDaysInArchive() {
+    Db db = new Db('mongodb://127.0.0.1/nepool');
+    return db.open().then((_) {
+      DbCollection coll = db.collection('masked_energy_offers');
+      return coll.distinct('day');
+    }).then((e) {
+      List<String> days = e['values'];
+      int noDays = days.length;
+      _log.info("Found $noDays days in the archive");
       db.close();
+      return days;
     });
-  });
-}
+  }
 
+  /**
+   * Aggregate the MustTake Energy and EcoMax by day for a given hour across
+   * all the units in the pool.
+   */
+  Future agg_byDay_mustTake_ecoMax({String hourEnding: "16", String day}) {
+    Db db = new Db('mongodb://127.0.0.1/nepool');
+    return db.open().then((_) {
+      DbCollection coll = db.collection('masked_energy_offers');
+
+      List pipeline = new List();
+      var p1 = {
+        "\$match": {
+          //"day": "20130719",
+          //"maskedAssetId": 60802,
+          "hourEnding": hourEnding
+        }
+      };
+      if (day != null) p1["\$match"]["day"] = day;
+
+      var p2 = {
+        "\$group": {
+          "_id": "\$day",
+          "totalMustTake": {"\$sum": "\$mustTakeEnergy"},
+          "totalEcoMax": {"\$sum": "\$ecoMax"}
+        }
+      };
+      var p3 = {"\$sort": {"_id": 1}};
+      pipeline.add(p1);
+      pipeline.add(p2);
+      pipeline.add(p3);
+
+      return coll.aggregate(pipeline);
+    }).then((res) {
+      List x = res[
+          "result"]; // a List of maps with _id (day), totalMustTake, totalEcoMax
+      //x.forEach((e) => print(e));
+      db.close();
+      return x;
+    });
+  }
+
+  /**
+   * Filter the database by beginDate, maskedAssetId or maskedParticipantId.
+   * beginDate is a String in the ISO local time format, e.g.
+   *   '2014-01-01T00:00:00.000-05:00'
+   */
+  Future<List<Map>> filterBy(
+      {String beginDate, int maskedAssetId, int maskedParticipantId}) async {
+    Map filter = {};
+    List<Map> res;
+    if (beginDate != null) filter['beginDate'] = beginDate;
+    if (maskedAssetId != null) filter['maskedAssetId'] = maskedAssetId;
+    await arch.db.open();
+    res = await arch.coll.find(filter).toList();
+    await arch.db.close();
+    return res;
+  }
+
+
+  Future getStack(String beginDate) async {
+    var res;
+    List pipeline = [];
+
+    // first you filter by datetime
+    Map match = {'\$match': {'beginDate': beginDate}};
+    Map unwind = {'\$unwind' : '\$offers'};
+
+
+    //pipeline.add({'\$limit': 100});
+    pipeline.add(match);
+    pipeline.add({'\$project': {'_id': 0, 'maskedAssetId': 1, 'offers': 1}});
+    pipeline.add(unwind);
+    pipeline.add({'\$sort': {'offers.price': 1}});
+    pipeline.add({'\$project': {'maskedAssetId': 1,
+      'price': '\$offers.price',
+      'quantity': '\$offers.quantity'
+    }});
+
+    await arch.db.open();
+    res = await arch.coll.aggregate(pipeline);
+    await arch.db.close();
+    return res;
+  }
+
+}
 
 /**
  * Deal with downloading the data, massaging it, and loading it into mongo.
  */
 class Archiver {
-  String DIR =
-  "/Downloads/Archive/DA_EnergyOffers/Json";
+  String DIR = "/Downloads/Archive/DA_EnergyOffers/Json";
 
   Db db;
   DbCollection coll;
-  Map<String,String> env;
-
+  Map<String, String> env;
 
   Archiver() {
-    if (db == null)
-      db = new Db('mongodb://127.0.0.1/nepool');
+    if (db == null) db = new Db('mongodb://127.0.0.1/nepool');
 
     coll = db.collection('energy_offers');
     env = Platform.environment;
   }
 
   /**
-   * Read the files in the json format
+   * Read and format the downloaded json files into a List<Map> suitable for insertion
+   * into mongo.
    */
   List<Map> oneDayJsonRead(String yyyymmdd, {String version: "1.1"}) {
-
     String filename = env['HOME'] + DIR + "/da_energy_offers_$yyyymmdd.json";
     File file = new File(filename);
     if (file.existsSync()) {
       String aux = file.readAsStringSync();
       List<Map> input =
-      JSON.decode(aux)['HbDayAheadEnergyOffers']['HbDayAheadEnergyOffer'];
+          JSON.decode(aux)['HbDayAheadEnergyOffers']['HbDayAheadEnergyOffer'];
       //print(res.first);
       return input.map((Map entry) => processOneEntry(entry)).toList();
     } else {
@@ -198,9 +158,10 @@ class Archiver {
     }
 
     print('Inserting $yyyymmdd into db');
-    return coll.insertAll(data)
-    .then((_) => print('--->  SUCCESS'))
-    .catchError((e) => print('   ' + e.toString()));
+    return coll
+        .insertAll(data)
+        .then((_) => print('--->  SUCCESS'))
+        .catchError((e) => print('   ' + e.toString()));
   }
 
   /**
@@ -208,8 +169,7 @@ class Archiver {
    * Make fields:  hourBeginning, localDate, pqPairs=[p1,q1,p2,q2,...]
    */
   Map processOneEntry(Map entry) {
-    List prices = [];
-    List quantities = [];
+    List pq = [];
     List segments = entry['Segments'];
 
     // if no segments -- Segments: []
@@ -217,17 +177,15 @@ class Archiver {
       // multiple segments -- "Segments":[{"Segment":[{"@Number":"1","Price":204.02,"Mw":149.9},{"@Number":"2","Price":221.28,"Mw":104.6}]}]
       var aux = segments.first['Segment'];
       // only one segment -- Segments: [{Segment: {@Number: 1, Price: 0, Mw: 99}}]
-      if (aux is Map)
-        aux = [aux];  // wrap it in a List
+      if (aux is Map) aux = [aux]; // wrap it in a List
 
       aux.forEach((Map e) {
-        prices.add(e['Price']);
-        quantities.add(e['Mw']);
+        pq.add({'price': e['Price'], 'quantity': e['Mw']});
       });
     }
 
     Map mongoEntry = {
-      'beginDate': entry['BeginDate'],        // String
+      'beginDate': entry['BeginDate'], // String
       'maskedParticipantId': entry['MaskedParticipantId'],
       'maskedAssetId': entry['MaskedAssetId'],
       'mustTakeEnergy': entry['MustTakeEnergy'],
@@ -238,50 +196,53 @@ class Archiver {
       'intermediateStartPrice': entry['IntermediateStartPrice'],
       'hotStartPrice': entry['HotStartPrice'],
       'noLoadPrice': entry['NoLoadPrice'],
-      'price': prices,
-      'quantity': quantities,
+      'offers': pq,
       'claim10Mw': entry['Claim10Mw'],
       'claim30Mw': entry['Claim30Mw']
     };
 
-    if (entry.containsKey('UnitStatus'))  // introduced sometimes in 2014?
-      mongoEntry['unitStatus'] = entry['UnitStatus'];
+    if (entry.containsKey('UnitStatus')) // introduced sometimes in 2014?
+        mongoEntry['unitStatus'] = entry['UnitStatus'];
 
     return mongoEntry;
   }
 
-
   Future oneDayDownload(String yyyymmdd) {
-    File fileout = new File(env['HOME'] + DIR + "/da_energy_offers_$yyyymmdd.json");
+    File fileout =
+        new File(env['HOME'] + DIR + "/da_energy_offers_$yyyymmdd.json");
 
     if (fileout.existsSync()) {
       return new Future.value(print('Day $yyyymmdd was already downloaded.'));
-
     } else {
-      String URL = "https://webservices.iso-ne.com/api/v1.1/hbdayaheadenergyoffer/day/${yyyymmdd}";
+      String URL =
+          "https://webservices.iso-ne.com/api/v1.1/hbdayaheadenergyoffer/day/${yyyymmdd}";
       HttpClient client = new HttpClient();
       client.badCertificateCallback = (cert, host, port) => true;
-      client.addCredentials(Uri.parse(URL), "", new HttpClientBasicCredentials(env['ISO1_LOGIN'], env["ISO1_PASSWD"]));
+      client.addCredentials(Uri.parse(URL), "", new HttpClientBasicCredentials(
+          env['ISO1_LOGIN'], env["ISO1_PASSWD"]));
       client.userAgent = "Mozilla/4.0";
 
-      return client.getUrl(Uri.parse(URL))
-      .then((HttpClientRequest request) {
+      return client.getUrl(Uri.parse(URL)).then((HttpClientRequest request) {
         request.headers.set(HttpHeaders.ACCEPT, "application/json");
         return request.close();
       })
-      .then((HttpClientResponse response) => response.pipe(fileout.openWrite()))
-      .then((_) => print('Downloaded energy offers for day $yyyymmdd.'));
+          .then((HttpClientResponse response) =>
+              response.pipe(fileout.openWrite()))
+          .then((_) => print('Downloaded energy offers for day $yyyymmdd.'));
     }
-
   }
 
-
+  /**
+   * Recreate the collection from scratch.
+   */
   setup() async {
     await db.open();
-    await db.ensureIndex('energy_offers', keys: {'maskedAssetId': 1, 'localDate': 1},
-        unique: true);
+    List<String> collections = await db.listCollections();
+    print(collections);
+    if (collections.contains('energy_offers')) await coll.drop();
+    await oneDayMongoInsert('20140101');
+    await db.ensureIndex('energy_offers',
+        keys: {'maskedAssetId': 1, 'beginDate': 1}, unique: true);
     await db.close();
   }
 }
-
-
