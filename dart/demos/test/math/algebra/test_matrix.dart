@@ -6,8 +6,8 @@ import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:demos/math/algebra/matrix.dart';
 //import 'package:demo/math/matrix2.dart';
-import 'package:demo/math/qrdecomposition.dart';
-import 'package:demo/math/decomposition_solver.dart';
+//import 'package:demo/math/qrdecomposition.dart';
+//import 'package:demo/math/decomposition_solver.dart';
 
 equalsWithPrecision(num value, {num precision: 1E-10}) => new _EqualsWithPrecision(value, precision);
 
@@ -236,6 +236,11 @@ qrDecomposition() {
 
 }
 
+/**
+ * Compare with other implementations
+ * https://github.com/kostya/benchmarks/tree/master/matmul
+ * pretty decent results.
+ */
 speed_test() {
   Matrix _makeTestMatrix(int N) {
     List m = [];
@@ -261,36 +266,11 @@ speed_test() {
 }
 
 
-speed_test2() {
-  Matrix _makeTestMatrix(int N) {
-    List m = [];
-    var aux = 1.0/N/N;
-    for (int i=0; i<N; i++)
-      for (int j=0; j<N; j++)
-        m.add(aux*(i-j)*(i+j));
-
-    return new Matrix(m, N, N);
-  }
-
-  int N = 1500;
-  print('Speed test Matrix2');
-  Stopwatch sw = new Stopwatch()..start();
-  Matrix a = _makeTestMatrix(N);
-  Matrix b = _makeTestMatrix(N);
-  sw.stop();
-  print('created in ${sw.elapsed}');
-  sw.start();
-  Matrix c = a.multiply(b);
-  print(c.data[N~/2][N~/2]); // -143.50016666665678
-  print('multiplied in ${sw.elapsed}');
-}
-
-
 
 main() {
 
 
-  basic_ops();
+  //basic_ops();
 //  diagMatrix();
 //  qrDecomposition();
 
@@ -303,24 +283,19 @@ main() {
 
 
   //speed_test();
-  //speed_test2();
 
   //speed_test_extract();
 
 //  Matrix2 m = new Matrix2([1,2,3,4], 2, 2);
 //  print(m.data);
 
-//  Float64List a = new Float64List.fromList([1.0,2.0,3.0]);
-//  print(a);
 
-  //printMatrix();
-
-//  List x = [1,2,3,4];
-//  Matrix m = new Matrix(x, 2, 2);
-//  print('m=$m');
-//  print('change x[1]');
-//  x[1] = 100;
-//  print('m=\n$m');
+  List x = [1,2,3,4];
+  Matrix m = new Matrix(x, 2, 2);
+  print('m=$m');
+  print('change x[1]');
+  x[1] = 100;
+  print('m=\n$m');
 
 
 
