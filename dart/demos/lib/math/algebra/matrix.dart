@@ -6,15 +6,11 @@ import 'dart:typed_data';
 abstract class Matrix {
   final int nrow;
   final int ncol;
-  List<List> data; // stored by row: [[1,2,3]\n[4,5,6]]
+  List data; // stored by row: [[1,2,3]\n[4,5,6]]
 
   static String MULTIPLICATION_METHOD = 'NAIVE';
 
   Matrix._empty(int this.nrow, int this.ncol);
-
-//  factory Matrix.empty(int nrow, int ncol, {String type: 'double'}) {
-//    if ()
-//  }
 
   /**
    * Create a matrix from a list of values.  Elements are filled in column major order, e.g.
@@ -356,11 +352,119 @@ class DiagonalMatrix extends Matrix {
   }
 }
 
+class ColumnMatrix extends Matrix {
+
+  /**
+   * A DoubleMatrix of column 1
+   */
+  ColumnMatrix(List x) : super._empty(x.length, 1) {
+    data = new Float64List.fromList(x);
+  }
+
+  /**
+   * Column bind this matrix with [that] matrix.
+   */
+  DoubleMatrix cbind(Matrix that) {
+    if (nrow != that.nrow) throw 'Dimensions mismatch';
+
+    DoubleMatrix res = new DoubleMatrix.filled(0.0, nrow, 1 + that.ncol);
+    for (int i = 0; i < nrow; i++) {
+      var row = new List.from(data[i])..addAll(that.data[i]);
+      res.data[i] = new Float64List.fromList(row);
+    }
+    return res;
+  }
+
+
+  ColumnMatrix rbind(ColumnMatrix that) => new ColumnMatrix(data..addAll(that.data));
+
+
+
+}
+
+
+
+class DoubleMatrix extends Matrix {
+  List<Float64List> data;
+
+  static int DECIMAL_DIGITS = 3;
+
+  /**
+   * A matrix will all double elements backed by a List<Float64List>.
+   */
+  DoubleMatrix(List x, int nrow, int ncol, {bool byRow: false}) : super._empty(nrow, ncol) {
+    data = new List.generate(nrow, (i) => new Float64List(ncol));
+    _populateMatrix(x, data, byRow: byRow);
+  }
+
+  DoubleMatrix.filled(double value, int nrow, int ncol) : super._empty(nrow, ncol) {
+    data = new List.generate(nrow, (i) => new Float64List(ncol));
+    _populateMatrix(new List.filled(nrow*ncol, value), data);
+  }
+
+  DoubleMatrix.zero(int nrow, int ncol) : super._empty(nrow, ncol) {
+    data = new List.generate(nrow, (i) => new Float64List(ncol));
+  }
+
+  DoubleMatrix column(int j) {
+    List<double> x = new List.generate(nrow, (i) => data[i][j]);
+    return new DoubleMatrix(x, nrow, 1);
+  }
+
+  DoubleMatrix row(int i) => new DoubleMatrix(data[i], 1, ncol);
+
+  /**
+   * Row bind this matrix with [that] matrix.
+   */
+  DoubleMatrix rbind(DoubleMatrix that) {
+    if (ncol != that.ncol) throw 'Dimensions mismatch';
+
+    DoubleMatrix res = new Matrix.filled(0.0, nrow + that.nrow, ncol);
+    res.data = new List.from(data)..addAll(that.data);
+    return res;
+  }
+
+  /**
+   * Column bind this matrix with [that] matrix.
+   */
+  DoubleMatrix cbind(DoubleMatrix that) {
+    if (nrow != that.nrow) throw 'Dimensions mismatch';
+
+    DoubleMatrix res = new Matrix.filled(0.0, nrow, ncol + that.ncol);
+    for (int i = 0; i < nrow; i++) {
+      var row = new List.from(data[i])..addAll(that.data[i]);
+      res.data[i] = new Float64List.fromList(row);
+    }
+    return res;
+  }
+
+  toString() {
+    List<String> out = [' ']..addAll(new List.generate(nrow, (i) => '[$i,]'));
+    var width = out.last.length;
+    out = out.map((String e) => e.padLeft(width)).toList();
+
+    for (int j = 0; j < ncol; j++) {
+      List col = column(j).toList();
+      List<String> aux = ['[,$j]']..addAll(col.map((double e) => e.toStringAsFixed(DECIMAL_DIGITS)));
+
+      var width = aux.fold(0, (prev, String e) => max(prev, e.length));
+      aux = aux.map((String e) => e.padLeft(width)).toList(growable: false);
+      for (int i = 0; i <= nrow; i++) out[i] = '${out[i]} ${aux[i]}';
+    }
+    return out.join("\n");
+  }
+
+}
+
+
+
+
 class IntMatrix extends Matrix {
   List<Int32List> data;
 
   /**
    * A matrix will all int elements backed by a List<Int23List>.
+   * Not sure how useful this is in the long run ...
    */
   IntMatrix(List x, int nrow, int ncol, {bool byRow: false}) : super._empty(nrow, ncol) {
     data = new List.generate(nrow, (i) => new Int32List(ncol));
@@ -430,79 +534,3 @@ class IntMatrix extends Matrix {
     return out.join("\n");
   }
 }
-
-class DoubleMatrix extends Matrix {
-  List<Float64List> data;
-
-  static int DECIMAL_DIGITS = 3;
-
-  /**
-   * A matrix will all int elements backed by a List<Int23List>.
-   */
-  DoubleMatrix(List x, int nrow, int ncol, {bool byRow: false}) : super._empty(nrow, ncol) {
-    data = new List.generate(nrow, (i) => new Float64List(ncol));
-    _populateMatrix(x, data, byRow: byRow);
-  }
-
-  DoubleMatrix.filled(double value, int nrow, int ncol) : super._empty(nrow, ncol) {
-    data = new List.generate(nrow, (i) => new Float64List(ncol));
-    _populateMatrix(new List.filled(nrow*ncol, value), data);
-  }
-
-  DoubleMatrix.zero(int nrow, int ncol) : super._empty(nrow, ncol) {
-    data = new List.generate(nrow, (i) => new Float64List(ncol));
-  }
-
-  DoubleMatrix column(int j) {
-    List<double> x = new List.generate(nrow, (i) => data[i][j]);
-    return new DoubleMatrix(x, nrow, 1);
-  }
-
-  DoubleMatrix row(int i) => new DoubleMatrix(data[i], 1, ncol);
-
-  /**
-   * Row bind this matrix with [that] matrix.
-   */
-  DoubleMatrix rbind(DoubleMatrix that) {
-    if (ncol != that.ncol) throw 'Dimensions mismatch';
-
-    DoubleMatrix res = new Matrix.filled(0.0, nrow + that.nrow, ncol);
-    res.data = new List.from(data)..addAll(that.data);
-    return res;
-  }
-
-  /**
-   * Column bind this matrix with [that] matrix.
-   */
-  DoubleMatrix cbind(DoubleMatrix that) {
-    if (nrow != that.nrow) throw 'Dimensions mismatch';
-
-    DoubleMatrix res = new Matrix.filled(0.0, nrow, ncol + that.ncol);
-    for (int i = 0; i < nrow; i++) {
-      var row = new List.from(data[i])..addAll(that.data[i]);
-      res.data[i] = new Float64List.fromList(row);
-    }
-    return res;
-  }
-
-  toString() {
-    List<String> out = [' ']..addAll(new List.generate(nrow, (i) => '[$i,]'));
-    var width = out.last.length;
-    out = out.map((String e) => e.padLeft(width)).toList();
-
-    for (int j = 0; j < ncol; j++) {
-      List col = column(j).toList();
-      List<String> aux = ['[,$j]']..addAll(col.map((double e) => e.toStringAsFixed(DECIMAL_DIGITS)));
-
-      var width = aux.fold(0, (prev, String e) => max(prev, e.length));
-      aux = aux.map((String e) => e.padLeft(width)).toList(growable: false);
-      for (int i = 0; i <= nrow; i++) out[i] = '${out[i]} ${aux[i]}';
-    }
-    return out.join("\n");
-  }
-
-}
-
-
-
-
