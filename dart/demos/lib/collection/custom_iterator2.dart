@@ -24,9 +24,7 @@ class ChessBoardIterator extends Iterator<Square> {
   Square _current;
   ChessBoard board;
 
-  ChessBoardIterator(ChessBoard this.board){
-    //_current = board.data.first;  // Should I have this here??
-  }
+  ChessBoardIterator(ChessBoard this.board);
 
   Square get current => _current;
 
