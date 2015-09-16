@@ -56,6 +56,7 @@ class _OptionFields {
 
   num get volatility => _volatility;
 
+  num notional;
   num _premium;
   set premium(num value) {
     if (_premium != null) throw 'Premium has already been set';
@@ -68,10 +69,10 @@ class _OptionFields {
 class EuropeanStockOptionBuilder extends Builder<EuropeanStockOption>
     with _OptionFields, Ticker, Strike, ExpirationDate {
   BuySell buySell;
-  num quantity;
+  num notional;
   EuropeanStockOptionBuilder(BuySell buySell, OptionType typeCallPut,
       num strike, DateTime expirationDate,
-      {String ticker, num premium, num quantity: 1}) {
+      {String ticker, num premium, num notional: 1}) {
     if (strike < 0) throw 'The strike should be positive';
     this.strike = strike;
     this.expirationDate = expirationDate;
@@ -79,7 +80,7 @@ class EuropeanStockOptionBuilder extends Builder<EuropeanStockOption>
     this.buySell = buySell;
     this.ticker = ticker;
     this.premium = premium;
-    this.quantity = quantity;
+    this.notional = notional;
   }
   EuropeanStockOption build() {
     return new EuropeanStockOption._empty()
@@ -88,7 +89,7 @@ class EuropeanStockOptionBuilder extends Builder<EuropeanStockOption>
       ..strike = strike
       ..typeCallPut = typeCallPut
       ..premium = premium
-      ..quantity = quantity
+      ..notional = notional
       ..ticker = ticker;
   }
 }
@@ -109,6 +110,8 @@ class EuropeanStockOption extends SimpleSecurity
     if (_timeToExpiration < 0) _timeToExpiration = 0.0;
     return _timeToExpiration;
   }
+
+  num get quantity => notional * delta();
 
   double _d1() {
     double d1;
@@ -143,6 +146,11 @@ class EuropeanStockOption extends SimpleSecurity
   }
 
   /**
+   * Calculate the MtM on this option
+   */
+  num get mtm => _sign() * notional * (value() - premium);
+
+  /**
    * Price the option using the BS model.
    */
   double value() {
@@ -166,7 +174,7 @@ class EuropeanStockOption extends SimpleSecurity
         break;
     }
 
-    return quantity * _sign() * res;
+    return res;
   }
 
   /**
@@ -183,7 +191,7 @@ class EuropeanStockOption extends SimpleSecurity
         res = -Phi(-_nd1());
         break;
     }
-    return quantity * _sign() * res;
+    return _sign() * res;
   }
 
   /**
@@ -192,7 +200,7 @@ class EuropeanStockOption extends SimpleSecurity
    */
   double gamma() {
     double aux = volatility * underlyingPrice * sqrt(timeToExpiration);
-    return quantity * _sign() * _dNd1() / aux;
+    return _sign() * _dNd1() / aux;
   }
 
   /**
@@ -218,14 +226,14 @@ class EuropeanStockOption extends SimpleSecurity
                 Phi(-_nd2());
         break;
     }
-    return quantity * _sign() * res;
+    return _sign() * res;
   }
 
   /**
    * Calculate the vega of the option (sensitivity with respect to volatility.)
    */
   double vega() =>
-      quantity * _sign() * underlyingPrice * sqrt(timeToExpiration) * _dNd1();
+    _sign() * underlyingPrice * sqrt(timeToExpiration) * _dNd1();
 
   /**
    * Calculate the sensitivity of the option with respect to interest rate
@@ -246,6 +254,8 @@ class EuropeanStockOption extends SimpleSecurity
             Phi(-_nd2());
         break;
     }
-    return quantity * _sign() * res;
+    return _sign() * res;
   }
+
+
 }
