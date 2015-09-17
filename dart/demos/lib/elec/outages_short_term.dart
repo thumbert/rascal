@@ -47,6 +47,10 @@ class Archiver {
           .map((String row) => processOneEntry(converter.convert(row).first))
           .toList();
       //print(aux.take(6));
+
+      // add the spreadsheet row number to each mongo entry
+      new Iterable.generate(aux.length).forEach((i) => aux[i]['row'] = i);
+
       return aux;
     } else {
       throw 'Could not find file for day $yyyymmdd';
@@ -76,6 +80,7 @@ class Archiver {
    * Prepare the data for mongo.
    */
   Map processOneEntry(List entry) {
+    // take only the report date.
     String rD = (entry[1] as String).split(' ').first;
 
     Map mongoEntry = {
@@ -92,12 +97,13 @@ class Archiver {
       'status': entry[14],
       'requestType': entry[15]
     };
-    if (entry[12] != "") mongoEntry['actualStart'] = fmtL.parse(entry[12]).toUtc();
-    if (entry[13] != "") mongoEntry['actualEnd'] = fmtL.parse(entry[13]).toUtc();
+    if (entry[12] != "") mongoEntry['actualStart'] =
+        fmtL.parse(entry[12]).toUtc();
+    if (entry[13] != "") mongoEntry['actualEnd'] =
+        fmtL.parse(entry[13]).toUtc();
 
     return mongoEntry;
   }
-
 
   /**
    * Download the file if not in the archive folder.  If file is already downloaded, no nothing.
@@ -132,8 +138,23 @@ class Archiver {
     print(collections);
     if (collections.contains('outages_short')) await coll.drop();
     await oneDayMongoInsert('20140101');
+
+    // this indexing assures that I don't insert the same data twice
     await db.ensureIndex('outages_short',
-        keys: {'maskedAssetId': 1, 'beginDate': 1}, unique: true);
+        keys: {
+          'reportDate': 1,
+          'row': 1
+        },
+        unique: true);
+
+    // this indexing useful for analysis
+    await db.ensureIndex('outage_short', keys: {
+      'equipmentType': 1,
+      'voltage': 1,
+      'equipmentDescription': 1
+    });
+
+
     await db.close();
   }
 }

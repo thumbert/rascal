@@ -12,7 +12,7 @@ packages
 pubspec.lock
 
 **/packages
-packages
+.packages
 
 *.dart.js
 
