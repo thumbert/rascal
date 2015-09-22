@@ -4,7 +4,9 @@ import 'dart:io';
 import 'dart:async';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:intl/intl.dart';
-//import 'package:congviewer/utils.dart';
+import 'package:csv/csv.dart';
+import 'package:timezone/standalone.dart';
+
 
 Future with_db(Db db, Function callback) {
   return db.open().then((_) {
@@ -24,7 +26,7 @@ class DaLmp {
 
   Db db;
   DbCollection coll;
-  String DIR = 'S:/All/Structured Risk/NEPOOL/FTRs/ISODatabase/NEPOOL/LMP/DA/Raw/';
+  String DIR = 'NEPOOL/LMP/DA/Raw/';
   final DateFormat fmt = new DateFormat("yyyy-MM-ddTHH:00:00.000-ZZZZ");
 
   DaLmp({this.db}) {
@@ -420,49 +422,8 @@ class DaLmp {
     .catchError((e) => print(e));
   }
 
-  /**
-   * Read the csv file and prepare it for ingestion into mongo.
-   * DateTimes need to be hourBeginning UTC, etc.
-   */
-  List<Map> oneDayCsvRead(String yyyymmdd) {
-    List<Map> data = [];
-    File file = new File(DIR + "WW_DALMP_ISO_${yyyymmdd}.csv");
-
-    List<String> keys = ['hourBeginning', 'localDate', 'ptid', 'congestionComponent'];
-
-    data = file.readAsLinesSync()
-    .map((String row) => row.split(','))
-    .where((List row) => row.first == '"D"')
-    //.where((List row) => row[3] == '"321"')
-    .map((List row) {
-      return new Map.fromIterables(keys, [
-        parseIsoTimestamp(unquote(row[1]), unquote(row[2]), hourEnding: false),
-        to_yyyymmdd(unquote(row[1])),
-        int.parse(unquote(row[3])),
-        num.parse(row[8])
-      ]);
-    }).toList();
 
 
-    //data.forEach((e) => print(e));
-
-    return data;
-  }
-
-  Future oneDayDownload(String yyyymmdd) {
-    String URL = "http://www.iso-ne.com/static-transform/csv/histRpts/da-lmp/WW_DALMP_ISO_$yyyymmdd.csv";
-    File file = new File(DIR + "WW_DALMP_ISO_${yyyymmdd}.csv");
-    if (file.existsSync()) {
-      print('  file already downloaded');
-      return new Future.value([0]);
-    } else {
-      print('  downloading file');
-      return new HttpClient().getUrl(Uri.parse(URL))
-      .then((HttpClientRequest request) => request.close())
-      .then((HttpClientResponse response) =>
-      response.pipe(file.openWrite()));
-    }
-  }
 
   /**
    * For the pipeline aggregation queries
@@ -493,7 +454,166 @@ class DaLmp {
 
     return aux;
   }
+}
 
 
+/**
+ * Deal with downloading the data, massaging it, and loading it into mongo.
+ */
+class Archiver {
+  String DIR;
+
+  Db db;
+  DbCollection coll;
+  Map<String, String> env;
+  DateFormat fmtS = new DateFormat('MM/dd/yyyy'); // short
+  DateFormat fmtL = new DateFormat('MM/dd/yyyy HH:mm:ss'); // long
+  final Location location = getLocation('America/New York');
+
+  Archiver({String this.DIR}) {
+    if (db == null) db = new Db('mongodb://127.0.0.1/nepool_dam');
+
+    coll = db.collection('lmp_H1');
+    env = Platform.environment;
+    if (DIR == null) DIR = env['HOME'] + '/Downloads/Archive/DA_LMP/Raw/Csv';
+  }
+
+  updateDb({DateTime from, DateTime to}) {
+    if (from == null) {
+      //from =
+    }
+  }
+
+  /**
+   * Read the csv file and prepare it for ingestion into mongo.
+   * DateTimes need to be hourBeginning UTC, etc.
+   */
+  List<Map> oneDayCsvRead(String yyyymmdd) {
+    File file = new File(DIR + "WW_DALMP_ISO_${yyyymmdd}.csv");
+    if (file.existsSync()) {
+      List<String> keys = ['hourBeginning', 'ptid', 'Lmp_Cong_Loss'];
+
+      List<Map> data = file.readAsLinesSync()
+      .map((String row) => row.split(','))
+      .where((List row) => row.first == '"D"')
+      .map((List row) {
+        return new Map.fromIterables(keys, [
+          parseIsoTimestamp(unquote(row[1]), unquote(row[2]), hourEnding: false),
+          int.parse(unquote(row[3])),    // ptid
+          [num.parse(row[6]), num.parse(row[8]), num.parse(row[9])]  // LMP, Congestion, Losses
+        ]);
+      }).toList();
+
+      return data;
+    } else {
+      throw 'Could not find file for day $yyyymmdd';
+    }
+
+    //data.forEach((e) => print(e));
+  }
+
+
+
+
+  /**
+   * Ingest one day offers of all generators in mongo
+   */
+  Future oneDayMongoInsert(String yyyymmdd) {
+    List data;
+    try {
+      data = oneDayRead(yyyymmdd);
+    } catch (e) {
+      return new Future.value(print('ERROR:  No file for day $yyyymmdd'));
+    }
+
+    print('Inserting day $yyyymmdd into db');
+    return coll
+    .insertAll(data)
+    .then((_) => print('--->  SUCCESS'))
+    .catchError((e) => print('   ' + e.toString()));
+  }
+
+  /**
+   * Process one entry corresponding to one row of the report.
+   * Prepare the data for mongo.
+   */
+  Map processOneEntry(List entry) {
+    // take only the report date.
+    String rD = (entry[1] as String).split(' ').first;
+
+    Map mongoEntry = {
+      'reportDate': fmtS.parse(rD).toUtc(),
+      'applicationNumber': entry[3],
+      'company1': entry[4],
+      'company2': entry[5],
+      'station': entry[6],
+      'equipmentType': entry[7],
+      'equipmentDescription': entry[8],
+      'voltage': entry[9],
+      'plannedStart': fmtL.parse(entry[10]).toUtc(),
+      'plannedEnd': fmtL.parse(entry[11]).toUtc(),
+      'status': entry[14],
+      'requestType': entry[15]
+    };
+    if (entry[12] != "") mongoEntry['actualStart'] =
+    fmtL.parse(entry[12]).toUtc();
+    if (entry[13] != "") mongoEntry['actualEnd'] =
+    fmtL.parse(entry[13]).toUtc();
+
+    return mongoEntry;
+  }
+
+  /**
+   * Download the file if not in the archive folder.  If file is already downloaded, no nothing.
+   */
+  Future oneDayDownload(String yyyymmdd) async {
+    File fileout = new File(DIR + "/WW_DALMP_ISO_$yyyymmdd.csv");
+    if (fileout.existsSync()) {
+      print('  file already downloaded');
+      return new Future.value(print('Day $yyyymmdd was already downloaded.'));
+    } else {
+      String URL = "http://www.iso-ne.com/static-transform/csv/histRpts/da-lmp/WW_DALMP_ISO_$yyyymmdd.csv";
+      HttpClient client = new HttpClient();
+      HttpClientRequest request = await client.getUrl(Uri.parse(URL));
+      HttpClientResponse response = await request.close();
+      await response.pipe(fileout.openWrite());
+      print('Downloaded short term outages for day $yyyymmdd.');
+    }
+  }
+
+
+  /**
+   * Recreate the collection from scratch.
+   */
+  setup() async {
+    if (!new Directory(DIR).existsSync()) new Directory(DIR)
+    .createSync(recursive: true);
+    await oneDayDownload('20140101');
+
+    await db.open();
+    List<String> collections = await db.listCollections();
+    print('Collections in db:');
+    print(collections);
+    if (collections.contains('lmp_H1')) await coll.drop();
+    await oneDayMongoInsert('20140101');
+
+    // this indexing assures that I don't insert the same data twice
+    await db.ensureIndex('lmp_H1',
+    keys: {
+      'reportDate': 1,
+      'row': 1
+    },
+    unique: true);
+
+    // this indexing useful for analysis
+    await db.ensureIndex('lmp_H1', keys: {
+      'equipmentType': 1,
+      'voltage': 1,
+      'equipmentDescription': 1
+    });
+
+
+    await db.close();
+  }
 }
 

@@ -24,7 +24,6 @@ main() {
   List data2 = makeData(new DateTime(2015, 11, 1)); // have 2
   List data = new List.from(data1)
     ..addAll(data2);
-
   data.forEach((e) => print(e));
 }
 

@@ -13,10 +13,10 @@ test_outages_shortTerm() async {
 
   await arch.db.open();
   Date day = new Date(2014,1,2);
-  while (day < new Date(2015,9,16)) {
+  while (day < Date.today()) {
     await arch.oneDayDownload(day.toString());
     await arch.oneDayMongoInsert(day.toString());
-    day = day.add(1);
+    day = day.next;
   }
   await arch.db.close();
 
