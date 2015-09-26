@@ -1,16 +1,23 @@
 library elec.nepool_dam_lmp_test;
 
 import 'package:test/test.dart';
+import 'package:date/date.dart';
 import 'package:demos/elec/nepool_da_lmp.dart';
+import 'package:intl/intl.dart';
 
-test_nepool_dam() {
 
+setup() async {
   Archiver arch = new Archiver();
-  arch.oneDayDownload('20150101');
+  await arch.setup();
+
+
+}
+
+test_nepool_dam() async {
 
 }
 
 
-main() {
-  test_nepool_dam();
+main() async {
+  await test_nepool_dam();
 }

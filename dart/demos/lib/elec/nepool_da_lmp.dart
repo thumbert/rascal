@@ -4,16 +4,31 @@ import 'dart:io';
 import 'dart:async';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:intl/intl.dart';
-import 'package:csv/csv.dart';
 import 'package:timezone/standalone.dart';
+import 'package:demos/elec/iso_timestamp.dart';
+import 'package:date/date.dart';
 
-
-Future with_db(Db db, Function callback) {
-  return db.open().then((_) {
-    return callback();
-  }).then((_) => db.close());
+abstract class Config {
+  String DIR;
+  String collectionName;
+  String dbName;
+  Db db;
 }
 
+class DefaultConfig implements Config {
+  String DIR;
+  String collectionName;
+  String dbName;
+  Db db;
+
+  DefaultConfig() {
+    Map env = Platform.environment;
+    dbName = 'nepool_dam';
+    DIR = env['HOME'] + '/Downloads/Archive/DA_LMP/Raw/Csv';
+    collectionName = 'lmp_hourly';
+    db = new Db('mongodb://127.0.0.1/$dbName');
+  }
+}
 
 /**
  * +0400 for EDT, +0500 for EST
@@ -22,18 +37,21 @@ Future with_db(Db db, Function callback) {
  *
  *
  */
-class DaLmp {
-
-  Db db;
+class DaLmp extends Config {
   DbCollection coll;
-  String DIR = 'NEPOOL/LMP/DA/Raw/';
+  Location location;
   final DateFormat fmt = new DateFormat("yyyy-MM-ddTHH:00:00.000-ZZZZ");
 
-  DaLmp({this.db}) {
-    if (db == null)
-      db = new Db('mongodb://127.0.0.1/nepool_dam');
+  DaLmp({Config config}) {
+    if (config == null) config = new DefaultConfig();
+    dbName = config.dbName;
+    DIR = config.DIR;
+    collectionName = config.collectionName;
+    db = config.db;
 
-    coll = db.collection('DA_LMP');
+    coll = db.collection(collectionName);
+    initializeTimeZoneSync();
+    location = getLocation('America/New_York');
   }
 
   /**
@@ -43,40 +61,28 @@ class DaLmp {
    * db.DA_LMP.aggregate([{$match: {ptid: {$in: [4001, 4000]}}},
    *   {$group: {_id: null, yMin: {$min: '$congestionComponent'}, yMax: {$max: '$congestionComponent'}}}])
    */
-  Future<Map> getLimits(List<int> ptids, String start, String end, {String frequency: 'hourly'}) {
+  Future<Map> getLimits(List<int> ptids, String start, String end,
+      {String frequency: 'hourly'}) {
     List pipeline = [];
     var groupId;
     Map group;
 //    String startDate = new DateFormat('yyyy-MM-dd').format(start);
 //    String endDate = new DateFormat('yyyy-MM-dd').format(end);
 
-    var match = {
-      '\$match': _constructMatchClause(ptids, start, end)
-    };
+    var match = {'\$match': _constructMatchClause(ptids, start, end)};
 
     if (frequency == 'daily') {
       groupId = {
         'ptid': '\$ptid',
-        'year': {
-          '\$year': '\$hourBeginning'
-        },
-        'month': {
-          '\$month': '\$hourBeginning'
-        },
-        'day': {
-          '\$dayOfMonth': '\$hourBeginning'
-        }
+        'year': {'\$year': '\$hourBeginning'},
+        'month': {'\$month': '\$hourBeginning'},
+        'day': {'\$dayOfMonth': '\$hourBeginning'}
       };
-
     } else if (frequency == 'monthly') {
       groupId = {
         'ptid': '\$ptid',
-        'year': {
-          '\$year': '\$hourBeginning'
-        },
-        'month': {
-          '\$month': '\$hourBeginning'
-        }
+        'year': {'\$year': '\$hourBeginning'},
+        'month': {'\$month': '\$hourBeginning'}
       };
     }
 
@@ -85,9 +91,7 @@ class DaLmp {
       group = {
         '\$group': {
           '_id': groupId,
-          'congestionComponent': {
-            '\$avg': '\$congestionComponent'
-          }
+          'congestionComponent': {'\$avg': '\$congestionComponent'}
         }
       };
     } else {
@@ -95,12 +99,8 @@ class DaLmp {
       group = {
         '\$group': {
           '_id': null,
-          'yMin': {
-            '\$min': '\$congestionComponent'
-          },
-          'yMax': {
-            '\$max': '\$congestionComponent'
-          }
+          'yMin': {'\$min': '\$congestionComponent'},
+          'yMax': {'\$max': '\$congestionComponent'}
         }
       };
     }
@@ -114,12 +114,8 @@ class DaLmp {
       var group2 = {
         '\$group': {
           '_id': null,
-          'yMin': {
-            '\$min': '\$congestionComponent'
-          },
-          'yMax': {
-            '\$max': '\$congestionComponent'
-          }
+          'yMin': {'\$min': '\$congestionComponent'},
+          'yMax': {'\$max': '\$congestionComponent'}
         }
       };
       pipeline.add(group2);
@@ -130,10 +126,7 @@ class DaLmp {
       ///print(v['result']);
       return v['result'].first;
     });
-
-
   }
-
 
   /**
    * Get the hourly congestion data from the table,
@@ -142,26 +135,25 @@ class DaLmp {
    * db.DA_LMP.find({ptid: {$in: [321, 4000]}}, {_id: 0}).limit(10)
    * TODO: does the result need to be ordered by ptid and hourBeginning?  Don't think so...
    */
-  Future<List<Map>> getHourlyCongestionData(List<int> ptids, DateTime start, DateTime end) {
+  Future<List<Map>> getHourlyCongestionData(
+      List<int> ptids, DateTime start, DateTime end) {
     assert(start.isUtc);
     assert(end.isUtc);
     SelectorBuilder sb = where;
 
-    if (ptids != null && ptids.isNotEmpty)
-      sb = sb.oneFrom('ptid', ptids);
+    if (ptids != null && ptids.isNotEmpty) sb = sb.oneFrom('ptid', ptids);
 
     // if you want to pull all the ptids at once, better to be a bit careful ...
-    if (start != null)
-      sb = sb.gte('hourBeginning', start);
+    if (start != null) sb = sb.gte('hourBeginning', start);
 
-    if (end != null)
-      sb = sb.lt('hourBeginning', end);
+    if (end != null) sb = sb.lt('hourBeginning', end);
 
     //print(sb.toString());
-    return coll.find(sb.excludeFields(['_id']).sortBy('ptid').sortBy('hourBeginning')).toList();
+    return coll
+        .find(sb.excludeFields(['_id']).sortBy('ptid').sortBy('hourBeginning'))
+        .toList();
     //return coll.find(sb.excludeFields(['_id'])).toList();
   }
-
 
   /**
    * Aggregate the hourly data daily between start and end dates inclusive.
@@ -171,28 +163,19 @@ class DaLmp {
    *
    * db.DA_LMP.aggregate([{$match: {ptid: {$in: [321, 4000]}}}, {$group: {_id: {ptid: {$ptid}, localDate: {$localDate}}, congestionComponent: {$avg: '$congestionComponent'}}}])
    */
-  Future<List<Map>> getDailyCongestionData(List<int> ptids, String start, String end) {
+  Future<List<Map>> getDailyCongestionData(
+      List<int> ptids, String start, String end) {
     assert(start.compareTo(end) < 1);
     List pipeline = [];
-    var match = {
-      '\$match': _constructMatchClause(ptids, start, end)
-    };
+    var match = {'\$match': _constructMatchClause(ptids, start, end)};
     var group = {
       '\$group': {
-        '_id': {
-          'ptid': '\$ptid',
-          'localDate': '\$localDate'
-        },
-        'congestionComponent': {
-          '\$avg': '\$congestionComponent'
-        }
+        '_id': {'ptid': '\$ptid', 'localDate': '\$localDate'},
+        'congestionComponent': {'\$avg': '\$congestionComponent'}
       }
     };
     var sort = {
-      '\$sort': {
-        '_id.ptid': 1,
-        '_id.localDate': 1
-      }
+      '\$sort': {'_id.ptid': 1, '_id.localDate': 1}
     };
     pipeline.add(match);
     pipeline.add(group);
@@ -212,7 +195,6 @@ class DaLmp {
     // {date: DateTime(2014,12,27), ptid: 321, congestionComponent: 11.077083333333334}
   }
 
-
   /**
    * Aggregate data monthly between the months start and end inclusive.
    * start a String representing a date in yyyy-mm-dd format, beginning of the month
@@ -225,43 +207,37 @@ class DaLmp {
    * db.DA_LMP.aggregate([{$match: {ptid: {$in: [321]}, localDate: {$gte: '2014-12-01', $lte: '2014-12-01'}}}, {$project: {congestionComponent: 1, ptid: 1, month: {$substr: ['$localDate', 0, 7]}}},
       {$group: {}}])
    */
-  Future<List<Map>> getMonthlyCongestionData(List<int> ptids, String start, String end) {
+  Future<List<Map>> getMonthlyCongestionData(
+      List<int> ptids, String start, String end) {
     assert(start.substring(7) == '-01');
     assert(end.substring(7) == '-01');
     assert(start.compareTo(end) < 1);
     var startDate = start;
     // go to the end of month for the end Date
-    var aux = nextMonth(from: DateTime.parse(end)).subtract(new Duration(days: 1));
+    var aux =
+        nextMonth(from: DateTime.parse(end)).subtract(new Duration(days: 1));
     var endDate = new DateFormat('yyyy-MM-dd').format(aux);
 
     List pipeline = [];
 
-    var match = {
-      '\$match': _constructMatchClause(ptids, startDate, endDate)
-    };
+    var match = {'\$match': _constructMatchClause(ptids, startDate, endDate)};
     var project = {
       '\$project': {
         'congestionComponent': 1,
         'ptid': 1,
-        'month': {'\$substr': ['\$localDate', 0, 7]}
+        'month': {
+          '\$substr': ['\$localDate', 0, 7]
+        }
       }
     };
     var group = {
       '\$group': {
-        '_id': {
-          'ptid': '\$ptid',
-          'month': '\$month'
-        },
-        'congestionComponent': {
-          '\$avg': '\$congestionComponent'
-        }
+        '_id': {'ptid': '\$ptid', 'month': '\$month'},
+        'congestionComponent': {'\$avg': '\$congestionComponent'}
       }
     };
     var sort = {
-      '\$sort': {
-        '_id.ptid': 1,
-        '_id.month': 1
-      }
+      '\$sort': {'_id.ptid': 1, '_id.month': 1}
     };
     pipeline.add(match);
     pipeline.add(project);
@@ -280,7 +256,6 @@ class DaLmp {
     });
   }
 
-
   /**
    * Format the return of getData from the long format to the wide format (to minimize
    * the amount of data transferred).  Hourly data is in hourBeginning format
@@ -296,19 +271,20 @@ class DaLmp {
    */
   Map<String, Map> toWideFormat(List<Map> data, String frequency) {
     // need to traverse twice ... // TODO explore if you do this in one pass ...
-    Map idFreq = {'hourly': 'hourBeginning', 'daily': 'date', 'monthly': 'month'};
+    Map idFreq = {
+      'hourly': 'hourBeginning',
+      'daily': 'date',
+      'monthly': 'month'
+    };
     String id = idFreq[frequency];
 
     // group all rows by ptid
-    Map<String, List> gData = {
-    };
-    data.forEach((row) => gData.putIfAbsent(row['ptid'].toString(), () => []).add(row));
+    Map<String, List> gData = {};
+    data.forEach(
+        (row) => gData.putIfAbsent(row['ptid'].toString(), () => []).add(row));
 
-    Map<String, Map> res = {
-    };
-    gData.keys.forEach((String key) => res[key] = {
-      'DT': [], 'CC': []
-    });
+    Map<String, Map> res = {};
+    gData.keys.forEach((String key) => res[key] = {'DT': [], 'CC': []});
     for (String key in gData.keys) {
       //print('Transposing $key ...');
       gData[key].forEach((row) {
@@ -316,7 +292,6 @@ class DaLmp {
         res[key]['CC'].add(row['congestionComponent']);
       });
     }
-
 
     return res;
   }
@@ -327,61 +302,24 @@ class DaLmp {
    * [from] is a midnight UTC day
    */
   updateDb({DateTime from}) {
-    return db.open()
-    .then((_) => lastDayInserted()
-    .then((DateTime lastDay) {
-      DateTime start, end;
-      if (from == null)
-        start = new DateTime.utc(lastDay.year, lastDay.month, lastDay.day).add(new Duration(days: 1));
-      else
-        start = from;
-      DateTime now = new DateTime.now();
-      if (now.hour < 14)
-        end = new DateTime.utc(now.year, now.month, now.day);
-      else
-        end = nextDay().toUtc();
-      print('Updating the db from $start to $end.');
-      return insertDaysStartEnd(start, end);
-    }))
-    .then((_) => db.close());
+    return db
+        .open()
+        .then((_) => lastDayInserted().then((DateTime lastDay) {
+              DateTime start, end;
+              if (from == null) start =
+                  new DateTime.utc(lastDay.year, lastDay.month, lastDay.day)
+                      .add(new Duration(days: 1));
+              else start = from;
+              DateTime now = new DateTime.now();
+              if (now.hour < 14) end =
+                  new DateTime.utc(now.year, now.month, now.day);
+              else end = nextDay().toUtc();
+              print('Updating the db from $start to $end.');
+              return insertDaysStartEnd(start, end);
+            }))
+        .then((_) => db.close());
   }
 
-
-  /**
-   * Archive and Insert days between start, end.
-   * Parameters start and end are midnight UTC DateTime objects.
-   * For each day in the range of days, download and insert the data into the db.
-   */
-  insertDaysStartEnd(DateTime start, DateTime end) {
-    List<DateTime> days = seqDays(start, end);
-    DateFormat fmtDay = new DateFormat('yyyyMMdd');
-
-    return Future.forEach(days, (day) {
-      String yyyymmdd = fmtDay.format(day);
-      return oneDayDownload(yyyymmdd).then((_) {
-        return oneDayMongoInsert(yyyymmdd);
-      });
-    }).then((_) {
-      print('Done!');
-    });
-
-  }
-
-  /**
-   * Make the daily insertions idempotent, so you never insert the same data over
-   * and over again.  You should run this only once when you set up the database.
-   * db.DA_LMP.ensureIndex({hourBeginning: 1, ptid: 1}, {unique: true})
-   * db.DA_LMP.getIndexes()
-   */
-  prepareCollection() {
-    return db.open().then((_) {
-      return db.ensureIndex('DA_LMP', keys: {
-        'ptid': 1, 'hourBeginning': 1
-      }, unique: true);
-    }).then((_) {
-      db.close();
-    });
-  }
 
   /**
    * Return the last day that was ingested in the db.
@@ -393,9 +331,8 @@ class DaLmp {
     List pipeline = [];
     var group = {
       '\$group': {
-        '_id': null, 'last': {
-          '\$max': '\$hourBeginning'
-        }
+        '_id': null,
+        'last': {'\$max': '\$hourBeginning'}
       }
     };
     pipeline.add(group);
@@ -407,100 +344,71 @@ class DaLmp {
     });
   }
 
-  /**
-   * Inserts one day into the db.
-   */
-  Future oneDayMongoInsert(String yyyymmdd) {
-    List data = oneDayCsvRead(yyyymmdd);
-    if (data.isEmpty)
-      return new Future.value(print('No data for $yyyymmdd.  Skipping.'));
-
-    DbCollection coll = db.collection('DA_LMP');
-    print('Inserting $yyyymmdd into db');
-    return coll.insertAll(data)
-    .then((_) => print('--->  SUCCESS'))
-    .catchError((e) => print(e));
-  }
-
-
-
 
   /**
    * For the pipeline aggregation queries
    * start and end are Strings in yyyy-mm-dd format.
    */
   Map _constructMatchClause(List<int> ptids, String start, String end) {
-    Map aux = {
-    };
-    if (ptids != null)
-      aux['ptid'] = {
-        '\$in': ptids
-      };
+    Map aux = {};
+    if (ptids != null) aux['ptid'] = {'\$in': ptids};
     if (start != null) {
-      if (!aux.containsKey('localDate'))
-        aux['localDate'] = {
-        };
+      if (!aux.containsKey('localDate')) aux['localDate'] = {};
 
       aux['localDate']['\$gte'] = start;
     }
     if (end != null) {
-      if (!aux.containsKey('localDate'))
-        aux['localDate'] = {
-        };
+      if (!aux.containsKey('localDate')) aux['localDate'] = {};
 
       aux['localDate']['\$lte'] = end;
     }
-
 
     return aux;
   }
 }
 
-
 /**
  * Deal with downloading the data, massaging it, and loading it into mongo.
  */
-class Archiver {
-  String DIR;
-
-  Db db;
+class Archiver extends Config {
   DbCollection coll;
-  Map<String, String> env;
-  DateFormat fmtS = new DateFormat('MM/dd/yyyy'); // short
-  DateFormat fmtL = new DateFormat('MM/dd/yyyy HH:mm:ss'); // long
-  final Location location = getLocation('America/New York');
+  Location location;
 
-  Archiver({String this.DIR}) {
-    if (db == null) db = new Db('mongodb://127.0.0.1/nepool_dam');
+  Archiver({Config config}) {
+    if (config == null) config = new DefaultConfig();
+    dbName = config.dbName;
+    DIR = config.DIR;
+    collectionName = config.collectionName;
+    db = config.db;
 
-    coll = db.collection('lmp_H1');
-    env = Platform.environment;
-    if (DIR == null) DIR = env['HOME'] + '/Downloads/Archive/DA_LMP/Raw/Csv';
+    coll = db.collection(collectionName);
+    initializeTimeZoneSync();
+    location = getLocation('America/New_York');
   }
 
-  updateDb({DateTime from, DateTime to}) {
-    if (from == null) {
-      //from =
-    }
-  }
 
   /**
    * Read the csv file and prepare it for ingestion into mongo.
    * DateTimes need to be hourBeginning UTC, etc.
    */
   List<Map> oneDayCsvRead(String yyyymmdd) {
-    File file = new File(DIR + "WW_DALMP_ISO_${yyyymmdd}.csv");
+    File file = new File(DIR + "/WW_DALMP_ISO_${yyyymmdd}.csv");
     if (file.existsSync()) {
       List<String> keys = ['hourBeginning', 'ptid', 'Lmp_Cong_Loss'];
 
-      List<Map> data = file.readAsLinesSync()
-      .map((String row) => row.split(','))
-      .where((List row) => row.first == '"D"')
-      .map((List row) {
+      List<Map> data = file
+          .readAsLinesSync()
+          .map((String row) => row.split(','))
+          .where((List row) => row.first == '"D"')
+          .map((List row) {
         return new Map.fromIterables(keys, [
-          parseIsoTimestamp(unquote(row[1]), unquote(row[2]), hourEnding: false),
-          int.parse(unquote(row[3])),    // ptid
-          [num.parse(row[6]), num.parse(row[8]), num.parse(row[9])]  // LMP, Congestion, Losses
+          parseHourEndingStamp(_unquote(row[1]), _unquote(row[2]), location),
+          int.parse(_unquote(row[3])), // ptid
+          [
+            num.parse(row[6]),
+            num.parse(row[8]),
+            num.parse(row[9])
+          ] // LMP, Congestion, Losses
         ]);
       }).toList();
 
@@ -508,59 +416,26 @@ class Archiver {
     } else {
       throw 'Could not find file for day $yyyymmdd';
     }
-
-    //data.forEach((e) => print(e));
   }
 
-
-
+  String _unquote(String x) => x.substring(1, x.length - 1);
 
   /**
-   * Ingest one day offers of all generators in mongo
+   * Ingest one day prices in mongo
    */
   Future oneDayMongoInsert(String yyyymmdd) {
     List data;
     try {
-      data = oneDayRead(yyyymmdd);
+      data = oneDayCsvRead(yyyymmdd);
     } catch (e) {
       return new Future.value(print('ERROR:  No file for day $yyyymmdd'));
     }
 
     print('Inserting day $yyyymmdd into db');
     return coll
-    .insertAll(data)
-    .then((_) => print('--->  SUCCESS'))
-    .catchError((e) => print('   ' + e.toString()));
-  }
-
-  /**
-   * Process one entry corresponding to one row of the report.
-   * Prepare the data for mongo.
-   */
-  Map processOneEntry(List entry) {
-    // take only the report date.
-    String rD = (entry[1] as String).split(' ').first;
-
-    Map mongoEntry = {
-      'reportDate': fmtS.parse(rD).toUtc(),
-      'applicationNumber': entry[3],
-      'company1': entry[4],
-      'company2': entry[5],
-      'station': entry[6],
-      'equipmentType': entry[7],
-      'equipmentDescription': entry[8],
-      'voltage': entry[9],
-      'plannedStart': fmtL.parse(entry[10]).toUtc(),
-      'plannedEnd': fmtL.parse(entry[11]).toUtc(),
-      'status': entry[14],
-      'requestType': entry[15]
-    };
-    if (entry[12] != "") mongoEntry['actualStart'] =
-    fmtL.parse(entry[12]).toUtc();
-    if (entry[13] != "") mongoEntry['actualEnd'] =
-    fmtL.parse(entry[13]).toUtc();
-
-    return mongoEntry;
+        .insertAll(data)
+        .then((_) => print('--->  SUCCESS'))
+        .catchError((e) => print('   ' + e.toString()));
   }
 
   /**
@@ -572,7 +447,8 @@ class Archiver {
       print('  file already downloaded');
       return new Future.value(print('Day $yyyymmdd was already downloaded.'));
     } else {
-      String URL = "http://www.iso-ne.com/static-transform/csv/histRpts/da-lmp/WW_DALMP_ISO_$yyyymmdd.csv";
+      String URL =
+          "http://www.iso-ne.com/static-transform/csv/histRpts/da-lmp/WW_DALMP_ISO_$yyyymmdd.csv";
       HttpClient client = new HttpClient();
       HttpClientRequest request = await client.getUrl(Uri.parse(URL));
       HttpClientResponse response = await request.close();
@@ -581,39 +457,44 @@ class Archiver {
     }
   }
 
-
   /**
    * Recreate the collection from scratch.
    */
   setup() async {
     if (!new Directory(DIR).existsSync()) new Directory(DIR)
-    .createSync(recursive: true);
+        .createSync(recursive: true);
     await oneDayDownload('20140101');
 
     await db.open();
-    List<String> collections = await db.listCollections();
+    List<String> collections = await db.getCollectionNames();
     print('Collections in db:');
     print(collections);
-    if (collections.contains('lmp_H1')) await coll.drop();
+    if (collections.contains(collectionName)) await coll.drop();
     await oneDayMongoInsert('20140101');
 
     // this indexing assures that I don't insert the same data twice
-    await db.ensureIndex('lmp_H1',
-    keys: {
-      'reportDate': 1,
-      'row': 1
-    },
-    unique: true);
-
-    // this indexing useful for analysis
-    await db.ensureIndex('lmp_H1', keys: {
-      'equipmentType': 1,
-      'voltage': 1,
-      'equipmentDescription': 1
-    });
-
+    await db.createIndex(collectionName,
+        keys: {'hourBeginning': 1, 'ptid': 1}, unique: true);
 
     await db.close();
   }
-}
 
+  /**
+   * Bring the table up to date.
+   */
+  updateDb(Date start, Date end) async {
+    // TODO: make start/end dependent on the data.
+    await db.open();
+    Date.fmt = new DateFormat('yyyyMMdd');
+    Date day = start;
+    while (day < end) {
+      await oneDayDownload(day.toString());
+      await oneDayMongoInsert(day.toString());
+      day = day.next;
+    }
+    await db.close();
+  }
+
+
+
+}
