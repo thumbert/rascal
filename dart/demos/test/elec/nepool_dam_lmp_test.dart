@@ -18,8 +18,10 @@ test_nepool_dam() async {
 
   await arch.db.open();
   Date end = await arch.lastDayInserted();
+  print('Last day inserted is: $end');
+  await arch.removeDataForDay(end);
+  print('Last day inserted is: ${await arch.lastDayInserted()}');
   await arch.db.close();
-
 }
 
 

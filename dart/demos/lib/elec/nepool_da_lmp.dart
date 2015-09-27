@@ -165,6 +165,7 @@ class DaLmp extends Config {
    * db.DA_LMP.aggregate([{$match: {ptid: {$in: [321, 4000]}}}, {$group: {_id: {ptid: {$ptid}, localDate: {$localDate}}, congestionComponent: {$avg: '$congestionComponent'}}}])
    */
   Future<List<Map>> getDailyCongestionData(
+
       List<int> ptids, String start, String end) {
     assert(start.compareTo(end) < 1);
     List pipeline = [];
@@ -297,29 +298,6 @@ class DaLmp extends Config {
     return res;
   }
 
-  /**
-   * Bring the db up to date.
-   * Find the latest day in the archive and update from there to nextDay
-   * [from] is a midnight UTC day
-   */
-  updateDb({DateTime from}) {
-    return db
-        .open()
-        .then((_) => lastDayInserted().then((DateTime lastDay) {
-              DateTime start, end;
-              if (from == null) start =
-                  new DateTime.utc(lastDay.year, lastDay.month, lastDay.day)
-                      .add(new Duration(days: 1));
-              else start = from;
-              DateTime now = new DateTime.now();
-              if (now.hour < 14) end =
-                  new DateTime.utc(now.year, now.month, now.day);
-              else end = nextDay().toUtc();
-              print('Updating the db from $start to $end.');
-              return insertDaysStartEnd(start, end);
-            }))
-        .then((_) => db.close());
-  }
 
   /**
    * For the pipeline aggregation queries
@@ -443,7 +421,7 @@ class DamArchive extends Config with DailyArchive {
    * db.DA_LMP.aggregate([{$group: {_id: null, firstHour: {$min: '$hourBeginning'}, lastHour: {$max: '$hourBeginning'}}}])
    */
   Future<Date> lastDayInserted() async {
-    Date lastDay;
+    DateTime lastDay;
 
     List pipeline = [];
     var group = {
@@ -455,11 +433,29 @@ class DamArchive extends Config with DailyArchive {
     pipeline.add(group);
 
     Map v = await coll.aggregate(pipeline);
-    //print('$v');
     Map aux = v['result'].first;
     lastDay = aux['last']; // a local datetime
     return new Date(lastDay.year, lastDay.month, lastDay.day);
   }
+
+
+  /**
+   * Remove all the data for a given day (in case the insert fails midway)
+   */
+  removeDataForDay(Date date) async {
+    SelectorBuilder sb = where;
+
+    TZDateTime start = new TZDateTime(location, date.year, date.month, date.day).toUtc();
+    sb = sb.gte('hourBeginning', start);
+
+    Date next = date.next;
+    TZDateTime end = new TZDateTime(location, next.year, next.month, next.day).toUtc();
+    sb = sb.lt('hourBeginning', end);
+
+    await coll.remove(sb);
+  }
+
+
 
   /**
    * Recreate the collection from scratch.
