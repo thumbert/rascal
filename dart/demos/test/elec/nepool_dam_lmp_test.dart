@@ -7,13 +7,18 @@ import 'package:intl/intl.dart';
 
 
 setup() async {
-  Archiver arch = new Archiver();
+  DamArchive arch = new DamArchive();
   await arch.setup();
 
-
+  await arch.updateDb(new Date(2015,1,1), new Date(2015,8,31));
 }
 
 test_nepool_dam() async {
+  DamArchive arch = new DamArchive();
+
+  await arch.db.open();
+  Date end = await arch.lastDayInserted();
+  await arch.db.close();
 
 }
 

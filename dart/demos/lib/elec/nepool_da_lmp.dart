@@ -5,8 +5,9 @@ import 'dart:async';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart';
-import 'package:demos/elec/iso_timestamp.dart';
 import 'package:date/date.dart';
+import 'package:demos/elec/iso_timestamp.dart';
+import 'package:demos/elec/archive.dart';
 
 abstract class Config {
   String DIR;
@@ -320,31 +321,6 @@ class DaLmp extends Config {
         .then((_) => db.close());
   }
 
-
-  /**
-   * Return the last day that was ingested in the db.
-   * db.DA_LMP.aggregate([{$group: {_id: null, firstHour: {$min: '$hourBeginning'}, lastHour: {$max: '$hourBeginning'}}}])
-   */
-  Future<DateTime> lastDayInserted() {
-    DateTime lastDay;
-
-    List pipeline = [];
-    var group = {
-      '\$group': {
-        '_id': null,
-        'last': {'\$max': '\$hourBeginning'}
-      }
-    };
-    pipeline.add(group);
-    return coll.aggregate(pipeline).then((v) {
-      print('$v');
-      Map aux = v['result'].first;
-      lastDay = aux['last']; // a local datetime
-      return new DateTime.utc(lastDay.year, lastDay.month, lastDay.day);
-    });
-  }
-
-
   /**
    * For the pipeline aggregation queries
    * start and end are Strings in yyyy-mm-dd format.
@@ -370,11 +346,11 @@ class DaLmp extends Config {
 /**
  * Deal with downloading the data, massaging it, and loading it into mongo.
  */
-class Archiver extends Config {
+class DamArchive extends Config with DailyArchive {
   DbCollection coll;
   Location location;
 
-  Archiver({Config config}) {
+  DamArchive({Config config}) {
     if (config == null) config = new DefaultConfig();
     dbName = config.dbName;
     DIR = config.DIR;
@@ -386,13 +362,18 @@ class Archiver extends Config {
     location = getLocation('America/New_York');
   }
 
+  String yyyymmdd(Date date) {
+    var mm = date.month.toString().padLeft(2, '0');
+    var dd = date.day.toString().padLeft(2, '0');
+    return '${date.year}$mm$dd';
+  }
 
   /**
    * Read the csv file and prepare it for ingestion into mongo.
    * DateTimes need to be hourBeginning UTC, etc.
    */
-  List<Map> oneDayCsvRead(String yyyymmdd) {
-    File file = new File(DIR + "/WW_DALMP_ISO_${yyyymmdd}.csv");
+  List<Map> oneDayRead(Date date) {
+    File file = new File(DIR + "/WW_DALMP_ISO_${yyyymmdd(date)}.csv");
     if (file.existsSync()) {
       List<String> keys = ['hourBeginning', 'ptid', 'Lmp_Cong_Loss'];
 
@@ -414,7 +395,7 @@ class Archiver extends Config {
 
       return data;
     } else {
-      throw 'Could not find file for day $yyyymmdd';
+      throw 'Could not find file for day $date';
     }
   }
 
@@ -423,15 +404,15 @@ class Archiver extends Config {
   /**
    * Ingest one day prices in mongo
    */
-  Future oneDayMongoInsert(String yyyymmdd) {
+  Future oneDayMongoInsert(Date date) {
     List data;
     try {
-      data = oneDayCsvRead(yyyymmdd);
+      data = oneDayRead(date);
     } catch (e) {
-      return new Future.value(print('ERROR:  No file for day $yyyymmdd'));
+      return new Future.value(print('ERROR:  No file for day $date}'));
     }
 
-    print('Inserting day $yyyymmdd into db');
+    print('Inserting day $date into db');
     return coll
         .insertAll(data)
         .then((_) => print('--->  SUCCESS'))
@@ -441,20 +422,43 @@ class Archiver extends Config {
   /**
    * Download the file if not in the archive folder.  If file is already downloaded, no nothing.
    */
-  Future oneDayDownload(String yyyymmdd) async {
-    File fileout = new File(DIR + "/WW_DALMP_ISO_$yyyymmdd.csv");
+  Future oneDayDownload(Date date) async {
+    File fileout = new File(DIR + "/WW_DALMP_ISO_${yyyymmdd(date)}.csv");
     if (fileout.existsSync()) {
       print('  file already downloaded');
-      return new Future.value(print('Day $yyyymmdd was already downloaded.'));
+      return new Future.value(print('Day $date was already downloaded.'));
     } else {
       String URL =
-          "http://www.iso-ne.com/static-transform/csv/histRpts/da-lmp/WW_DALMP_ISO_$yyyymmdd.csv";
+          "http://www.iso-ne.com/static-transform/csv/histRpts/da-lmp/WW_DALMP_ISO_${yyyymmdd(date)}.csv";
       HttpClient client = new HttpClient();
       HttpClientRequest request = await client.getUrl(Uri.parse(URL));
       HttpClientResponse response = await request.close();
       await response.pipe(fileout.openWrite());
-      print('Downloaded short term outages for day $yyyymmdd.');
+      print('Downloaded short term outages for day $date.');
     }
+  }
+
+  /**
+   * Return the last day that was ingested in the db.
+   * db.DA_LMP.aggregate([{$group: {_id: null, firstHour: {$min: '$hourBeginning'}, lastHour: {$max: '$hourBeginning'}}}])
+   */
+  Future<Date> lastDayInserted() async {
+    Date lastDay;
+
+    List pipeline = [];
+    var group = {
+      '\$group': {
+        '_id': null,
+        'last': {'\$max': '\$hourBeginning'}
+      }
+    };
+    pipeline.add(group);
+
+    Map v = await coll.aggregate(pipeline);
+    //print('$v');
+    Map aux = v['result'].first;
+    lastDay = aux['last']; // a local datetime
+    return new Date(lastDay.year, lastDay.month, lastDay.day);
   }
 
   /**
@@ -463,14 +467,14 @@ class Archiver extends Config {
   setup() async {
     if (!new Directory(DIR).existsSync()) new Directory(DIR)
         .createSync(recursive: true);
-    await oneDayDownload('20140101');
+    await oneDayDownload(new Date(2014, 1, 1));
 
     await db.open();
     List<String> collections = await db.getCollectionNames();
     print('Collections in db:');
     print(collections);
     if (collections.contains(collectionName)) await coll.drop();
-    await oneDayMongoInsert('20140101');
+    await oneDayMongoInsert(new Date(2014, 1, 1));
 
     // this indexing assures that I don't insert the same data twice
     await db.createIndex(collectionName,
@@ -485,16 +489,12 @@ class Archiver extends Config {
   updateDb(Date start, Date end) async {
     // TODO: make start/end dependent on the data.
     await db.open();
-    Date.fmt = new DateFormat('yyyyMMdd');
     Date day = start;
     while (day < end) {
-      await oneDayDownload(day.toString());
-      await oneDayMongoInsert(day.toString());
+      await oneDayDownload(day);
+      await oneDayMongoInsert(day);
       day = day.next;
     }
     await db.close();
   }
-
-
-
 }
