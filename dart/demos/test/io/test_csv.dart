@@ -3,7 +3,9 @@ library test_csv;
 import 'package:csv/csv.dart';
 import 'dart:io';
 
-var seatac = """"month","day","year","max.temp","record.max","normal.max","min.temp","record.min","normal.min","precip","record.precip","normal.precip","time.max","time.min"
+String loadSeatac() {
+
+  return """"month","day","year","max.temp","record.max","normal.max","min.temp","record.min","normal.min","precip","record.precip","normal.precip","time.max","time.min"
 "January",1,2007,43,58,45,34,10,35,0.13,1.37,0.17,1509,13
 "January",2,2007,56,56,45,45,6,35,1.77,1.51,0.17,1000,135
 "January",3,2007,48,58,45,43,6,35,1.01,1.01,0.17,1411,713
@@ -94,6 +96,9 @@ var seatac = """"month","day","year","max.temp","record.max","normal.max","min.t
 "March",29,2007,63,78,55,37,24,40,NA,0.7,0.11,1410,553
 "March",30,2007,53,72,55,44,27,40,0.06,0.65,0.11,1121,232
 "March",31,2007,50,75,55,41,30,40,0.18,0.57,0.1,1348,806""";
+}
+
+
 
 Function toNumeric = (String x) {
   if (x == "" || x == "NA")
@@ -114,7 +119,7 @@ main() {
     print("You're right, the second element is the empty string!");
   }
   
-  List<List<String>> x = decoder.convert(seatac);
+  List<List<String>> x = decoder.convert(loadSeatac());
   //print(x);
 
   var z = decoder.convert('"March",29,NA,553', 
@@ -130,5 +135,8 @@ main() {
   List<List<String>> aux = const CsvToListConverter(eol: "\n").convert(str);
   print("Took ${stopwatch.elapsed} to convert csv");
   print(aux.length);
-  
+
+  // a large csv file about 1.1 GB is NOAA's climate data by year.
+  // ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/2014.csv.gz
+  // write some code to read it ...
 }

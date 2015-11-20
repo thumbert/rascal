@@ -42,6 +42,15 @@ test_orderings() {
   print(natural.sorted(dt));
   // [2010-01-01 00:00:00.000, 2011-01-01 00:00:00.000, 2014-01-01 00:00:00.000]
 
+  print('sort a List of Maps with nulls');
+  var map1 = [
+    {'station': 'A', 'value': 10},
+    {'station': 'A', 'value': null},
+    {'station': 'B', 'value': 15},
+    {'station': 'A', 'value': 7},
+  ];
+  Ordering ord = new Ordering.natural().nullsFirst().onResultOf((Map row) => row['value']);
+  print(ord.sorted(map1));
 }
 
 main() {

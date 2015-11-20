@@ -1,6 +1,6 @@
 import 'dart:io';
 
-/*
+/**
  * Send an SVG to a server
  */
 

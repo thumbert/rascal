@@ -1,4 +1,4 @@
-/*
+/**
  * Set a server to get the data from mongo.
  *  
  */
