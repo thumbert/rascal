@@ -5,6 +5,13 @@ import 'package:demos/datetime/utils.dart';
 import 'package:demos/math/utils.dart';
 import 'package:demos/graphics/axis_datetime_utils.dart';
 
+
+Map theme = {
+  /// distance in points from the edge of the plot window
+  'margin': 10,
+
+};
+
 /**
  * A DateTime axis for the x axis.
  */
@@ -38,6 +45,10 @@ class DateTimeAxis {
 
   /// header height in px
   num headerHeight = 20;
+
+  DateTimeAxis() {
+
+  }
 
   /**
    * Calculate the ticks, the headers and the label.

@@ -10,7 +10,7 @@ import 'package:demos/graphics/axis_datetime_utils.dart';
  */
 class DateTimeAxisXl extends Sprite with DateTimeAxis {
   final fmt =
-    new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
+    new TextFormat("Arial", 20, Color.Black, align: TextFormatAlign.CENTER);
 
   DateTimeAxisXl(
       DateTime start, DateTime end, {List<DateTime> ticks, String label}) {
@@ -20,7 +20,7 @@ class DateTimeAxisXl extends Sprite with DateTimeAxis {
 
     if (ticks == null) defaultTicks();
 
-    if (label != null) this.label = label;
+    this.label ??= label;
   }
 
   draw() {
@@ -68,7 +68,7 @@ class DateTimeAxisXl extends Sprite with DateTimeAxis {
 
 class HeaderXl extends Sprite {
   final fmt =
-      new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
+      new TextFormat("Arial", 20, Color.Black, align: TextFormatAlign.CENTER);
 
   /**
    * Draw the header.
