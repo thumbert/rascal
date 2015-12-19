@@ -162,8 +162,18 @@ selectFromArray() async {
   List res = await coll.find(sb).toList();
   res.forEach((e) => print(e));
 
+  // db.grades.find({semester: 2}, {'grades.$': 1})  // does not work
 
-  print('Select only the midterm grades for semester 2');
+  print('Select only the midterm grades for semester 2 (need to use the aggregate framework)');
+  List pipeline = [];
+
+  pipeline.add({'\$match': {'semester': 2}});
+  //pipeline.add({'\$project': {'_id': 1, 'semester': 1, 'midgrade':  '\$grades.1'}});
+  //pipeline.add({'\$project': {'_id': 1, 'semester': 1, 'midgrade':  {'\$grades': 1}}});
+
+  List res2 = await coll.aggregateToStream(pipeline).toList();
+  res2.forEach((e) => print(e));
+
 
 
   //await coll.remove();
