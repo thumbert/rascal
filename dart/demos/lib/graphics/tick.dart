@@ -1,71 +1,104 @@
 library graphics.tick;
 
-import 'package:stagexl/stagexl.dart';
 import 'dart:math';
+import 'package:stagexl/stagexl.dart';
+import 'package:demos/graphics/theme.dart';
 
-class Direction {
-  static const int UP = 3;
-  static const int DOWN = 1;
-  static const int LEFT = 2;
-  static const int RIGHT = 4;
+enum TickOrientation { outside, inside }
+
+class TickDirection {
+  static const int up = 3;
+  static const int down = 1;
+  static const int left = 2;
+  static const int right = 4;
+}
+
+/// Format a tick
+class TickFormat {
+  /// tick length in points
+  num length;
+
+  /// tick width
+  num width;
+
+  /// tick padding in points
+  num padding;
+
+  /// tick color
+  int color;
+
+  /// text format for this tick
+  TextFormat textFormat;
+
+  /// tick orientation relative to the axis (towards outside or inside)
+  /// not needed if angle is set
+  TickOrientation tickOrientation;
+
+  /// polar angle to define the orientation of the ticks
+  num angle;
+
+  TickFormat(this.length, this.padding, this.color, this.textFormat,
+      {this.width: 1, this.tickOrientation: TickOrientation.outside}) {}
 }
 
 /**
  * An axis tick.  Draws the line tick and the text label.
  *
  * [text] is the tick label.
- * [direction] is one of Direction.UP, etc.
- * [length] is the length of the tick in pixels.
- * [padding] is the distance in points from the tick to the label.
+ * [tickFormat] is the format of the tick
  *
  */
 class Tick extends Sprite {
+  String text;
+  TickFormat tickFormat;
 
-  Shape line;
-  TextField textField;
+  Tick({this.text: '', this.tickFormat}) {
+    tickFormat ??= Theme.basic.tickFormat;
+  }
 
-  Tick(String text, int direction, {int length: 14, int padding: 3}) {
-    line = new Shape();
+  void draw(int direction) {
+    TextField textField;
+    var fmt = tickFormat.textFormat;
+    Shape line = new Shape();
     line.graphics.moveTo(0, 0);
-    var fmt = new TextFormat("Arial", 14, Color.Black, align: TextFormatAlign.CENTER);
 
-    //print(direction);
+    /// TODO:  implement tick angle, tickOrientation
     switch (direction) {
-      case Direction.DOWN:
-        line.graphics.lineTo(0, length);
+      case TickDirection.down:
+        line.graphics.lineTo(0, tickFormat.length);
         textField = new TextField()
           ..defaultTextFormat = fmt
-          ..y = length + padding
+          ..y = tickFormat.length + tickFormat.padding
           ..autoSize = TextFieldAutoSize.CENTER
           ..text = text;
         textField..x = -textField.width ~/ 2;
         break;
-      case Direction.LEFT:
-        line.graphics.lineTo(-length,0);
+      case TickDirection.left:
+        line.graphics.lineTo(-tickFormat.length, 0);
         textField = new TextField()
           ..defaultTextFormat = fmt
           ..autoSize = TextFieldAutoSize.CENTER
-          ..rotation = -PI/2
-          ..x = -length - padding
+          ..rotation = -PI / 2
+          ..x = -tickFormat.length - tickFormat.padding
           ..text = text;
         textField..y = textField.width ~/ 2;
         break;
-      case Direction.UP:
-        line.graphics.lineTo(0, -length);
+      case TickDirection.up:
+        line.graphics.lineTo(0, -tickFormat.length);
         textField = new TextField()
           ..defaultTextFormat = fmt
-          ..y = -length -padding - 14
+          ..y = -tickFormat.length - tickFormat.padding - 14
           ..autoSize = TextFieldAutoSize.CENTER
           ..text = text;
         textField..x = -textField.width ~/ 2;
         break;
-      case Direction.RIGHT:
-        line.graphics.lineTo(length,0);
+      case TickDirection.right:
+        line.graphics.lineTo(tickFormat.length, 0);
         textField = new TextField()
           ..defaultTextFormat = fmt
           ..autoSize = TextFieldAutoSize.LEFT
-          ..rotation = PI/2
-          ..x = length + padding + 14
+          ..rotation = PI / 2
+          ..x = tickFormat.length + tickFormat.padding + 14
           ..text = text;
         textField..y = -textField.width ~/ 2;
         print("width=${textField.width}");

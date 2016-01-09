@@ -5,9 +5,9 @@ import 'package:demos/math/utils.dart';
 
 
 /**
- * Calculate the numerical ticks.
+ * Calculate the location of default numerical ticks.
  */
-List<num> calculateTicks(num min, num max) {
+List<num> defaultNumericTicks(num min, num max) {
 
   num range10 = log10(max - min);
   //print("range10 is " + range10.toString());
