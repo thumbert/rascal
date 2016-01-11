@@ -22,7 +22,8 @@ void main() {
   Figure fig = new Figure(stage)
     ..line(xData, y1Data)
     ..line(xData, y2Data)
-    ..key = new Key();
+    ..key = new Key()
+    ..draw();
 
 
 

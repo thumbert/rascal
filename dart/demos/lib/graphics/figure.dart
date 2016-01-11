@@ -7,11 +7,12 @@ import 'package:demos/graphics/theme.dart';
 import 'package:demos/graphics/axis.dart';
 import 'package:demos/graphics/drawable.dart';
 import 'package:demos/graphics/key.dart';
+import 'package:demos/graphics/axis_numeric.dart';
 
 class Figure extends DisplayObjectContainer implements Drawable {
   TextField tooltip;
   Theme theme = Theme.basic;
-  List<Axis> axes;
+  Map<Position,Axis> axes;
   Key key;
 
   /// the plot area
@@ -29,15 +30,19 @@ class Figure extends DisplayObjectContainer implements Drawable {
     this.addTo(stage);
   }
 
+  /// x axis limits for numerical values
   set xLim(Tuple2<num, num> values) {
     _xLimFixed = true;
     _xLim = values;
+    axes[Position.bottom] = new NumericAxis(values.i1, values.i2);
   }
   Tuple2<num, num> get xLim => _xLim;
 
+  /// y axis limits for numerical values
   set yLim(Tuple2<num, num> values) {
     _yLimFixed = true;
     _yLim = values;
+    axes[Position.left] = new NumericAxis(values.i1, values.i2);
   }
   Tuple2<num, num> get yLim => _yLim;
 
@@ -47,12 +52,12 @@ class Figure extends DisplayObjectContainer implements Drawable {
       color = theme.colors[_colorIndex % theme.colors.length];
       _colorIndex += 1;
     }
-    _drawableChildren += 1;
 
     AxisType axisTypeX = Axis.getAxisType(xData);
 
     if (!_xLimFixed) {
-      //xLim =
+      var aux = new AxisLimits.fromData(xData);
+      _xLim = new Tuple2(aux.minData, aux.maxData);
     }
 
     var lp = new LinePlot(this, xData, yData, color: color);
