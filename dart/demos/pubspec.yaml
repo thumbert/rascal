@@ -18,9 +18,7 @@ dependencies:
   more: '^1.5.0'
   petitparser: ">=1.0.0 <2.0.0"
   intl: any
-  stagexl:
-    git:
-      url: git://github.com/bp74/StageXL.git
+  stagexl: '0.13.1'
   timezone: "^0.3.1"
 
 dev_dependencies:
