@@ -16,12 +16,15 @@ void main() {
   renderLoop.addStage(stage);
 
   List xData  = [100, 200, 300, 400, 500];
-  List y1Data = [100, 300, 200, 100, 500];
-  List y2Data = [150, 500, 400, 360, 200];
+  List y1Data = [10, 30, 27, 10, 50];
+  List y2Data = [15, 50, 40, 36, 20];
 
   new Figure(stage)
     ..line(xData, y1Data)
     ..line(xData, y2Data, color: Color.HotPink)
+    ..xLabel = 'Number of days, ${new String.fromCharCode(0x03BC)}'
+    ..yLabel = 'Intensity'
+    ..title = 'Dynamics of bat population in underground Spanish caves'
     ..key = new Key()
     ..draw();
 

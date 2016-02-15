@@ -25,6 +25,13 @@ class Figure extends DisplayObjectContainer implements Drawable {
   /// the left axis
   Axis yAxis;
 
+  /// the top axis (is null for the default figure)
+  Axis topAxis;
+
+  /// the right axis (useful for timeseries or if you need to plot
+  /// several series with different scales)
+  Axis rightAxis;
+
   /// the plot area
   PlotArea _plotArea;
   /// keep track of the order of colors for multiple series
@@ -36,6 +43,10 @@ class Figure extends DisplayObjectContainer implements Drawable {
   bool _yLimFixed = false;
   /// guess the axis type from the data
   AxisType _axisTypeBottom, _axisTypeLeft;
+
+  TextField _xLabel;
+  TextField _yLabel;
+  TextField _title;
 
 
   Figure(this.stage) {
@@ -64,16 +75,54 @@ class Figure extends DisplayObjectContainer implements Drawable {
   Function xScale, yScale;
 
   /// Label for the X axis
-  String xLabel;
+  TextField get xLabel => _xLabel;
+
+  /// set the value of the x axis label.  You can pass in either a TextField
+  /// or a String which gets formatted with [theme.textFormat].
+  set xLabel(value) {
+    if (value is TextField) {
+      _xLabel = value;
+    } else {
+      _xLabel = new TextField(value.toString(), theme.textFormat);
+    }
+  }
 
   /// Label for the Y axis
-  String yLabel;
+  TextField get yLabel => _yLabel;
+
+  /// set the value of the y axis label.  You can pass in either a TextField
+  /// or a String which gets formatted with [theme.textFormat].
+  set yLabel(value) {
+    if (value is TextField) {
+      _yLabel = value;
+    } else {
+      _yLabel = new TextField(value.toString(), theme.textFormat);
+    }
+  }
+
+
+  /// the title of the figure
+  TextField get title => _title;
+
+  /// set the value of the title of the figure.  You can pass in either a TextField
+  /// or a String which gets formatted with [theme.textFormat].
+  set title(value) {
+    if (value is TextField) {
+      _title = value;
+    } else {
+      _title = new TextField(value.toString(), theme.textFormat);
+    }
+  }
+
 
   /// Customize the location of the ticks on the X axis
   List<num> xTicks;
 
   /// Customize the location of the ticks on the Y axis
   List<num> yTicks;
+
+
+
 
   /// draw a line in the plot area of the active panel
   void line(List xData, List yData, {int color, num strokeWidth: 1.5}) {
@@ -136,11 +185,20 @@ class Figure extends DisplayObjectContainer implements Drawable {
   /// draw this figure
   void draw() {
 
+    /// draw the plot area first
     _plotArea.graphics.rect(0, 0, _plotAreaWidth(), _plotAreaHeight());
     _plotArea.graphics.fillColor(Color.White);
     _plotArea
       ..x = _plotAreaX()
       ..y = _plotAreaY();
+
+    if (title != null) {
+      title.autoSize = TextFieldAutoSize.CENTER;
+      _plotArea.addChild(title);
+      title.alignPivot(HorizontalAlign.Center);
+      title.x = _plotAreaWidth()/2;
+      title.y = - 2*theme.textFormat.size;
+    }
 
 
     num hX = theme.borderSpaceToData;
@@ -149,30 +207,35 @@ class Figure extends DisplayObjectContainer implements Drawable {
     xScale = new LinearScale(xLim.i1, xLim.i2, hX, _plotAreaWidth() - hX);
     yScale = new LinearScale(yLim.i1, yLim.i2, _plotAreaHeight() - hY, hY);
 
-    if (_axisTypeBottom == AxisType.numeric) {
-      Scale scale = new LinearScale(xLim.i1, xLim.i2, 0, _plotAreaWidth()-2*hX);
-      xAxis = new NumericAxis(scale, Position.bottom);
-    }
-    xAxis.addTo(_plotArea);
-    xAxis.x = hX;
-    xAxis.y = _plotAreaHeight();
-    xAxis.name = 'draw-bottomAxis';
-
-    if (_axisTypeLeft == AxisType.numeric) {
-      Scale scale = new LinearScale(yLim.i1, yLim.i2, _plotAreaHeight()-2*hY, 0);
-      yAxis = new NumericAxis(scale, Position.left);
-    }
-    yAxis.addTo(_plotArea);
-    yAxis.x = 0;
-    //yAxis.y = _plotAreaHeight() - hY;
-    yAxis.y = hY;
-    yAxis.rotation = -PI/2;
-    yAxis.name = 'draw-leftAxis';
-
+    _constructAxes();
 
     /// draw all the children
     children.where((e) => e.name.startsWith('draw')).forEach((e) => e.draw());
   }
+
+  void _constructAxes() {
+    if (_axisTypeBottom == AxisType.numeric) {
+      Scale scale = new LinearScale(xLim.i1, xLim.i2, 0, _plotAreaWidth()-2*theme.borderSpaceToData);
+      xAxis = new NumericAxis(scale, Position.bottom);
+    }
+    xAxis.addTo(_plotArea);
+    xAxis.x = theme.borderSpaceToData;
+    xAxis.y = _plotAreaHeight();
+    xAxis.name = 'draw-bottomAxis';
+    if (xLabel != null) xAxis.label = xLabel;
+
+    if (_axisTypeLeft == AxisType.numeric) {
+      Scale scale = new LinearScale(yLim.i1, yLim.i2, _plotAreaHeight()-2*theme.borderSpaceToData, 0);
+      yAxis = new NumericAxis(scale, Position.left);
+    }
+    yAxis.addTo(_plotArea);
+    yAxis.x = 0;
+    yAxis.y = theme.borderSpaceToData;
+    yAxis.name = 'draw-leftAxis';
+    if (yLabel != null) yAxis.label = yLabel;
+
+  }
+
 }
 
 class PlotArea extends Sprite implements Drawable {

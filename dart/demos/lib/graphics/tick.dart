@@ -22,7 +22,7 @@ class TickFormat {
   /// tick width
   num width;
 
-  /// tick padding in points //TODO:  what is this for?!
+  /// tick padding in points (distance from the end of the tick to the tick label)
   num padding;
 
   /// tick color
@@ -81,10 +81,9 @@ class Tick extends Sprite {
         textField = new TextField()
           ..defaultTextFormat = fmt
           ..autoSize = TextFieldAutoSize.CENTER
-          ..rotation = -PI / 2
-          ..x = -tickFormat.length - tickFormat.padding
           ..text = text;
-        textField..y = textField.width ~/ 2;
+        textField.x = -textField.width - tickFormat.length - tickFormat.padding -2;
+        textField.y = -textField.height ~/ 2 -2;
         break;
       case TickDirection.up:
         line.graphics.lineTo(0, -tickFormat.length);
@@ -104,7 +103,7 @@ class Tick extends Sprite {
           ..x = tickFormat.length + tickFormat.padding + 14
           ..text = text;
         textField..y = -textField.width ~/ 2;
-        print("width=${textField.width}");
+        //print("width=${textField.width}");
         break;
     }
     line.graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.SQUARE);

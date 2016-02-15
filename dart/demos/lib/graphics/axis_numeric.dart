@@ -1,10 +1,10 @@
 library axis_numeric;
 
-import 'dart:math' as math;
+import 'dart:math' as math show PI, log, LOG10E, max;
 import 'package:tuple/tuple.dart';
 import 'package:stagexl/stagexl.dart';
+
 import 'ticks_numeric.dart';
-import 'figure.dart';
 import 'tick.dart';
 import 'axis.dart';
 import 'scale.dart';
@@ -83,32 +83,81 @@ class NumericAxis extends Axis {
   draw() {
 
     /// draw the axis line
-    graphics.moveTo(0.5, 0);
-    graphics.lineTo(_axisLength-0.5, 0);
+    if (position == Position.bottom) {
+      graphics.moveTo(0.5, 0);
+      graphics.lineTo(_axisLength-0.5, 0);
+
+    } else if (position == Position.left) {
+      graphics.moveTo(0, 0.5-_axisLength);
+      graphics.lineTo(0, 0.5);
+    }
 
     /// add the ticks
     ticks.forEach((tick) => addChild(tick));
     ticks.forEach((tick) => tick.draw());
 
-    //graphics.strokeColor(Color.Black);
+    /// add the axis label if it exists
+    if (label != null) {
+      label.autoSize = TextFieldAutoSize.CENTER;
+      //label.alignPivot(HorizontalAlign.Center);
+      //label.border = true;
+      addChild(label);
+      switch (position) {
+        case Position.bottom:
+          label.x = (this.width - label.width)~/2;
+          label.y = theme.tickFormat.length + 2*theme.fontSize;
+          break;
+        case Position.left:
+          label.alignPivot(HorizontalAlign.Center);
+          label.x = -(theme.tickFormat.length + 3*theme.fontSize);
+          label.y = -_axisLength~/2;
+          label.rotation = -math.PI/2;
+          break;
+        case Position.top:
+
+          break;
+        case Position.right:
+
+          break;
+      }
+
+    }
+
     graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.SQUARE);
   }
 
   /// default ticks
   List<Tick> _defaultNumericTicks() {
-    List<Tick> _ticks = [];
 
+    int direction;   // tick direction
+    switch (position) {
+      case Position.bottom:
+        direction = TickDirection.down;
+        break;
+      case Position.left:
+        direction = TickDirection.left;
+        break;
+      case Position.top:
+        direction = TickDirection.up;
+        break;
+      case Position.right:
+        direction = TickDirection.right;
+        break;
+    }
+
+    List<Tick> _ticks = [];
     List<num> tickNum = defaultNumericTicks(scale.x1, scale.x2);
     List<String> tickLabels = tickNum.map((e) => _defaultNumericTickLabel(e)).toList();
-    print(tickLabels);
+    //print(tickLabels);
+
 
     /// construct the ticks
     num _left = 0;
     for (int i = 0; i < tickNum.length; i++) {
       print('i: $i, ${tickNum[i]}, ${scale(tickNum[i])}');
-      var x = scale(tickNum[i]);
+      var coord = scale(tickNum[i]);
       Tick tick = new Tick(text: tickLabels[i])
-        ..direction = TickDirection.down;
+        ..direction = direction;
 
       // if the label doesn't fit, remove the label
 //      if (x - tick.width/2 < _left + minSpaceBetweenLabels) {
@@ -120,7 +169,11 @@ class NumericAxis extends Axis {
 //          ..direction = TickDirection.down;
 //      }
 
-      tick.x = x;
+      if (position == Position.bottom)
+        tick.x = coord;
+      else if (position == Position.left)
+        tick.y = coord;
+
       tick.name = 'draw-tick-{i}';
       _left = x + tick.width/2;
       _ticks.add(tick);

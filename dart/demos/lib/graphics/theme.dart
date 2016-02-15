@@ -48,6 +48,7 @@ class BasicTheme extends Theme {
     tickFormat = new TickFormat(14, 3, Color.Black, textFormat);
     tickOrientation = TickOrientation.outside;
 
+
     borderSpaceToData = 15;
     margin = {
       Margin.bottom: 5 * fontSize,
