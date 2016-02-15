@@ -15,13 +15,13 @@ void main() {
   RenderLoop renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
 
-  List xData = [100, 200, 300, 400, 500];
+  List xData  = [100, 200, 300, 400, 500];
   List y1Data = [100, 300, 200, 100, 500];
-  List y2Data = [100, 500, 400, 360, 200];
+  List y2Data = [150, 500, 400, 360, 200];
 
-  Figure fig = new Figure(stage)
+  new Figure(stage)
     ..line(xData, y1Data)
-    ..line(xData, y2Data)
+    ..line(xData, y2Data, color: Color.HotPink)
     ..key = new Key()
     ..draw();
 

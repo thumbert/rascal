@@ -29,6 +29,9 @@ abstract class Theme {
   /// default margins in points
   Map<Margin, num> margin;
 
+  /// default distance between the [min,max] of the data and the plot area width, in points
+  num borderSpaceToData;
+
   /// list of colors to be used for multiple series
   List colors;
 
@@ -45,6 +48,7 @@ class BasicTheme extends Theme {
     tickFormat = new TickFormat(14, 3, Color.Black, textFormat);
     tickOrientation = TickOrientation.outside;
 
+    borderSpaceToData = 15;
     margin = {
       Margin.bottom: 5 * fontSize,
       Margin.left: 4 * fontSize,

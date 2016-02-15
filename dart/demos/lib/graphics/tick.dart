@@ -13,6 +13,7 @@ class TickDirection {
   static const int right = 4;
 }
 
+
 /// Format a tick
 class TickFormat {
   /// tick length in points
@@ -21,7 +22,7 @@ class TickFormat {
   /// tick width
   num width;
 
-  /// tick padding in points
+  /// tick padding in points //TODO:  what is this for?!
   num padding;
 
   /// tick color
@@ -37,6 +38,7 @@ class TickFormat {
   /// polar angle to define the orientation of the ticks
   num angle;
 
+  /// Tick format.
   TickFormat(this.length, this.padding, this.color, this.textFormat,
       {this.width: 1, this.tickOrientation: TickOrientation.outside}) {}
 }
@@ -51,12 +53,13 @@ class TickFormat {
 class Tick extends Sprite {
   String text;
   TickFormat tickFormat;
+  int direction;
 
   Tick({this.text: '', this.tickFormat}) {
     tickFormat ??= Theme.basic.tickFormat;
   }
 
-  void draw(int direction) {
+  void draw() {
     TextField textField;
     var fmt = tickFormat.textFormat;
     Shape line = new Shape();
@@ -104,7 +107,7 @@ class Tick extends Sprite {
         print("width=${textField.width}");
         break;
     }
-    line.graphics.strokeColor(Color.Black, 1);
+    line.graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.SQUARE);
 
     addChild(line);
     addChild(textField);

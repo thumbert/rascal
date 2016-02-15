@@ -1,9 +1,9 @@
 library graphics.axis;
 
 import 'package:stagexl/stagexl.dart';
-import 'package:demos/graphics/tick.dart';
-import 'package:demos/graphics/theme.dart';
-
+import 'tick.dart';
+import 'theme.dart';
+import 'scale.dart';
 
 /// possible axis positions for standard plots
 enum Position {
@@ -18,6 +18,7 @@ enum AxisType {
   categorical,
   datetime
 }
+
 
 class AxisLimits {
   num minData;
@@ -61,6 +62,7 @@ class AxisLimits {
 
 
 /// General Axis class, with subclasses NumericalAxis, CategoricalAxis, DateTimeAxis, etc.
+/// An Axis has a fixed length that
 class Axis extends Sprite {
   Position axisPosition;
   List<Tick> ticks;
@@ -71,6 +73,9 @@ class Axis extends Sprite {
 
   /// keeps all the formatting of the label
   TextField _label;
+
+  /// how to go from the data to the screen coordinates
+  Scale scale;
 
   /// empty constructor
   Axis() {}

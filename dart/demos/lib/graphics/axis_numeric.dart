@@ -3,9 +3,11 @@ library axis_numeric;
 import 'dart:math' as math;
 import 'package:tuple/tuple.dart';
 import 'package:stagexl/stagexl.dart';
-import 'package:demos/graphics/ticks_numeric.dart';
-import 'package:demos/graphics/tick.dart';
-import 'package:demos/graphics/axis.dart';
+import 'ticks_numeric.dart';
+import 'figure.dart';
+import 'tick.dart';
+import 'axis.dart';
+import 'scale.dart';
 
 
 /**
@@ -13,20 +15,12 @@ import 'package:demos/graphics/axis.dart';
  */
 class NumericAxis extends Axis {
 
-  /// min value for this axis
-  num min;
+  /// the ticks for the axis
+  List<Tick> ticks;
 
-  /// max value for this axis
-  num max;
-
-//  List<String> tickLabels;
 //  TextFormat fmt;
 
-  /// go from a num to a screen coordinate;
-  Function scale;
-
-
-  /// margin in points from the edges of the parent
+  /// margin in points from the edges of the parent (what is this for??)
   num margin = 30;
 
   /// margin in points from the left edge of the parent to the first tick
@@ -37,24 +31,31 @@ class NumericAxis extends Axis {
   /// amount of minimum space between labels, so they don't look crowded
   num minSpaceBetweenLabels = 10;
 
-  /// the actual length of the axis in pixels
-  num _axisLength;
 
+  /// the position of the axis
+  Position position;
 
   /**
    * A numeric axis.
    *
-   * [min] lowest value to represent
-   * [margin] margin in points from the edges of the parent.
-   *   if ticks are specified
-   *   if the tickLabels are specified, then the margin is adjusted to make room (if possible)
+   * [min] lowest value of the data
+   * [max] largest value of the data
    */
-  NumericAxis(this.min, this.max, {List<num> this.ticks, List<String> this.tickLabels}) {
-    assert(min <= max);
+  NumericAxis(Scale scale, this.position, {this.ticks}) {
+    this.scale = scale;
 
-    ticks ??= defaultNumericTicks(min, max);
+    ticks ??= _defaultNumericTicks();
 
     //print('ticks are: ${ticks.join(',')}');
+  }
+
+  /// Extend the limits of a numeric axis, so the data is contained in
+  /// a 'nice' interval.  For example if the lim of the data is [0.5,9]
+  /// a nice extended limit would be [0,10].
+  static Tuple2<num,num> extendLimits(Tuple2<num,num> lim) {
+    Tuple2<num,num> limExt = lim;
+
+    return limExt;
   }
 
   /// Calculate the [min,max] of the iterable for axis limits
@@ -75,53 +76,52 @@ class NumericAxis extends Axis {
     return new Tuple2(min,max);
   }
 
+  /// the actual length of the axis in pixels
+  num get _axisLength => scale.y2 - scale.y1;
 
   /// Draw this axis
   draw() {
-    if (_axisLength == null) {
-      if (parent != null) {
-        _axisLength = parent.width;
-      } else {
-        throw('axisLength is null and parent is not set yet!');
-      }
-    }
-
-    scale = (num x) => ((x - min) * (_axisLength - 2*margin) /(max - min) + margin).truncate();
 
     /// draw the axis line
-    graphics.moveTo(0.5, y);
-    graphics.lineTo(_axisLength-0.5, y);
+    graphics.moveTo(0.5, 0);
+    graphics.lineTo(_axisLength-0.5, 0);
 
     /// add the ticks
-    _defaultNumericTicks().forEach((tick) => addChild(tick));
+    ticks.forEach((tick) => addChild(tick));
+    ticks.forEach((tick) => tick.draw());
 
-    graphics.strokeColor(Color.Black);
+    //graphics.strokeColor(Color.Black);
+    graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.SQUARE);
   }
 
   /// default ticks
   List<Tick> _defaultNumericTicks() {
-    List _ticks = [];
+    List<Tick> _ticks = [];
 
-    tickLabels ??= _defaultNumericTickLabels();
+    List<num> tickNum = defaultNumericTicks(scale.x1, scale.x2);
+    List<String> tickLabels = tickNum.map((e) => _defaultNumericTickLabel(e)).toList();
+    print(tickLabels);
 
-    /// tickLabels need to match the length of the ticks
-    /// assert(tickLabels.length == ticks.length);
-
+    /// construct the ticks
     num _left = 0;
-    for (int i = 0; i < ticks.length; i++) {
-      //print('i: $i, ${scale(ticks[i])}');
-      var x = scale(ticks[i]);
-      Tick tick = new Tick(tickLabels[i], Direction.DOWN);
+    for (int i = 0; i < tickNum.length; i++) {
+      print('i: $i, ${tickNum[i]}, ${scale(tickNum[i])}');
+      var x = scale(tickNum[i]);
+      Tick tick = new Tick(text: tickLabels[i])
+        ..direction = TickDirection.down;
 
       // if the label doesn't fit, remove the label
-      if (x - tick.width/2 < _left + minSpaceBetweenLabels) {
-        tick = new Tick('', Direction.DOWN);
-      }
-      if (x + tick.width/2 > _axisLength) {
-        tick = new Tick('', Direction.DOWN);
-      }
+//      if (x - tick.width/2 < _left + minSpaceBetweenLabels) {
+//        tick = new Tick(text: '')
+//          ..direction = TickDirection.down;
+//      }
+//      if (x + tick.width/2 > _axisLength) {
+//        tick = new Tick(text: '')
+//          ..direction = TickDirection.down;
+//      }
 
       tick.x = x;
+      tick.name = 'draw-tick-{i}';
       _left = x + tick.width/2;
       _ticks.add(tick);
     }
@@ -130,10 +130,11 @@ class NumericAxis extends Axis {
   }
 
 
-  /// default tick labels
-  _defaultNumericTickLabels() {
+  /// Construct the default tick label for a given value
+  ///
+  List<String> _defaultNumericTickLabel(num value) {
     Function fmtLabel;
-    num range10 = (math.log(max - min)*math.LOG10E);
+    num range10 = (math.log(scale.x2 - scale.x1)*math.LOG10E);
     //print('range10: $range10');
     if (range10 <= 0.6) {
       int precision = math.max(range10, 1).ceil();
@@ -156,7 +157,7 @@ class NumericAxis extends Axis {
         return res;
       };
     }
-    tickLabels = ticks.map((e) => fmtLabel(e)).toList();
+    return fmtLabel(value);
   }
 
 
