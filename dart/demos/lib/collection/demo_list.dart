@@ -89,6 +89,23 @@ Map groupBy(Iterable x, Function f) {
   return result;
 }
 
+/**
+ * Count the distinct elements of the iterable x.
+ * Return a map with keys the distinct values in x, and the values the count of
+ * that value.
+ */
+Map count(Iterable x) {
+  Map grp = {};
+  x.forEach((e) {
+    if (grp.containsKey(e)) grp[e] += 1;
+    else grp[e] = 1;
+  });
+
+  return grp;
+}
+
+
+
 
 void main() {
 
