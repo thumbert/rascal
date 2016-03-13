@@ -1,6 +1,6 @@
 library math.sudoku;
 
-import 'dart:math' show sqrt;
+import 'dart:math' show sqrt, min;
 import 'package:tuple/tuple.dart';
 
 /**
@@ -21,21 +21,29 @@ class Board {
   int _blockSize;
 
   /// allowed values, e.g. [1, 2, ..., n]
-  List<int> _values;
+  Set<int> _values;
 
   /// The board is represented as a collection of cells.
   /// Each cell associates a Tuple2<int,int> to a list of (possible) values.
   /// The board is solved when for all the keys, the values are a list of length 1.
-  Map<Tuple2<int, int>, List<int>> cells = {};
+  Map<Coord, List<int>> cells = {};
 
   /// the constraints
 
   /// the peers of each cell is a list of other cells.  This allows to check
   /// for constraints quickly.
-  Map<Tuple2<int, int>, List<Tuple2<int, int>>> peers = {};
+  Map<Coord, Set<Coord>> peers = {};
+
+  /// Memory of the board state when choices are made.  Need this for backtracking.
+  List<Map<Coord, List<int>>> _states;
+
+  /// keep track of the choices made when solving.  You only chose 1 value
+  /// at a time.  Length of _choices is one less than length of _states
+  List<Map<Coord, int>> _choices;
+
 
   Board({this.n: 9}) {
-    _values = new List.generate(n, (i) => i + 1);
+    _values = new List.generate(n, (i) => i + 1).toSet();
     _blockSize = sqrt(n).round();
   }
 
@@ -49,7 +57,7 @@ class Board {
   Board.fromString(String input) {
     n = 9;
     _blockSize = 3;
-    _values = new List.generate(n, (i) => i + 1);
+    _values = new List.generate(n, (i) => i + 1).toSet();
 
     var aux = input.replaceAll(' ', '').split('\n').where((e) => e.isNotEmpty);
     int i = 0;
@@ -61,9 +69,9 @@ class Board {
 
         /// the value 0 is special, it means the cell is empty
         if (value == 0) {
-          cells[new Tuple2(i, j)] = new List.from(_values);
+          cells[new Coord(i, j)] = new List.from(_values);
         } else {
-          cells[new Tuple2(i, j)] = [value];
+          cells[new Coord(i, j)] = [value];
         }
       }
       i += 1;
@@ -73,65 +81,140 @@ class Board {
   }
 
   /// solve the board
-  solve() {}
+  solve() {
+    enforceConstraintsAll();
+
+    /// if simply enforcing the constraints does not solve the Sudoku,
+    /// you need to start making choices.
+    while ( !isSolved() ) {
+
+    }
+
+  }
 
   /// Enforce constraints for all the cells
   enforceConstraintsAll() {
+    int baseline = numberOfSingleCells();
     cells.forEach((ij, values) {
       if (values.length == 1) setCellValue(ij, values.first);
     });
+
+    int current = numberOfSingleCells();
+    if (current > baseline) {
+      print('have $current single cells');
+      enforceConstraintsAll();
+    }
   }
 
-  /// Set the value for cell [i,j]
+  /// Set the value for cell [i,j], and remove this value from the peers.
   /// Return true if you created a new cell in the elimination process.
-  bool setCellValue(Tuple2<int, int> ij, int value) {
-    bool haveNewSingle = false;
-
+  setCellValue(Coord ij, int value) {
     /// only if it's in the existing list
     if (!cells[ij].contains(value))
       throw 'Cannot remove from cell $ij the value $value.  It does not exist!';
 
-    /// set the value of this cell
+    /// set the value of this cell, in case it wasn't set
     cells[ij] = [value];
 
     /// remove this value from all the cell's peers
-    peers[ij].forEach((Tuple2 peer) {
+    peers[ij].forEach((Coord peer) {
       cells[peer]..retainWhere((e) => e != value);
-      if (cells[peer].length == 1) haveNewSingle = true;
     });
-
-    return haveNewSingle;
   }
 
-  /// If a cell has only one value V, look for
-  /// 1) another V in the other two rows of the block
-  /// 2) another V in the other two columns of the block
-  ///
-  enforceSecondOrderConstraints(Tuple2<int, int> ij, int value) {
+  /// pick a value for a cell and enforce the constraints
+  _makeChoice() {
+    int minLength = cells.values.fold(0, (a,b) => min(a.length, b.length));
 
+  }
+
+  int numberOfSingleCells() {
+    return cells.values.where((e) => e.length == 1).length;
   }
 
 
   /// Check if the board has been solved.
   bool isSolved() {
-    return cells.values.every((e) => e.length == 1);
+
+    /// need only one value for each cell
+    if (!cells.values.every((e) => e.length == 1))
+      return false;
+
+    bool res = true;
+    /// check rows
+    for (int r = 0; r < n; r++) {
+      Set aux = new List.generate(n, (i) => new Coord(r, i))
+          .map((ij) => cells[ij].first).toSet();
+      if (aux.difference(_values).isNotEmpty) {
+        print('Row $r fails!');
+        return false;
+      }
+    }
+    /// check cols
+    for (int c = 0; c < n; c++) {
+      Set aux = new List.generate(n, (i) => new Coord(i,c))
+          .map((ij) => cells[ij].first).toSet();
+      if (aux.difference(_values).isNotEmpty) {
+        print('Column $c fails!');
+        return false;
+      }
+    }
+
+    /// check unit blocks
+    List _rows = new List.generate(_blockSize, (i) => i);
+    for (int b = 0; b < n; b++) {
+      /// coordinate of top cell in the block b
+      int ib = (b % _blockSize) * _blockSize;
+      int jb = (b ~/ _blockSize) * _blockSize;
+
+      Set aux = new Set();
+      _rows.forEach((int r) {
+        aux.addAll(
+            new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i))
+            .map((ij) => cells[ij].first).toSet());
+      });
+      if (aux.difference(_values).isNotEmpty) {
+        print('Block $b fails');
+        return false;
+      }
+
+    }
+
+    return res;
+  }
+
+  String toString() {
+    StringBuffer sb = new StringBuffer();
+    for (int r = 0; r < n; r++) {
+      for (int c = 0; c < n; c++) {
+        if (c % _blockSize == 0 && c != 0) sb.write('|');
+        if (cells[new Coord(r,c)].length > 1) {
+          sb.write(' ');
+        } else {
+          sb.write(cells[new Coord(r,c)].first);
+        }
+      }
+      if (r % _blockSize == 2 && r != 0) sb.write('\n-----------\n');
+      else sb.write('\n');
+    }
+    return sb.toString();
   }
 
 
   _makePeers() {
     /// row peers
     for (int r = 0; r < n; r++) {
-      List aux = new List.generate(n, (i) => new Tuple2(r, i));
-      aux.forEach((Tuple2 t) {
-        peers[t] = new List.from(aux)..removeWhere((e) => e == t);
+      List aux = new List.generate(n, (i) => new Coord(r, i));
+      aux.forEach((Coord t) {
+        peers[t] = new Set.from(aux)..removeWhere((e) => e == t);
       });
     }
 
     /// column peers
     for (int c = 0; c < n; c++) {
-      List aux = new List.generate(n, (i) => new Tuple2(i, c));
-      aux.forEach((Tuple2 t) {
-        peers[t] = new List.from(aux)..removeWhere((e) => e == t);
+      List aux = new List.generate(n, (i) => new Coord(i, c));
+      aux.forEach((Coord t) {
+        peers[t].addAll(new Set.from(aux)..removeWhere((e) => e == t));
       });
     }
 
@@ -143,30 +226,29 @@ class Board {
       int jb = (b ~/ _blockSize) * _blockSize;
 
       /// all the cells in this block
-      List<Tuple2> aux = [];
+      List<Coord> aux = [];
       _rows.forEach((int r) {
         aux.addAll(
-            new List.generate(_blockSize, (i) => new Tuple2(ib + r, jb + i)));
+            new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i)));
       });
 
       /// assign the peers for the cells in the block, except the cell itself
       aux.forEach((e) {
-        peers[e] = new List.from(aux)..retainWhere((peer) => peer != e);
+        peers[e].addAll(new Set.from(aux)..retainWhere((peer) => peer != e));
       });
     }
   }
 }
 
-class Cell {
+class Coord {
   int row, column;
-  List<int> allowedValues;
-  int maxValue;
   int _value;
 
-  Cell(this.row, this.column, {int this.maxValue: 9}) {}
+  Coord(this.row, this.column) {
+    _value = 1024*column +  row;
+  }
 
-  int get value => _value;
-
-  ///
-  set value(int number) {}
+  int get hashCode => _value;
+  bool operator ==(Coord other) => other != null && _value == other._value;
+  String toString() => '[$row, $column]';
 }

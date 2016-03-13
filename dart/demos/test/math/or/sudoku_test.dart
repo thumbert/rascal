@@ -1,8 +1,11 @@
 library test.math.or.sudoku;
 
+import 'package:tuple/tuple.dart';
+
 
 import 'package:demos/math/or/sudoku.dart';
 
+/// trivial board, just applying constraints will solve it
 String board1() {
   String input = """
   003020600
@@ -19,6 +22,7 @@ String board1() {
   return input;
 }
 
+/// hard, really hard
 board2() {
   String input = """
   400000805
@@ -35,12 +39,44 @@ board2() {
   return input;
 }
 
+/// medium hard
+board3() {
+  String input = """
+  060104050
+  008305600
+  200000001
+  800407006
+  006000300
+  700901004
+  500000002
+  007206900
+  040508070
+  """;
+
+  return input;
+}
+
+
+
 main() {
 
-  Board b = new Board.fromString(board1());
+  Board b = new Board.fromString(board3());
+  print(b.toString());
+  print('Number of single cells: ${b.numberOfSingleCells()}');
 
-  b.cells.forEach((k,v) => print('$k: $v'));
+  //b.cells.forEach((k,v) => print('$k: $v'));
+
+  ///b.peers.forEach((k,v) => print('$k: $v'));
+
+  ///print(b.peers[new Coord(0,0)]);
+
   print('Enforcing constraints');
+  b.enforceConstraintsAll();
 
-  print(b.isSolved());
+
+  print('Is the board solved? ${b.isSolved()}');
+  print(b.toString());
+  b.cells.forEach((k,v) => print('$k: $v'));
+
+
 }
