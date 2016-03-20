@@ -12,6 +12,7 @@ class Sudoku {
   List<List<int>> data;
 }
 
+
 /**
  * Represent the board.
  */
@@ -124,7 +125,24 @@ class Board {
 
   /// pick a value for a cell and enforce the constraints
   _makeChoice() {
-    int minLength = cells.values.fold(0, (a,b) => min(a.length, b.length));
+    /// find the minimum length of value among the remaining cells
+    int minLength = cells.values.where((v) => v.length > 1)
+        .fold(1, (a,b) => min(a.length, b.length));
+    /// there may be several cells with minLength values, so pick the first one
+    Coord aMinCell = cells.keys.firstWhere((k) => cells[k].length == minLength);
+    int chosen = cells[aMinCell].first;
+    print('Chosen for $aMinCell: $chosen');
+    _choices.add({aMinCell: chosen});
+
+    /// set the value and check if there are conflicts
+    setCellValue(aMinCell, chosen);
+    if (isInConflict()) {
+      /// need to remove the chosen value from the list of values
+      /// for cell aMinCell, it means other value should work.  If no
+      /// value works, I need to backtrack one level.
+
+
+    }
 
   }
 
@@ -140,14 +158,23 @@ class Board {
     if (!cells.values.every((e) => e.length == 1))
       return false;
 
-    bool res = true;
+    /// if you have only one value, check that constraints are satisfied
+    return !isInConflict();
+  }
+
+  /// Test if the board is in conflict.  Returns true if the board is
+  /// in conflict (constraints are violated) or false if the board is
+  /// sound.
+  bool isInConflict() {
+    bool res = false;
+
     /// check rows
     for (int r = 0; r < n; r++) {
       Set aux = new List.generate(n, (i) => new Coord(r, i))
           .map((ij) => cells[ij].first).toSet();
       if (aux.difference(_values).isNotEmpty) {
         print('Row $r fails!');
-        return false;
+        return true;
       }
     }
     /// check cols
@@ -156,7 +183,7 @@ class Board {
           .map((ij) => cells[ij].first).toSet();
       if (aux.difference(_values).isNotEmpty) {
         print('Column $c fails!');
-        return false;
+        return true;
       }
     }
 
@@ -171,16 +198,15 @@ class Board {
       _rows.forEach((int r) {
         aux.addAll(
             new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i))
-            .map((ij) => cells[ij].first).toSet());
+                .map((ij) => cells[ij].first).toSet());
       });
       if (aux.difference(_values).isNotEmpty) {
         print('Block $b fails');
-        return false;
+        return true;
       }
-
     }
 
-    return res;
+    return  res;
   }
 
   String toString() {
