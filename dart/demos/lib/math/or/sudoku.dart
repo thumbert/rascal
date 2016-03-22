@@ -17,8 +17,9 @@ class Sudoku {
  * Represent the board.
  */
 class Board {
-  /// the size of the board
+  /// the size of the board, usually 9 for a 9x9 board
   int n;
+  /// the size of the small square unit, usually 3
   int _blockSize;
 
   /// allowed values, e.g. [1, 2, ..., n]
@@ -88,6 +89,9 @@ class Board {
     /// if simply enforcing the constraints does not solve the Sudoku,
     /// you need to start making choices.
     while ( !isSolved() ) {
+      if ( numberOfSingleCells() == n*n) {}
+      /// it's not a conflict, so make another choice!
+      _makeChoice();
 
     }
 
@@ -123,8 +127,11 @@ class Board {
     });
   }
 
-  /// pick a value for a cell and enforce the constraints
-  _makeChoice() {
+  /// pick a value for a cell and enforce the constraints.
+  /// Return true if the choice doesn't create a conflict,
+  /// false if it creates conflict.
+  bool _makeChoice() {
+    bool res = true;
     /// find the minimum length of value among the remaining cells
     int minLength = cells.values.where((v) => v.length > 1)
         .fold(1, (a,b) => min(a.length, b.length));
@@ -136,14 +143,15 @@ class Board {
 
     /// set the value and check if there are conflicts
     setCellValue(aMinCell, chosen);
-    if (isInConflict()) {
+    if ( isInConflict() ) {
       /// need to remove the chosen value from the list of values
       /// for cell aMinCell, it means other value should work.  If no
-      /// value works, I need to backtrack one level.
+      /// value works at this level, I need to backtrack one level.
 
-
+      return false;
     }
 
+    return res;
   }
 
   int numberOfSingleCells() {
@@ -208,6 +216,8 @@ class Board {
 
     return  res;
   }
+
+
 
   String toString() {
     StringBuffer sb = new StringBuffer();
