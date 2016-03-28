@@ -1,6 +1,7 @@
 library test_lists;
 
 import 'dart:collection';
+import 'dart:math' show min;
 
 class Person {
   String name;
@@ -20,6 +21,8 @@ class MyCustomList<E> extends Object with ListMixin<E> {
 
 }
 
+
+
 main() {
   List x = [new Person("Andrei", 50),
             new Person("Laura",  10), 
@@ -34,14 +37,9 @@ main() {
             new Person("Gaga",   27)]);
   y.removeWhere((p) => p.age < 20);
   print(y);
-  
-  // create a mixed type List, for example for a time-series 
-  var dt = new DateTime(2014);
-  List res = [];
-  res.add([dt]..addAll(new List.generate(4, (i)=> i)));
-  res.add([dt.add(new Duration(hours: 1))]..addAll(new List.generate(4, (i)=> i+1)));  
-  print(res);  // [[2014-01-01 00:00:00.000, 0, 1, 2, 3], [2014-01-01 01:00:00.000, 1, 2, 3, 4]]
-  
-  
-  
+
+  /// Calculate the minimum of a list
+  List z = [3, 5, 1, 4, 7];
+  print(z.fold(z.first, (a,b) => min(a,b)));
+
 }

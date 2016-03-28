@@ -36,12 +36,9 @@ class Board {
   /// for constraints quickly.
   Map<Coord, Set<Coord>> peers = {};
 
-  /// Memory of the board state when choices are made.  Need this for backtracking.
-  List<Map<Coord, List<int>>> _states;
-
-  /// keep track of the choices made when solving.  You only chose 1 value
-  /// at a time.  Length of _choices is one less than length of _states
-  List<Map<Coord, int>> _choices;
+  /// keep track of the choices made when solving.  You constantly add and
+  /// delete from this list until you find the solution!
+  List<Cell> _path;
 
 
   Board({this.n: 9}) {
@@ -86,13 +83,40 @@ class Board {
   solve() {
     enforceConstraintsAll();
 
+    if (isSolved()) return;
+
+    /// the baseline I always return to
+    Map<Coord, List<int>> cells0 = {};
+    cells.forEach((k,v) {cells0[k] = new List.from(v);});
+    _path = [];
+
+    cells[new Coord(0,5)] = [8];
+
     /// if simply enforcing the constraints does not solve the Sudoku,
     /// you need to start making choices.
-    while ( !isSolved() ) {
-      _makeChoice();
-      if ( numberOfSingleCells() == n*n) {}
-      /// it's not a conflict, so make another choice!
+    while ( true ) {
+      _path = _makeChoice(_path);
+      print('path is: $_path');
 
+      /// _makeChoice returns either when you're done or when
+      if ( isSolved()) return;
+      else {
+        /// it was a conflict, backtrack until no conflict!
+        while ( isBoardInConflict() ) {
+          cells0.forEach((k,v) {cells[k] = new List.from(v);});
+          Cell last = _path.removeLast();
+          print('Backtracking: Remove $last from path');
+          if (_path.isNotEmpty) {
+            _path.forEach((Cell c) => setCellValue(c.coord, c.value));
+            enforceConstraintsAll();
+          }
+          /// always can remove the last value as for sure it doesn't work
+          cells[last.coord].remove(last.value);
+          ///if (cells[last.coord].length == 1) enforceConstraintsAll();
+          print('Board in conflict? ${isBoardInConflict()}');
+          cells.forEach((k,v) => print('$k: $v'));
+        }
+      }
     }
 
   }
@@ -128,43 +152,38 @@ class Board {
   }
 
   /// Pick a value for a cell and enforce the constraints.
-  /// If the choice creates a conflict, select another value from the
-  /// list of available values for this cell.  Either one of the values
-  /// will not create conflict, or if all values create a conflict, you'll
-  /// need to backtrack (possibly several levels.)
+  /// If the choice creates a conflict, return.
   ///
-  /// Return true if the choice doesn't create a conflict,
-  /// false if it creates conflict.
+  /// Returns the path of choices made.  When it returns, either the board
+  /// is solved, or there is a conflict.
   ///
-  bool _makeChoice() {
-    bool res = true;
-    /// find the minimum length of value among the remaining cells
-    int minLength = cells.values.where((v) => v.length > 1)
-        .fold(1, (a,b) => min(a.length, b.length));
-    /// there may be several cells with minLength values, so pick the first one
-    Coord aMinCell = cells.keys.firstWhere((k) => cells[k].length == minLength);
+  List<Cell> _makeChoice(List<Cell> path) {
 
-        
+    if (isBoardInConflict() || isSolved()) {
+      return path;
+    } else {
+      var aux = cells.values.where((v) => v.length > 1);
+      /// find the minimum length of value among the remaining cells
+      int minLength = aux.fold(aux.first.length, (a,b) => min(a, b.length));
+      print('Min length is $minLength');
+      /// there may be several cells with minLength values, so pick the first one
+      Coord coord = cells.keys.firstWhere((k) => cells[k].length == minLength);
 
-    /// chose a value to guess on this cell
-    int chosen = cells[aMinCell].first;
-    print('Chosen for $aMinCell: $chosen');
-    _choices.add({aMinCell: chosen});
+      /// chose a value to guess on this cell
+      int chosen = cells[coord].first;
+      print('  Chosen for $coord: $chosen');
+      path.add( new Cell(coord, chosen) );
 
-    /// set the value and check if there are conflicts
-    setCellValue(aMinCell, chosen);
-    if ( isBoardInConflict() ) {
-      /// need to remove the chosen value from the list of values
-      /// for cell aMinCell, it means other value should work.  If no
-      /// value works at this level, I need to backtrack one level.
-      cells[aMinCell].remove(chosen);
+      /// set the value and check if there are conflicts
+      setCellValue(coord, chosen);
+      enforceConstraintsAll();
+      /// after all constraints are enforced, board can become in conflict!
 
-      return false;
+      return _makeChoice( path );
     }
-
-    return res;
   }
 
+  /// Return the number of single cells on the board
   int numberOfSingleCells() {
     return cells.values.where((e) => e.length == 1).length;
   }
@@ -193,35 +212,43 @@ class Board {
     /// are the whole _values, i.e. you are not missing a value!
     for (int r = 0; r < n; r++) {
       List _row = new List.generate(n, (i) => new Coord(r, i));
+      if (_row.any((ij) => cells[ij].isEmpty)) {
+        print('Row $r fails!  Empty cell.');
+        return true;
+      }
       Set aux = _row.expand((ij) => cells[ij]).toSet();
       if (aux.length != _values.length) {
-        print('Row $r fails!');
+        print('Row $r fails!  Missing or duplicate values.');
         return true;
       }
-      /// make sure that you don't have already the same value set in the same row!
-      List oneVals = _row.where((ij) => cells[ij].length == 1)
-          .map((ij) => cells[ij].first).toList(growable: false);
-      if (oneVals.length != oneVals.toSet().length) {
-        print('Row $r fails!');
-        return true;
-      }
+//      /// make sure that you don't have already the same value set in the same row!
+//      List oneVals = _row.where((ij) => cells[ij].length == 1)
+//          .map((ij) => cells[ij].first).toList(growable: false);
+//      if (oneVals.length != oneVals.toSet().length) {
+//        print('Row $r fails!  Duplicate values.');
+//        return true;
+//      }
 
     }
     /// check cols
     for (int c = 0; c < n; c++) {
       List _col = new List.generate(n, (i) => new Coord(i,c));
+      if (_col.any((ij) => cells[ij].isEmpty)) {
+        print('Row $c fails!  Empty cell.');
+        return true;
+      }
       Set aux = _col.map((ij) => cells[ij]).toSet();
       if (aux.length != _values.length) {
-        print('Column $c fails!  Missing values!');
+        print('Column $c fails!  Missing or duplicate values!');
         return true;
       }
-      /// make sure that you don't have already the same value set in the same row!
-      List oneVals = _col.where((ij) => cells[ij].length == 1)
-          .map((ij) => cells[ij].first).toList(growable: false);
-      if (oneVals.length != oneVals.toSet().length) {
-        print('Col $c fails!  Duplicate values.');
-        return true;
-      }
+//      /// make sure that you don't have already the same value set in the same row!
+//      List oneVals = _col.where((ij) => cells[ij].length == 1)
+//          .map((ij) => cells[ij].first).toList(growable: false);
+//      if (oneVals.length != oneVals.toSet().length) {
+//        print('Col $c fails!  Duplicate values.');
+//        return true;
+//      }
     }
 
     /// check unit blocks
@@ -231,27 +258,25 @@ class Board {
       int ib = (b % _blockSize) * _blockSize;
       int jb = (b ~/ _blockSize) * _blockSize;
 
-      Set aux = new Set();
+      List coords = [];
       _rows.forEach((int r) {
-        aux.addAll(
-            new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i))
-                .expand((ij) => cells[ij]).toSet());
+        coords.addAll(
+            new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i)));
       });
+
+      Set aux = coords.expand((ij) => cells[ij]).toSet();
       if (aux.length != _values.length) {
-        print('Block $b fails.  Missing values.');
+        print('Block $b fails.  Missing or duplicate values.');
         return true;
       }
-      List oneVals = [];
-      _rows.forEach((int r) {
-        oneVals.add(
-            new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i))
-                .where((ij) => cells[ij].length == 1)
-                .map((ij) => cells[ij].first));
-      });
-      if (oneVals.length != oneVals.toSet().length) {
-        print('Block $b fails!  Duplicate values.');
-        return true;
-      }
+//      /// make sure you don't have duplicates in the block
+//      List oneVals = coords
+//          .where((ij) => cells[ij].length == 1)
+//          .map((ij) => cells[ij].first).toList();
+//      if (oneVals.length != oneVals.toSet().length) {
+//        print('Block $b fails!  Duplicate values.');
+//        return true;
+//      }
     }
 
     return  res;
@@ -321,10 +346,20 @@ class Coord {
   int _value;
 
   Coord(this.row, this.column) {
-    _value = 1024*column +  row;
+    _value = 1024*column + row;
   }
 
   int get hashCode => _value;
-  bool operator ==(Coord other) => other != null && _value == other._value;
-  String toString() => '[$row, $column]';
+  bool operator ==(Coord other) => other != null && row == other.row && column == other.column;
+  String toString() => '($row, $column)';
+}
+
+class Cell {
+  Coord coord;
+  int value;
+  Cell(this.coord, this.value);
+
+  int get hashCode => 1024*coord._value + value;
+  bool operator ==(Cell other) => other != null && value == other.value && coord == other.coord;
+  String toString() => coord.toString() + ': $value';
 }

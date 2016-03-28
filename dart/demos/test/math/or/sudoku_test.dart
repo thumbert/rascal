@@ -6,7 +6,7 @@ import 'package:tuple/tuple.dart';
 import 'package:demos/math/or/sudoku.dart';
 
 /// trivial board, just applying constraints will solve it
-String board1() {
+String boardEasy1() {
   String input = """
   003020600
   900305001
@@ -21,6 +21,24 @@ String board1() {
 
   return input;
 }
+
+String boardEasy2() {
+  String input = """
+  692500000
+  000000000
+  040700008
+  000000000
+  476000500
+  300040100
+  000009020
+  200006034
+  010080090
+  """;
+
+  return input;
+}
+
+
 
 /// hard, really hard
 board2() {
@@ -56,11 +74,27 @@ board3() {
   return input;
 }
 
+/// not easy
+String board4() {
+  String input = """
+  006007300
+  018009050
+  500000064
+  920080000
+  000763000
+  000090075
+  630000008
+  090300520
+  002400600
+  """;
+
+  return input;
+}
 
 
 main() {
 
-  Board b = new Board.fromString(board3());
+  Board b = new Board.fromString(boardEasy1());
   print(b.toString());
   print('Number of single cells: ${b.numberOfSingleCells()}');
 
@@ -77,6 +111,11 @@ main() {
   print('Is the board solved? ${b.isSolved()}');
   print(b.toString());
   b.cells.forEach((k,v) => print('$k: $v'));
+
+
+  b.solve();
+  print('Is the board solved? ${b.isSolved()}');
+
 
 
 }
