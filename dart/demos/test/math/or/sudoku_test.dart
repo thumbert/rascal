@@ -94,7 +94,7 @@ String board4() {
 
 main() {
 
-  Board b = new Board.fromString(boardEasy1());
+  Board b = new Board.fromString(boardEasy2());
   print(b.toString());
   print('Number of single cells: ${b.numberOfSingleCells()}');
 
