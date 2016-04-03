@@ -103,6 +103,7 @@ class Board {
       else {
         /// it was a conflict, backtrack until no conflict!
         while ( isBoardInConflict() ) {
+          /// reconstruct the board
           cells0.forEach((k,v) {cells[k] = new List.from(v);});
           Cell last = _path.removeLast();
           print('Backtracking: Remove $last from path');
@@ -112,7 +113,7 @@ class Board {
           }
           /// always can remove the last value as for sure it doesn't work
           cells[last.coord].remove(last.value);
-          ///if (cells[last.coord].length == 1) enforceConstraintsAll();
+          if (cells[last.coord].length == 1) enforceConstraintsAll();
           print('Board in conflict? ${isBoardInConflict()}');
           cells.forEach((k,v) => print('$k: $v'));
         }
