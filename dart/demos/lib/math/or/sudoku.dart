@@ -90,29 +90,44 @@ class Board {
     cells.forEach((k,v) {cells0[k] = new List.from(v);});
     _path = [];
 
-    cells[new Coord(0,5)] = [8];
+
+    int level = 0;
+    int topLevel = 0;
+    /// keep a list of the cells to remove from a search branch
+    List<Map> badCells;
 
     /// if simply enforcing the constraints does not solve the Sudoku,
     /// you need to start making choices.
     while ( true ) {
+      if (_path.isEmpty) badCells = [];
       _path = _makeChoice(_path);
       print('path is: $_path');
 
-      /// _makeChoice returns either when you're done or when
+      if (badCells.isNotEmpty) {
+        badCells.retainWhere((Map m) => m['level'] < _path.length);
+      }
+
+      /// _makeChoice returns either when you're done or when there is conflict
       if ( isSolved()) return;
       else {
-        /// it was a conflict, backtrack until no conflict!
+        /// it was a conflict, so backtrack until no conflict!
+        /// you can have conflict on more than one level, for example
+        /// if the last element in the path has only 2 choices, and
+        /// the one you have is wrong, and then the second one gets a
+        /// conflict too, you may need to iterate a few times.
         while ( isBoardInConflict() ) {
           /// reconstruct the board
           cells0.forEach((k,v) {cells[k] = new List.from(v);});
           Cell last = _path.removeLast();
+          badCells.add({'cell': last, 'level': _path.length});
           print('Backtracking: Remove $last from path');
           if (_path.isNotEmpty) {
+            /// replay the choices
             _path.forEach((Cell c) => setCellValue(c.coord, c.value));
+            /// remove all the bad cells at this level
+            badCells.forEach((Map m) => cells[m['cell'].coord].remove(m['cell'].value));
             enforceConstraintsAll();
           }
-          /// always can remove the last value as for sure it doesn't work
-          cells[last.coord].remove(last.value);
           if (cells[last.coord].length == 1) enforceConstraintsAll();
           print('Board in conflict? ${isBoardInConflict()}');
           cells.forEach((k,v) => print('$k: $v'));
