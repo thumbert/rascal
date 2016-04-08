@@ -90,22 +90,26 @@ class Board {
     cells.forEach((k,v) {cells0[k] = new List.from(v);});
     _path = [];
 
-
-    int level = 0;
-    int topLevel = 0;
     /// keep a list of the cells to remove from a search branch
-    List<Map> badCells;
+    List<Map> badCells = [];
 
     /// if simply enforcing the constraints does not solve the Sudoku,
     /// you need to start making choices.
     while ( true ) {
-      if (_path.isEmpty) badCells = [];
+      if (_path.isEmpty) {
+        badCells.retainWhere((Map m) => m['level'] == 0);
+        /// all the cells at level 0 should be removed from cells0!
+        badCells.forEach((Map m) {
+          Cell cell = m['cell'];
+          cells0[cell.coord].remove(cell.value);
+          cells[cell.coord].remove(cell.value);
+          if (cells[cell.coord].length == 1) enforceConstraintsAll();
+        });
+        /// you can start anew
+        badCells = [];
+      }
       _path = _makeChoice(_path);
       print('path is: $_path');
-
-      if (badCells.isNotEmpty) {
-        badCells.retainWhere((Map m) => m['level'] < _path.length);
-      }
 
       /// _makeChoice returns either when you're done or when there is conflict
       if ( isSolved()) return;

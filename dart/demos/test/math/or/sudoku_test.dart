@@ -40,25 +40,8 @@ String boardEasy2() {
 
 
 
-/// hard, really hard
-board2() {
-  String input = """
-  400000805
-  030000000
-  000700000
-  020000060
-  000080400
-  000010000
-  000603070
-  500200000
-  104000000
-  """;
-
-  return input;
-}
-
 /// medium hard
-board3() {
+String boardMedium1() {
   String input = """
   060104050
   008305600
@@ -91,10 +74,66 @@ String board4() {
   return input;
 }
 
+/// From http://www.247sudoku.com/sudokuExpert.php
+String boardExpert1() {
+  String input = """
+  480050000
+  000004900
+  090000007
+  200600000
+  000090506
+  070000004
+  620007040
+  004100308
+  000305000
+  """;
+
+  return input;
+}
+
+
+/// From Corinna.  Fails.
+/// (0,5):[4,8] and (1,5):[4,8].  I eliminate 4 from (0,5)
+/// but it does not eliminate the 8 from (1,5) when I enforce the constraints!
+String boardFiendiesh1() {
+  String input = """
+  000500070
+  706000090
+  480039000
+  500027000
+  001040300
+  000180005
+  000370014
+  040000607
+  010002000
+  """;
+
+  return input;
+}
+
+
+/// hard, really hard.  From Norvig.
+String boardFiendiesh2() {
+  String input = """
+  400000805
+  030000000
+  000700000
+  020000060
+  000080400
+  000010000
+  000603070
+  500200000
+  104000000
+  """;
+
+  return input;
+}
+
+
 
 main() {
 
-  Board b = new Board.fromString(boardEasy2());
+  Board b = new Board.fromString(boardFiendiesh1());
   print(b.toString());
   print('Number of single cells: ${b.numberOfSingleCells()}');
 
@@ -115,7 +154,7 @@ main() {
 
   b.solve();
   print('Is the board solved? ${b.isSolved()}');
-
+  print(b.toString());
 
 
 }
