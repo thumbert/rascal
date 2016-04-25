@@ -115,20 +115,19 @@ String boardFiendiesh1() {
 /// hard, really hard.  From Norvig.
 String boardFiendiesh2() {
   String input = """
-  400000805
-  030000000
-  000700000
-  020000060
-  000080400
-  000010000
-  000603070
-  500200000
-  104000000
+  850002400
+  720000009
+  004000000
+  000107002
+  305000900
+  040000000
+  000080070
+  017000000
+  000036040
   """;
 
   return input;
 }
-
 
 
 main() {
@@ -149,7 +148,7 @@ main() {
 
   print('Is the board solved? ${b.isSolved()}');
   print(b.toString());
-  b.cells.forEach((k,v) => print('$k: $v'));
+  ///b.cells.forEach((k,v) => print('$k: $v'));
 
 
   b.solve();

@@ -12,13 +12,13 @@ class Sudoku {
   List<List<int>> data;
 }
 
-
 /**
  * Represent the board.
  */
 class Board {
   /// the size of the board, usually 9 for a 9x9 board
   int n;
+
   /// the size of the small square unit, usually 3
   int _blockSize;
 
@@ -39,7 +39,6 @@ class Board {
   /// keep track of the choices made when solving.  You constantly add and
   /// delete from this list until you find the solution!
   List<Cell> _path;
-
 
   Board({this.n: 9}) {
     _values = new List.generate(n, (i) => i + 1).toSet();
@@ -87,58 +86,89 @@ class Board {
 
     /// the baseline I always return to
     Map<Coord, List<int>> cells0 = {};
-    cells.forEach((k,v) {cells0[k] = new List.from(v);});
+    cells.forEach((k, v) {
+      cells0[k] = new List.from(v);
+    });
     _path = [];
 
     /// keep a list of the cells to remove from a search branch
     List<Map> badCells = [];
+    /// you keep only the bad cells with one level above this value.  all other badCells are trashed.
+    int level;
 
     /// if simply enforcing the constraints does not solve the Sudoku,
     /// you need to start making choices.
-    while ( true ) {
+    while (true) {
       if (_path.isEmpty) {
-        badCells.retainWhere((Map m) => m['level'] == 0);
-        /// all the cells at level 0 should be removed from cells0!
-        badCells.forEach((Map m) {
+        /// the cell at level 0 should be removed from cells0!  Should be the last element.
+        badCells.where((Map m) => m['level'] == 0).forEach((Map m) {
           Cell cell = m['cell'];
+          print('-----> Eliminating ${cell.coord}:${cell.value} <------');
           cells0[cell.coord].remove(cell.value);
           cells[cell.coord].remove(cell.value);
           if (cells[cell.coord].length == 1) enforceConstraintsAll();
         });
-        /// you can start anew
+
+        /// you start anew
         badCells = [];
+      } else {
+        badCells.retainWhere((Map m) => m['level'] <= _path.length);
       }
+
       _path = _makeChoice(_path);
-      print('path is: $_path');
+      level = _path.length - 1;
 
       /// _makeChoice returns either when you're done or when there is conflict
-      if ( isSolved()) return;
+      if (isSolved())
+        return;
       else {
         /// it was a conflict, so backtrack until no conflict!
         /// you can have conflict on more than one level, for example
         /// if the last element in the path has only 2 choices, and
         /// the one you have is wrong, and then the second one gets a
         /// conflict too, you may need to iterate a few times.
-        while ( isBoardInConflict() ) {
+        while (isBoardInConflict()) {
           /// reconstruct the board
-          cells0.forEach((k,v) {cells[k] = new List.from(v);});
+          cells0.forEach((k, v) => cells[k] = new List.from(v));
           Cell last = _path.removeLast();
+
+          /// if all the badCells have a level higher than the this level
+          /// set the badCells to this cell!  You exhausted the levels below.
+          if (badCells.every((Map m) => m['level'] == _path.length + 1))
+            badCells = [];
+
           badCells.add({'cell': last, 'level': _path.length});
-          print('Backtracking: Remove $last from path');
+
           if (_path.isNotEmpty) {
             /// replay the choices
             _path.forEach((Cell c) => setCellValue(c.coord, c.value));
+
             /// remove all the bad cells at this level
-            badCells.forEach((Map m) => cells[m['cell'].coord].remove(m['cell'].value));
+            badCells.forEach(
+                (Map m) => cells[m['cell'].coord].remove(m['cell'].value));
             enforceConstraintsAll();
           }
           if (cells[last.coord].length == 1) enforceConstraintsAll();
-          print('Board in conflict? ${isBoardInConflict()}');
-          cells.forEach((k,v) => print('$k: $v'));
+          /// need to find if there are other cells in the badCells list at this level.
+          /// if there are, I need to remove all the badCells with a level higher than this.
+          int count = badCells.where((Map m) => m['level'] == level).length;
+          if (count > 1) {
+            badCells.retainWhere((Map m) => m['level'] <= level);
+            /// replay the choices again!
+            cells0.forEach((k, v) => cells[k] = new List.from(v));
+            _path.forEach((Cell c) => setCellValue(c.coord, c.value));
+
+            /// remove all the bad cells at this level
+            badCells.forEach(
+                (Map m) => cells[m['cell'].coord].remove(m['cell'].value));
+            enforceConstraintsAll();
+          }
+
+          level -= 1;
+          ///cells.forEach((k, v) => print('$k: $v'));
         }
       }
     }
-
   }
 
   /// Enforce constraints for all the cells
@@ -150,7 +180,6 @@ class Board {
 
     int current = numberOfSingleCells();
     if (current > baseline) {
-      print('have $current single cells');
       enforceConstraintsAll();
     }
   }
@@ -178,28 +207,28 @@ class Board {
   /// is solved, or there is a conflict.
   ///
   List<Cell> _makeChoice(List<Cell> path) {
-
     if (isBoardInConflict() || isSolved()) {
       return path;
     } else {
       var aux = cells.values.where((v) => v.length > 1);
+
       /// find the minimum length of value among the remaining cells
-      int minLength = aux.fold(aux.first.length, (a,b) => min(a, b.length));
-      print('Min length is $minLength');
+      int minLength = aux.fold(aux.first.length, (a, b) => min(a, b.length));
+
       /// there may be several cells with minLength values, so pick the first one
       Coord coord = cells.keys.firstWhere((k) => cells[k].length == minLength);
 
       /// chose a value to guess on this cell
       int chosen = cells[coord].first;
-      print('  Chosen for $coord: $chosen');
-      path.add( new Cell(coord, chosen) );
+      path.add(new Cell(coord, chosen));
 
       /// set the value and check if there are conflicts
       setCellValue(coord, chosen);
       enforceConstraintsAll();
+
       /// after all constraints are enforced, board can become in conflict!
 
-      return _makeChoice( path );
+      return _makeChoice(path);
     }
   }
 
@@ -208,19 +237,14 @@ class Board {
     return cells.values.where((e) => e.length == 1).length;
   }
 
-
   /// Check if the board has been solved.
   bool isSolved() {
-
     /// have only one value left in each cell
-    if (!cells.values.every((e) => e.length == 1))
-      return false;
+    if (!cells.values.every((e) => e.length == 1)) return false;
 
     /// if you have only one value, check that constraints are satisfied
     return !isBoardInConflict();
   }
-
-
 
   /// Test if the board is in conflict.  Returns true if the board is
   /// in conflict (constraints are violated) or false if the board is
@@ -233,42 +257,28 @@ class Board {
     for (int r = 0; r < n; r++) {
       List _row = new List.generate(n, (i) => new Coord(r, i));
       if (_row.any((ij) => cells[ij].isEmpty)) {
-        print('Row $r fails!  Empty cell.');
+        //print('Row $r fails!  Empty cell.');
         return true;
       }
       Set aux = _row.expand((ij) => cells[ij]).toSet();
       if (aux.length != _values.length) {
-        print('Row $r fails!  Missing or duplicate values.');
+        //print('Row $r fails!  Missing or duplicate values.');
         return true;
       }
-//      /// make sure that you don't have already the same value set in the same row!
-//      List oneVals = _row.where((ij) => cells[ij].length == 1)
-//          .map((ij) => cells[ij].first).toList(growable: false);
-//      if (oneVals.length != oneVals.toSet().length) {
-//        print('Row $r fails!  Duplicate values.');
-//        return true;
-//      }
-
     }
+
     /// check cols
     for (int c = 0; c < n; c++) {
-      List _col = new List.generate(n, (i) => new Coord(i,c));
+      List _col = new List.generate(n, (i) => new Coord(i, c));
       if (_col.any((ij) => cells[ij].isEmpty)) {
-        print('Row $c fails!  Empty cell.');
+        //print('Row $c fails!  Empty cell.');
         return true;
       }
       Set aux = _col.map((ij) => cells[ij]).toSet();
       if (aux.length != _values.length) {
-        print('Column $c fails!  Missing or duplicate values!');
+        //print('Column $c fails!  Missing or duplicate values!');
         return true;
       }
-//      /// make sure that you don't have already the same value set in the same row!
-//      List oneVals = _col.where((ij) => cells[ij].length == 1)
-//          .map((ij) => cells[ij].first).toList(growable: false);
-//      if (oneVals.length != oneVals.toSet().length) {
-//        print('Col $c fails!  Duplicate values.');
-//        return true;
-//      }
     }
 
     /// check unit blocks
@@ -286,41 +296,32 @@ class Board {
 
       Set aux = coords.expand((ij) => cells[ij]).toSet();
       if (aux.length != _values.length) {
-        print('Block $b fails.  Missing or duplicate values.');
+        //print('Block $b fails.  Missing or duplicate values.');
         return true;
       }
-//      /// make sure you don't have duplicates in the block
-//      List oneVals = coords
-//          .where((ij) => cells[ij].length == 1)
-//          .map((ij) => cells[ij].first).toList();
-//      if (oneVals.length != oneVals.toSet().length) {
-//        print('Block $b fails!  Duplicate values.');
-//        return true;
-//      }
     }
 
-    return  res;
+    return res;
   }
-
-
 
   String toString() {
     StringBuffer sb = new StringBuffer();
     for (int r = 0; r < n; r++) {
       for (int c = 0; c < n; c++) {
         if (c % _blockSize == 0 && c != 0) sb.write('|');
-        if (cells[new Coord(r,c)].length > 1) {
+        if (cells[new Coord(r, c)].length > 1) {
           sb.write(' ');
         } else {
-          sb.write(cells[new Coord(r,c)].first);
+          sb.write(cells[new Coord(r, c)].first);
         }
       }
-      if (r % _blockSize == 2 && r != 0) sb.write('\n-----------\n');
-      else sb.write('\n');
+      if (r % _blockSize == 2 && r != 0)
+        sb.write('\n-----------\n');
+      else
+        sb.write('\n');
     }
     return sb.toString();
   }
-
 
   _makePeers() {
     /// row peers
@@ -366,11 +367,12 @@ class Coord {
   int _value;
 
   Coord(this.row, this.column) {
-    _value = 1024*column + row;
+    _value = 1024 * column + row;
   }
 
   int get hashCode => _value;
-  bool operator ==(Coord other) => other != null && row == other.row && column == other.column;
+  bool operator ==(Coord other) =>
+      other != null && row == other.row && column == other.column;
   String toString() => '($row, $column)';
 }
 
@@ -379,7 +381,8 @@ class Cell {
   int value;
   Cell(this.coord, this.value);
 
-  int get hashCode => 1024*coord._value + value;
-  bool operator ==(Cell other) => other != null && value == other.value && coord == other.coord;
+  int get hashCode => 1024 * coord._value + value;
+  bool operator ==(Cell other) =>
+      other != null && value == other.value && coord == other.coord;
   String toString() => coord.toString() + ': $value';
 }
