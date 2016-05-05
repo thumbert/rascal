@@ -40,7 +40,6 @@ abstract class Theme {
 
 class BasicTheme extends Theme {
   BasicTheme() {
-    layout = new Layout(nrow: 1, ncol:1);
     plotAreaBackgroundColor = Color.White;
     fontSize = 20;
     textFormat = new TextFormat("Arial", fontSize, Color.Black,
