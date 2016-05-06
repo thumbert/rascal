@@ -13,7 +13,7 @@ import 'axis_numeric.dart';
 import 'scale.dart';
 
 class Figure extends DisplayObjectContainer implements Drawable {
-  Stage stage;
+  //Stage stage;
   TextField tooltip;
   Theme theme = Theme.basic;
   Map<Position,Axis> axes;
@@ -48,12 +48,10 @@ class Figure extends DisplayObjectContainer implements Drawable {
   TextField _yLabel;
   TextField _title;
 
-
-  Figure(this.stage) {
-    this.addTo(stage);
-
+  /// Instantiate a Figure with a stage only if you don't need a layout
+  /// and you want this figure on the stage.
+  Figure() {
     _plotArea = new PlotArea(this);
-    _plotArea.addTo(this);
   }
 
   /// Set the X axis limits for numerical values
@@ -155,6 +153,7 @@ class Figure extends DisplayObjectContainer implements Drawable {
         color: color,
         strokeWidth: strokeWidth);
     lp.name = 'draw-line:$_colorIndex';
+
     _plotArea.addChild(lp);
   }
 
@@ -172,18 +171,22 @@ class Figure extends DisplayObjectContainer implements Drawable {
 
   /// Calculate the width of the plotArea, it depends of axis labels, the key, title, etc.
   num _plotAreaWidth() {
-    num _width = stage.stageWidth - (theme.margin[Margin.left] + theme.margin[Margin.right]);
+    num _width = parent.width - (theme.margin[Margin.left] + theme.margin[Margin.right]);
     return _width;
   }
 
   /// Calculate the height of the plotArea, it depends of axis labels, the key, title, etc.
   num _plotAreaHeight() {
-    num _height = stage.stageHeight - (theme.margin[Margin.top] + theme.margin[Margin.bottom]);
+    num _height = parent.height - (theme.margin[Margin.top] + theme.margin[Margin.bottom]);
     return _height;
   }
 
   /// draw this figure
   void draw() {
+    print('parent.width=${parent.width}');
+    print('is parent stage ${parent == stage}');
+    /// the parent of this figure should have dimensions set before calling draw.
+    _plotArea.addTo(this);
 
     /// draw the plot area first
     _plotArea.graphics.rect(0, 0, _plotAreaWidth(), _plotAreaHeight());

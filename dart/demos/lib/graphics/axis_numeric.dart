@@ -154,7 +154,7 @@ class NumericAxis extends Axis {
     /// construct the ticks
     num _left = 0;
     for (int i = 0; i < tickNum.length; i++) {
-      print('i: $i, ${tickNum[i]}, ${scale(tickNum[i])}');
+      //print('i: $i, ${tickNum[i]}, ${scale(tickNum[i])}');
       var coord = scale(tickNum[i]);
       Tick tick = new Tick(text: tickLabels[i])
         ..direction = direction;
