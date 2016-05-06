@@ -25,7 +25,7 @@ void main() {
     ..xLabel = 'Number of days, ${new String.fromCharCode(0x03BC)}'
     ..yLabel = 'Intensity'
     ..title = 'Dynamics of bat population in underground Spanish caves'
-    ..key = new Key()
+    //..key = new Key()
     ..draw();
 
 

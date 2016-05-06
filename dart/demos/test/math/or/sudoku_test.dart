@@ -129,6 +129,14 @@ String boardFiendiesh2() {
   return input;
 }
 
+String c2() {
+  String input = """
+  850002400
+  """;
+
+  return input;
+}
+
 
 main() {
 
