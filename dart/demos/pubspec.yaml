@@ -14,6 +14,8 @@ dependencies:
       ref: '0.0.3'
   either: "<= 0.1.8"
   intl: ">=0.1.0 <0.13.0"
+  google_charts: '^0.2.1'
+  js: '^0.6.0'
   mongo_dart: "^0.2.4"
   more: '^1.5.0'
   petitparser: ">=1.0.0 <2.0.0"
