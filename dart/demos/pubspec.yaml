@@ -2,22 +2,19 @@ name: demos
 environment:
   sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
-  args: any
-  archive: any
-  browser: any
-  charted: any
-  crypto: any
-  csv: any
+  args: '^0.13.4+2'
+  archive: '^1.0.24'
+  browser: '^0.10.0+2'
+  crypto: '^2.0.1'
   date:
     git:
       url: git://github.com/thumbert/date.git
       ref: '0.0.3'
-  either: "<= 0.1.8"
   intl: ">=0.1.0 <0.13.0"
   google_charts: '^0.2.1'
   js: '^0.6.0'
-  mongo_dart: "^0.2.4"
-  more: '^1.5.0'
+  mongo_dart: "^0.2.7"
+  more: '^1.5.1'
   petitparser: ">=1.0.0 <2.0.0"
   intl: any
   stagexl: '0.13.5+1'
