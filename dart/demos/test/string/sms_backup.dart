@@ -11,27 +11,11 @@ List<String> data = [
 
 
 
-List<Message> readFile(File filename) {
-  File file = new File('~/Downloads/sms-20160609063913.xml');
-  String aux = file.readAsStringSync();
-  XmlDocument doc = parse(aux);
-
-  List<Message> res = [];
-
-
-
-  return res;
-}
-
-
-
-/// Create the Latex file
-void writeLatex() {
-
-}
-
 
 main() {
+  print(Directory.current);
+
+  makePdf();
 
 //  XmlDocument res = parse(data.first);
 //  var x = res.firstChild;
