@@ -12,7 +12,8 @@ void main() {
     ..antialias = true
     ..renderEngine = RenderEngine.Canvas2D;
 
-  Stage stage = new Stage(html.querySelector('#stage'), options: stageOptions);
+  Stage stage = new Stage(html.querySelector('#stage'),
+      options: stageOptions);
   RenderLoop renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
 
@@ -20,16 +21,17 @@ void main() {
   List y1Data = [10, 30, 27, 10, 50];
   List y2Data = [15, 50, 40, 36, 20];
 
-
-  new Figure()
+  new Figure(width: 800, height: 500)
     ..line(xData, y1Data)
     ..line(xData, y2Data, color: Color.HotPink)
-    ..xLabel = 'Number of days, ${new String.fromCharCode(0x03BC)}'
-    ..yLabel = 'Intensity'
-    ..title = 'Dynamics of bat population in underground Spanish caves'
+    ..xLabel = 'Number of days'
+    ..yLabel = 'Intensity, ${new String.fromCharCode(0x03BC)}'
+    ..title = 'Dynamics of bats in underground Spanish caves'
     //..key = new Key()
     ..addTo(stage)
     ..draw();
+
+
 
 //  Layout layout = new Layout(stage)
 //    ..matrix = [1,2]

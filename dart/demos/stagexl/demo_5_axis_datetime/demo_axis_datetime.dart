@@ -6,8 +6,8 @@ import 'dart:html';
 import 'package:demos/graphics/axis_datetime.dart';
 import 'package:demos/graphics/axis_datetime_xl.dart';
 
-CanvasElement canvas = html.querySelector('#stage');
-Stage stage = new Stage(canvas);
+//CanvasElement canvas = html.querySelector('#stage');
+//Stage stage = new Stage(canvas);
 
 
 class PlotArea extends DisplayObjectContainer {
@@ -27,9 +27,15 @@ class PlotArea extends DisplayObjectContainer {
 
 
 main() {
+  StageOptions stageOptions = new StageOptions()
+    ..backgroundColor = Color.Beige
+    ..antialias = true
+    ..renderEngine = RenderEngine.Canvas2D;
+
+  Stage stage = new Stage(html.querySelector('#stage'), options: stageOptions);
+
   RenderLoop renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
-  stage.backgroundColor = Color.Beige;
 
   var area = new PlotArea(700, 500)
     ..x = 50
@@ -38,19 +44,19 @@ main() {
     ..addTo(stage);
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
-  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 1, 2))
-    ..addTo(area)
-    ..draw();
-
-  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 2, 1))
-    ..y = 75
-    ..addTo(area)
-    ..draw();
-
-  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 4, 1))
-    ..y = 150
-    ..addTo(area)
-    ..draw();
+//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 1, 2))
+//    ..addTo(area)
+//    ..draw();
+//
+//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 2, 1))
+//    ..y = 75
+//    ..addTo(area)
+//    ..draw();
+//
+//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 4, 1))
+//    ..y = 150
+//    ..addTo(area)
+//    ..draw();
 
 
 

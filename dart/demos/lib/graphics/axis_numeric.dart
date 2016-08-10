@@ -37,9 +37,9 @@ class NumericAxis extends Axis {
 
   /**
    * A numeric axis.
+   * [scale] is the scale that converts data points to screen coordinates.
+   * [position] is a Position
    *
-   * [min] lowest value of the data
-   * [max] largest value of the data
    */
   NumericAxis(Scale scale, this.position, {this.ticks}) {
     this.scale = scale;
