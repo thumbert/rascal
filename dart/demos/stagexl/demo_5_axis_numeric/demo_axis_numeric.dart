@@ -3,6 +3,8 @@ library demo_axis_numeric;
 import 'dart:html';
 import 'package:stagexl/stagexl.dart';
 import 'package:demos/graphics/axis_numeric.dart';
+import 'package:demos/graphics/scale.dart';
+import 'package:demos/graphics/axis.dart';
 
 CanvasElement canvas = querySelector('#stage');
 Stage stage = new Stage(canvas);
@@ -48,49 +50,50 @@ main() {
 
 
   print(plotArea.width);
-  new NumericAxis(0, 1)
+  int N = 400;
+  new NumericAxis(new LinearScale(0, 1, 0, N), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 25;
   print(plotArea.width);
 
-  new NumericAxis(0, 100)
+  new NumericAxis(new LinearScale(0, 100, 0, N), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 75;
   print(plotArea.width);
 
-  new NumericAxis(0, 3)
+  new NumericAxis(new LinearScale(0, 3, 0, N), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 125;
   print(plotArea.width);
 
-  new NumericAxis(1, 3000)
+  new NumericAxis(new LinearScale(0, 3000, 0, N), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 175;
   print(plotArea.width);
 
-  new NumericAxis(65, 66)
+  new NumericAxis(new LinearScale(65, 66, 0, N), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 225;
   print(plotArea.width);
 
-  new NumericAxis(1000, 1000000)
+  new NumericAxis(new LinearScale(1000, 1000000, 0, N), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 275;
   print(plotArea.width);
 
-  new NumericAxis(100000, 100000000)
+  new NumericAxis(new LinearScale(100000, 100000000, 0, N), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 325;
   print(plotArea.width);
 
-  new NumericAxis(-1000000, 1000000)
+  new NumericAxis(new LinearScale(-1000000, 1000000, 0, 600), Position.bottom)
     ..addTo(plotArea)
     ..draw()
     ..y = 375;

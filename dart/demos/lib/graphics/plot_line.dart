@@ -18,11 +18,9 @@ class LinePlot extends Sprite implements Drawable {
 
   LinePlot(this.figure, this.xData, this.yData, {this.color: Color.Tomato,
     this.strokeWidth: 1.5}) {
-    //strokeWidth ??= 1.5;
     onMouseOver.listen(_onMouseOver);
     onMouseOut.listen(_onMouseOut);
     onMouseWheel.listen(_onMouseWheel);
-
   }
 
   draw() {
