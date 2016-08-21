@@ -6,19 +6,21 @@ dependencies:
   archive: '^1.0.24'
   browser: '^0.10.0+2'
   crypto: '^2.0.1'
+  cryptoutils: '0.2.1'
   date:
     git:
       url: git://github.com/thumbert/date.git
       ref: '0.0.3'
   intl: ">=0.1.0 <0.13.0"
   google_charts: '^0.2.1'
+  http: '0.11.3+9'
   js: '^0.6.0'
   mongo_dart: "^0.2.7"
   more: '^1.5.1'
   petitparser: ">=1.0.0 <2.0.0"
   intl: any
   stagexl: '0.13.5+1'
-  timezone: "^0.3.1"
+  timezone: "^0.4.3"
 
 dev_dependencies:
   test: '>=0.12.13 <0.13.0'

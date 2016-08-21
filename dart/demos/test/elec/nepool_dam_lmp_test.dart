@@ -13,6 +13,18 @@ setup() async {
   await arch.updateDb(new Date(2015,1,1), new Date(2015,8,31));
 }
 
+/// download one month of data
+download_files() async {
+  DamArchive  archive = new DamArchive();
+  var range = new TimeIterable(new Date(2015,1,1), new Date(2015,1,31)).toList();
+  Date current = range.first;
+  while (current <= range.last) {
+    await archive.oneDayDownload( current );
+    current = current.next;
+  }
+}
+
+
 test_nepool_dam() async {
   DamArchive arch = new DamArchive();
 
@@ -26,5 +38,8 @@ test_nepool_dam() async {
 
 
 main() async {
-  await test_nepool_dam();
+  ///await test_nepool_dam();
+
+  test('download prices', download_files);
+
 }

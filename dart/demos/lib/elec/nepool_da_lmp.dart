@@ -412,7 +412,7 @@ class DamArchive extends Config with DailyArchive {
       HttpClientRequest request = await client.getUrl(Uri.parse(URL));
       HttpClientResponse response = await request.close();
       await response.pipe(fileout.openWrite());
-      print('Downloaded short term outages for day $date.');
+      print('Downloaded DA LMP prices for day $date.');
     }
   }
 
