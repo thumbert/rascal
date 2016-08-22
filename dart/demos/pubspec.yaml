@@ -19,13 +19,8 @@ dependencies:
   more: '^1.5.1'
   petitparser: ">=1.0.0 <2.0.0"
   intl: any
-<<<<<<< HEAD
-  stagexl: '0.13.5+1'
-  timezone: "^0.4.3"
-=======
   stagexl: '0.13.9+2'
-  timezone: "^0.3.1"
->>>>>>> 765434f7e486d835067c15edc3654cdf40748acd
+  timezone: "^0.4.3"
 
 dev_dependencies:
   test: '>=0.12.13 <0.13.0'
