@@ -1,6 +1,7 @@
 library elec.nepool_da_lmp_influx;
 
 import 'dart:io';
+import 'dart:async';
 import 'package:date/date.dart';
 import 'package:timezone/standalone.dart';
 
@@ -16,21 +17,26 @@ Map env = Platform.environment;
 String DIR = env['HOME'] + '/Downloads/Archive/DA_LMP/Raw/Csv';
 //initializeTimeZoneSync();
 Location location = getLocation('America/New_York');
-String dbname = 'isone_lmp_prices_1H';
+String dbName = 'isone_lmp_prices_1H';
 
 
-/// get one csv file into the db
-import_csv_file(InfluxDB db, Date day) {
+/// Get the data associated with one csv file into the db.  Timestamp is hour
+/// beginning.
+///
+Future insertOneDay(InfluxDB db, Date day) {
   List<Map> data = oneDayRead( day );
   String str = data.map((e) => makeLine(e)).join('\n');
-  db.write(dbname, str);
+  return db.write(dbName, str);
 }
 
 /// Make a String line ready to insert into the db using the line protocol
 /// The line will look something like this:
 /// 'isone_lmp_prices_1H,ptid=321,market=da lmp=63.24,congestion=0.0,loss=1.2 1420088400000000000'
+/// so the measurement is 'isone_lmp_prices_1H', the tag keys are: 'market', 'ptid', and the
+/// field keys are 'lmp', 'congestion', 'loss'
+///
 String makeLine(Map row) {
-  return 'isone_lmp_prices_1H,ptid=${row['ptid']},market=da' +
+  return '$dbName,ptid=${row['ptid']},market=da' +
       ' lmp=${row['Lmp_Cong_Loss'][0]},congestion=${row['Lmp_Cong_Loss'][1]},loss=${row['Lmp_Cong_Loss'][2]}' +
       ' ${row['hourBeginning'].millisecondsSinceEpoch*1000000}';
 }
@@ -40,8 +46,8 @@ String makeLine(Map row) {
  * Read the csv file and prepare it for ingestion into mongo.
  * DateTimes need to be hourBeginning UTC, etc.
  */
-List<Map> oneDayRead(Date date) {
-  File file = new File(DIR + "/WW_DALMP_ISO_${yyyymmdd(date)}.csv");
+List<Map<String,dynamic>> oneDayRead(Date date) {
+  File file = new File(DIR + "/WW_DALMP_ISO_${_yyyymmdd(date)}.csv");
   if (file.existsSync()) {
     List<String> keys = ['hourBeginning', 'ptid', 'Lmp_Cong_Loss'];
 
@@ -70,7 +76,7 @@ List<Map> oneDayRead(Date date) {
 String _unquote(String x) => x.substring(1, x.length - 1);
 
 
-String yyyymmdd(Date date) {
+String _yyyymmdd(Date date) {
   var mm = date.month.toString().padLeft(2, '0');
   var dd = date.day.toString().padLeft(2, '0');
   return '${date.year}$mm$dd';

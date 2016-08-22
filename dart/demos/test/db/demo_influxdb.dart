@@ -24,12 +24,16 @@ basicOperations(InfluxDB db) {
 
 }
 
-importOneDay(InfluxDB db) async {
-  Date day = new Date(2015,1,1);
-  List<Map> data = oneDayRead( day );
-  String str = data.map((e) => makeLine(e)).join('\n');
-  await db.write('test', str);
-}
+/// Check with
+/// >show series from isone_lmp_prices_1H where ptid='4000'
+/// >select * from isone_lmp_prices_1H where ptid='4000'
+///
+//insertOneDay(InfluxDB db) async {
+//  Date day = new Date(2015,1,1);
+//  List<Map> data = oneDayRead( day );
+//  String str = data.map((e) => makeLine(e)).join('\n');
+//  await db.write('test', str);
+//}
 
 
 main() async {
@@ -41,7 +45,9 @@ main() async {
   String password = 'root';
   InfluxDB db = new InfluxDB(host, port, username, password);
 
-  await importOneDay(db);
+  await insertOneDay(db, new Date(2015, 1, 1));
+
+
 
 
 }
