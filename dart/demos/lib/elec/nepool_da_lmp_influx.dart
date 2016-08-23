@@ -23,10 +23,11 @@ String dbName = 'isone_lmp_prices_1H';
 /// Get the data associated with one csv file into the db.  Timestamp is hour
 /// beginning.
 ///
-Future insertOneDay(InfluxDB db, Date day) {
+insertOneDay(InfluxDB db, Date day) async {
   List<Map> data = oneDayRead( day );
   String str = data.map((e) => makeLine(e)).join('\n');
-  return db.write(dbName, str);
+  await db.write(dbName, str);
+  print('done');
 }
 
 /// Make a String line ready to insert into the db using the line protocol

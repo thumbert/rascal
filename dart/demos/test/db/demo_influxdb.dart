@@ -28,12 +28,12 @@ basicOperations(InfluxDB db) {
 /// >show series from isone_lmp_prices_1H where ptid='4000'
 /// >select * from isone_lmp_prices_1H where ptid='4000'
 ///
-//insertOneDay(InfluxDB db) async {
-//  Date day = new Date(2015,1,1);
-//  List<Map> data = oneDayRead( day );
-//  String str = data.map((e) => makeLine(e)).join('\n');
-//  await db.write('test', str);
-//}
+insertOneDay2(InfluxDB db) async {
+  Date day = new Date(2015,1,1);
+  List<Map> data = oneDayRead( day );
+  String str = data.map((e) => makeLine(e)).join('\n');
+  await db.write('test', str);
+}
 
 
 main() async {
@@ -45,9 +45,23 @@ main() async {
   String password = 'root';
   InfluxDB db = new InfluxDB(host, port, username, password);
 
-  await insertOneDay(db, new Date(2015, 1, 1));
+//  String data = 'cpu_load,host=server01,region=us-west value=0.64 1434055562000000000';
+//  await db.write('test', data);
+
+  //insertOneDay(db);
 
 
+  /// >create database test
+  /// >use test
+  /// >show series
+
+  ///
+  /// Why this is not working???
+  insertOneDay(db, new Date(2015, 1, 2));
+
+
+  /// and this works???
+  insertOneDay2(db);
 
 
 }
