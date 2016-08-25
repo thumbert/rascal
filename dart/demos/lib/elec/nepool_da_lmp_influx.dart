@@ -17,7 +17,8 @@ Map env = Platform.environment;
 String DIR = env['HOME'] + '/Downloads/Archive/DA_LMP/Raw/Csv';
 //initializeTimeZoneSync();
 Location location = getLocation('America/New_York');
-String dbName = 'isone_lmp_prices_1H';
+String dbName = 'test';
+String measurement = 'isone_lmp_prices_1H';
 
 
 /// Get the data associated with one csv file into the db.  Timestamp is hour
@@ -27,7 +28,6 @@ insertOneDay(InfluxDB db, Date day) async {
   List<Map> data = oneDayRead( day );
   String str = data.map((e) => makeLine(e)).join('\n');
   await db.write(dbName, str);
-  print('done');
 }
 
 /// Make a String line ready to insert into the db using the line protocol
@@ -37,7 +37,7 @@ insertOneDay(InfluxDB db, Date day) async {
 /// field keys are 'lmp', 'congestion', 'loss'
 ///
 String makeLine(Map row) {
-  return '$dbName,ptid=${row['ptid']},market=da' +
+  return '$measurement,ptid=${row['ptid']},market=da' +
       ' lmp=${row['Lmp_Cong_Loss'][0]},congestion=${row['Lmp_Cong_Loss'][1]},loss=${row['Lmp_Cong_Loss'][2]}' +
       ' ${row['hourBeginning'].millisecondsSinceEpoch*1000000}';
 }

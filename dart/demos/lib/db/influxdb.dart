@@ -29,6 +29,19 @@ class InfluxDB {
     client.postSilentMicrotask("$_connectionString$host:$port/query?q=CREATE DATABASE \"$name\"");
   }
 
+  query(String dbName, {String epoch, String username, String password}) async {
+
+  }
+
+  dropMeasurement(String name) async {
+    client.postSilentMicrotask("$_connectionString$host:$port/query?q=DELETE MEASUREMENT \"$name\"",
+        headers: {'Content-Type': 'application/text'});
+  }
+
+  showMeasurements() async {
+    /// get silent microtask
+  }
+
   Future<Response> write(String dbName, String data) async {
     return client.postSilentMicrotask("$_connectionString$host:$port/write?db=$dbName",
         headers: {'Content-Type': 'application/text'},
