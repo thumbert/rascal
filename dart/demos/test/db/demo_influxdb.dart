@@ -49,13 +49,17 @@ main() async {
 
   //insertOneDay(db);
 
+  //await db.createDatabase('junk');
+  await db.dropDatabase('junk');
+
+
 
   /// >create database test
   /// >use test
   /// >show series
 
   /// insertion is idempotent.  You insert the most recent data. (Great!)
-  await insertOneDay(db, new Date(2015, 1, 2));
+  ///await insertOneDay(db, new Date(2015, 1, 2));
 
 
 

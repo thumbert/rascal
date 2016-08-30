@@ -33,6 +33,16 @@ class InfluxDB {
 
   }
 
+  createDatabase(String dbName) async {
+    client.postSilentMicrotask("$_connectionString$host:$port/query?q=CREATE DATABASE $dbName",
+        headers: {'Content-Type': 'application/text'});
+  }
+
+  dropDatabase(String dbName) async {
+    client.postSilentMicrotask("$_connectionString$host:$port/query?q=DROP DATABASE $dbName",
+        headers: {'Content-Type': 'application/text'});
+  }
+
   dropMeasurement(String name) async {
     client.postSilentMicrotask("$_connectionString$host:$port/query?q=DELETE MEASUREMENT \"$name\"",
         headers: {'Content-Type': 'application/text'});
