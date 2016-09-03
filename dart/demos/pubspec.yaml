@@ -11,7 +11,7 @@ dependencies:
     git:
       url: git://github.com/thumbert/date.git
       ref: '0.0.3'
-  intl: ">=0.1.0 <0.13.0"
+  intl: ">=0.14.0 <0.15.0"
   google_charts: '^0.2.1'
   http: '0.11.3+9'
   js: '^0.6.0'
