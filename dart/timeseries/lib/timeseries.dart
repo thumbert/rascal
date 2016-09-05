@@ -27,7 +27,7 @@ class Obs<V> {
  * with a given periodicity.  
  *   
  * Time stamped data can arise from a logger or a tool that measures something at specific 
- * time points.  Aggregated time-series hold a value for a given time interval.  For exampe, 
+ * time points.  Aggregated time-series hold a value for a given time interval.  For example,
  * the monthly average historical temperature in Boston.  Each month will have a double associated
  * with it representing the temperature, but it is also important to distinguish the fact 
  * that "2014-01-01 00:00:00.000" corresponds to the entire month, not only to the instant.  
