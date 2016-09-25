@@ -1,5 +1,6 @@
 library test.cointossing;
 
+import 'dart:math';
 import 'package:dama/dama.dart';
 
 /// Check if you do have the right pattern
@@ -19,6 +20,29 @@ List<String> takeUntil(DiscreteDistribution dist, List<String> pattern) {
   }
   return x;
  }
+
+/// The expected number of coin tosses until pattern HH shows up
+/// is given by this sum:
+/// \sum{i=0}{\infty} \frac{F_i (i+2)}{2^{i+2}} where F_i is the Fibonacci number
+/// of order i.  F_0=1, F_1=1, F_2=2, F_3=3, F_4=5, etc.
+/// You get to this expression by simple counting:
+/// Pattern HH appears with probability 1/4 and has length 2
+/// Pattern THH appears with probability 1/8 and has length 3,
+/// Patterns TTHH, HTHH appear with probability 2/16 and have length 4, etc.
+///
+sumSeries({int nTerms: 1000}) {
+  List<num> res = [1/2, 3/8];
+  int f1 = 1;
+  int f2 = 1;
+  int aux;
+  for (int i=3; i<nTerms; i++) {
+    res.add((f1 + f2)*(i+1)/pow(2,i+1));
+    aux = f2;
+    f2 = f1 + f2;
+    f1 = aux;
+  }
+  print('\nExpected number of tosses = 6, Actual = ${res.reduce((a,b)=>a+b)}');
+}
 
 
 /// Calculate the number of coin flips until the pattern
@@ -58,5 +82,7 @@ expected_tosses_HH_HT() {
 
 main() {
   expected_tosses_HH_HT();
+
+  sumSeries(nTerms: 1000);
 
 }
