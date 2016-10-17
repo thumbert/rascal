@@ -1,0 +1,9 @@
+---
+title: "Dygraphs Demo"
+output: html_document
+---
+
+```{r}
+  library(dygraphs)      
+  dygraph(nhtemp, main = "New Haven Temperatures", ylab = "Temp (F)")
+```
