@@ -64,7 +64,7 @@ class InfluxDB {
     /// get silent microtask
   }
 
-  /// Insert data into the database $dbName.  
+  /// Insert data into the database $dbName.
   Future<Response> write(String dbName, String data) async {
     return client.postSilentMicrotask("$_connectionString$host:$port/write?db=$dbName",
         headers: {'Content-Type': 'application/text'},
