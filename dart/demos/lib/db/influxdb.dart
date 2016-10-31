@@ -29,8 +29,13 @@ class InfluxDB {
 //    client.postSilentMicrotask("$_connectionString$host:$port/query?q=CREATE DATABASE \"$name\"");
 //  }
 
-  query(String dbName, {String epoch, String username, String password}) async {
-
+  ///
+  /// curl -GET 'http://localhost:8086/query?db=test' --data-urlencode 'q=select * from isone_lmp_prices_1H where ptid='4000'"'
+  /// http://localhost:8086/query?db=test&q=select * from isone_lmp_prices_1H where ptid='4000'
+  Future<Response> select(String dbName, String query, {String epoch, String username, String password}) async {
+    return client.get("$_connectionString$host:$port/query?db=$dbName&q=$query",
+        headers: {'Content-Type': 'application/text'}
+    );
   }
 
   Future<Response> createDatabase(String dbName) async {
@@ -93,8 +98,8 @@ class InfluxDBClient extends BaseClient {
       resp = await this.get(url, headers: headers);
       if (resp.statusCode.toString() == '204')
         print('--> Response successful!');
-      print('Response get status: ${resp.statusCode}');
-      print('Response body: ${resp.reasonPhrase}');
+      //print('Response get status: ${resp.statusCode}');
+      //print('Response body: ${resp.reasonPhrase}');
     });
 
     return resp;
