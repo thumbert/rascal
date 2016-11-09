@@ -68,19 +68,21 @@ main() async {
   String password = 'root';
   InfluxDb db = new InfluxDb(host, port, username, password);
 
+  TZDateTime dt = TZDateTime.parse(location, '2015-02-01T05:00:00Z');
+  print(dt);
 
   //print(await insertDays(db, new Date(2015,3,3), new Date(2015,3,31)));
 
   print(await daysInserted(db));
 
-  var res = await hourlyLmpByPtid(db, 4000, component: ['congestion'],
+  var res = await getHourlyLmpByPtid(db, 4000, component: ['lmp'],
       start: new TZDateTime(location, 2015, 2),
-      end: new TZDateTime(location, 2015, 3));
+      end: new TZDateTime(location, 2015, 2, 2));
 
 //  var res = await db.showDatabases();
-  var aux = new InfluxDbResponse(res).toIterable();
+  var aux = new InfluxDbResponse(res, location).toIterable();
   aux.forEach(print);
-  print(aux.first['lmp']);
+
 
   //await db.createDatabase('junk');
   //await db.dropDatabase('junk');

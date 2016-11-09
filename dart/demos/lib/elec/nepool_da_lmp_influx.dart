@@ -22,9 +22,10 @@ Location location = getLocation('America/New_York');
 String dbName = 'test';
 String measurement = 'isone_lmp_prices_1H';
 
-/// Get hourly LMP prices for a given ptid.
+/// Get the hour beginning DA LMP prices for a given ptid between a [start, end) TZDateTime interval.
 /// http://localhost:8086/query?db=test&q=select * from isone_lmp_prices_1H where ptid='4000' limit 10
-Future<Response> hourlyLmpByPtid(InfluxDb db, int ptid, {TZDateTime start, TZDateTime end,
+/// http://localhost:8086/query?db=test&q=select lmp from isone_lmp_prices_1H where ptid='4000' limit 10
+Future<Response> getHourlyLmpByPtid(InfluxDb db, int ptid, {TZDateTime start, TZDateTime end,
   List component: const ['lmp', 'congestion', 'loss']}) async {
   String query = "select * from isone_lmp_prices_1H where ptid='$ptid'";
   if (component != const ['lmp', 'congestion', 'loss'])
@@ -32,9 +33,9 @@ Future<Response> hourlyLmpByPtid(InfluxDb db, int ptid, {TZDateTime start, TZDat
   if (start != null)
     query += " and time >= '${start.toUtc().toIso8601String()}'";
   if (end != null)
-    query += " and time <= '${end.toUtc().toIso8601String()}'";
+    query += " and time < '${end.toUtc().toIso8601String()}'";
 
-  print(query);
+  //print(query);
   return await db.select(dbName, query);
 }
 
@@ -49,7 +50,7 @@ Future insertOneDay(InfluxDb db, Date day) async {
 
 /// Insert a range of days into influxdb
 /// return 0 for success
-Future<int> insertDays(InfluxDb db, Date start, Date end) async {
+Future<int> insertDayRange(InfluxDb db, Date start, Date end) async {
   List<Date> range = new TimeIterable(start, end).toList();
   Iterable<Future> ins = range.map((day) {
     print('Inserting day $day');

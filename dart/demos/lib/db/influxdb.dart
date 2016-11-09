@@ -10,6 +10,7 @@ import 'package:http/src/client.dart';
 import 'package:http/src/streamed_response.dart';
 import 'package:http/src/base_request.dart';
 import 'dart:convert';
+import 'package:timezone/timezone.dart';
 //import 'package:cryptoutils/cryptoutils.dart';
 
 class InfluxDb {
@@ -78,11 +79,14 @@ class InfluxDb {
 }
 
 class InfluxDbResponse {
-  Map<String,dynamic> _resJson;
+  Map<String, dynamic> _resJson;
   List<String> _columns;
+  Location _location;
 
-  InfluxDbResponse(Response response) {
-    _resJson = (((JSON.decode(response.body)['results'] as List).first as Map)['series'] as List).first;
+  /// location keeps track of the timezone of the timestamps in the response.
+  InfluxDbResponse(Response response, this._location) {
+    _resJson = (((JSON.decode(response.body)['results'] as List)
+        .first as Map)['series'] as List).first;
   }
 
   List<String> get columns {
@@ -90,8 +94,14 @@ class InfluxDbResponse {
     return _columns;
   }
 
-  Iterable<Map> toIterable() {
-    return (_resJson['values'] as List).map((List e) => new Map.fromIterables(columns, e));
+  /// Get the values
+  List<List> get values => _resJson['values'];
+
+  Iterable<Map<String,dynamic>> toIterable() {
+    return (_resJson['values'] as List).map((List e) {
+      e[0] = TZDateTime.parse(_location, e[0]);
+      return new Map.fromIterables(columns, e);
+    });
   }
 }
 
