@@ -10,7 +10,7 @@ import 'package:http/src/client.dart';
 import 'package:http/src/streamed_response.dart';
 import 'package:http/src/base_request.dart';
 import 'dart:convert';
-import 'package:cryptoutils/cryptoutils.dart';
+//import 'package:cryptoutils/cryptoutils.dart';
 
 class InfluxDB {
   String host;

@@ -25,8 +25,8 @@ String measurement = 'isone_lmp_prices_1H';
 /// beginning.
 ///
 insertOneDay(InfluxDB db, Date day) async {
-  List<Map> data = oneDayRead( day );
-  String str = data.map((e) => makeLine(e)).join('\n');
+  List<Map> data = _oneDayRead( day );
+  String str = data.map((e) => _makeLine(e)).join('\n');
   await db.write(dbName, str);
 }
 
@@ -36,7 +36,7 @@ insertOneDay(InfluxDB db, Date day) async {
 /// so the measurement is 'isone_lmp_prices_1H', the tag keys are: 'market', 'ptid', and the
 /// field keys are 'lmp', 'congestion', 'loss'
 ///
-String makeLine(Map row) {
+String _makeLine(Map row) {
   return '$measurement,ptid=${row['ptid']},market=da' +
       ' lmp=${row['Lmp_Cong_Loss'][0]},congestion=${row['Lmp_Cong_Loss'][1]},loss=${row['Lmp_Cong_Loss'][2]}' +
       ' ${row['hourBeginning'].millisecondsSinceEpoch*1000000}';
@@ -47,7 +47,7 @@ String makeLine(Map row) {
  * Read the csv file and prepare it for ingestion into mongo.
  * DateTimes need to be hourBeginning UTC, etc.
  */
-List<Map<String,dynamic>> oneDayRead(Date date) {
+List<Map<String,dynamic>> _oneDayRead(Date date) {
   File file = new File(DIR + "/WW_DALMP_ISO_${_yyyymmdd(date)}.csv");
   if (file.existsSync()) {
     List<String> keys = ['hourBeginning', 'ptid', 'Lmp_Cong_Loss'];

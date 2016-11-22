@@ -54,14 +54,6 @@ select(InfluxDB db) async {
 }
 
 
-/// Check with
-_insertOneDay2(InfluxDB db, Date day) async {
-  List<Map> data = oneDayRead( day );
-  String str = data.map((e) => makeLine(e)).join('\n');
-  await db.write('test', str);
-}
-
-
 main() async {
   initializeTimeZoneSync();
 
@@ -70,9 +62,6 @@ main() async {
   String username = 'root';
   String password = 'root';
   InfluxDB db = new InfluxDB(host, port, username, password);
-
-//  String data = 'cpu_load,host=server01,region=us-west value=0.64 1434055562000000000';
-//  await db.write('test', data);
 
 
   await select(db);
