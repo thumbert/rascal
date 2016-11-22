@@ -10,19 +10,20 @@ import 'package:http/src/client.dart';
 import 'package:http/src/streamed_response.dart';
 import 'package:http/src/base_request.dart';
 import 'dart:convert';
+import 'package:timezone/timezone.dart';
 //import 'package:cryptoutils/cryptoutils.dart';
 
-class InfluxDB {
+class InfluxDb {
   String host;
   int port;
   String username;
   String password;
 
   static String _connectionString = "http://";
-  InfluxDBClient client;
+  InfluxDbClient client;
 
-  InfluxDB(this.host, this.port, this.username, this.password) {
-    client = new InfluxDBClient(new Client(), username, password);
+  InfluxDb(this.host, this.port, this.username, this.password) {
+    client = new InfluxDbClient(new Client(), username, password);
   }
 
 //  createDb(String name) async {
@@ -75,16 +76,42 @@ class InfluxDB {
         headers: {'Content-Type': 'application/text'},
         body: data);
   }
-
 }
 
-class InfluxDBClient extends BaseClient {
+class InfluxDbResponse {
+  Map<String, dynamic> _resJson;
+  List<String> _columns;
+  Location _location;
+
+  /// location keeps track of the timezone of the timestamps in the response.
+  InfluxDbResponse(Response response, this._location) {
+    _resJson = (((JSON.decode(response.body)['results'] as List)
+        .first as Map)['series'] as List).first;
+  }
+
+  List<String> get columns {
+    _columns ??= _resJson['columns'];
+    return _columns;
+  }
+
+  /// Get the values
+  List<List> get values => _resJson['values'];
+
+  Iterable<Map<String,dynamic>> toIterable() {
+    return (_resJson['values'] as List).map((List e) {
+      e[0] = TZDateTime.parse(_location, e[0]);
+      return new Map.fromIterables(columns, e);
+    });
+  }
+}
+
+class InfluxDbClient extends BaseClient {
   String userAgent;
   Client _inner;
   String _username;
   String _password;
 
-  InfluxDBClient(this._inner, this._username, this._password);
+  InfluxDbClient(this._inner, this._username, this._password);
 
   Future<StreamedResponse> send(BaseRequest request) {
     //request.headers["Authorization"] = "Basic ${CryptoUtils.bytesToBase64(UTF8.encode("$_username:$_password"))}";
@@ -110,10 +137,11 @@ class InfluxDBClient extends BaseClient {
     http.Response resp;
     scheduleMicrotask(() async {
       resp = await this.post(url, headers: headers, body: body, encoding: encoding);
-      if (resp.statusCode.toString() == '204')
-        print('--> Response successful!');
-      print('Response status: ${resp.statusCode}');
-      print('Response body: ${resp.reasonPhrase}');
+      if (resp.statusCode.toString() != '204')
+        throw 'Response for $url with headers $headers was not successful.';
+//        print('--> Response successful!');
+//      print('Response status: ${resp.statusCode}');
+//      print('Response body: ${resp.reasonPhrase}');
     });
 
     return resp;

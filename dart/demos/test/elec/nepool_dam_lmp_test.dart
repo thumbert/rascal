@@ -16,7 +16,7 @@ setup() async {
 /// download one month of data
 download_files() async {
   DamArchive  archive = new DamArchive();
-  var range = new TimeIterable(new Date(2015,1,1), new Date(2015,1,31)).toList();
+  var range = new TimeIterable(new Date(2015,3,3), new Date(2015,3,3)).toList();
   Date current = range.first;
   while (current <= range.last) {
     await archive.oneDayDownload( current );
@@ -40,6 +40,6 @@ test_nepool_dam() async {
 main() async {
   ///await test_nepool_dam();
 
-  test('download prices', download_files);
+  await download_files();
 
 }

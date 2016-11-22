@@ -336,7 +336,9 @@ class DamArchive extends Config with DailyArchive {
     db = config.db;
 
     coll = db.collection(collectionName);
-    initializeTimeZoneSync();
+    Map env = Platform.environment;
+    String tzdb = env['HOME'] + '/.pub-cache/hosted/pub.dartlang.org/timezone-0.4.3/lib/data/2015b.tzf';
+    initializeTimeZoneSync(tzdb);
     location = getLocation('America/New_York');
   }
 
