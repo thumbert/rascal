@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Congestion viewer</title>
+    <script src="dygraph-combined.js"></script>
+    <script type="application/dart" src="congview_dygraphs_client.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+    <style type="text/css">
+      body {
+        margin: 20px;
+      }
+      div.wrapper {
+        margin: 0 auto;
+        max-width: 800px;
+        text-align: center;
+        font-style: italic;
+      }
+    </style>
+</head>
+<body>
+<div>
+    <div class="wrapper">
+        <canvas id="canvas" height="650" width="800"></canvas>
+        <p>Data exploration</p>
+    </div>
+</div>
+</body>
+</html>

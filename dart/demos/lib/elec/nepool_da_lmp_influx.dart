@@ -18,13 +18,13 @@ import 'package:demos/db/influxdb.dart';
 
 Map env = Platform.environment;
 String DIR = env['HOME'] + '/Downloads/Archive/DA_LMP/Raw/Csv';
-Location location = getLocation('America/New_York');
+Location location = getLocation('US/Eastern');
 String dbName = 'test';
 String measurement = 'isone_lmp_prices_1H';
 
 /// Get the hour beginning DA LMP prices for a given ptid between a [start, end) TZDateTime interval.
 /// http://localhost:8086/query?db=test&q=select * from isone_lmp_prices_1H where ptid='4000' limit 10
-/// http://localhost:8086/query?db=test&q=select lmp from isone_lmp_prices_1H where ptid='4000' limit 10
+/// http://localhost:8086/query?db=test&q=select ptid, lmp from isone_lmp_prices_1H where ptid='4000' limit 10
 Future<Response> getHourlyLmpByPtid(InfluxDb db, int ptid, {TZDateTime start, TZDateTime end,
   List component: const ['lmp', 'congestion', 'loss']}) async {
   String query = "select * from isone_lmp_prices_1H where ptid='$ptid'";

@@ -54,7 +54,26 @@ select(InfluxDb db) async {
 
 }
 
+getOnePtid(InfluxDb db) async {
+  var res = await getHourlyLmpByPtid(db, 4000, component: ['lmp'],
+      start: new TZDateTime(location, 2015, 2),
+      end: new TZDateTime(location, 2015, 2, 2));
 
+  var aux = new InfluxDbResponse(res, location).toIterable();
+  aux.forEach(print);
+}
+
+getManyPtids(InfluxDb db) {
+  List<int> ptids = new List.generate(8, (i) => 4000 + i);
+  TZDateTime start = new TZDateTime(location, 2015,1,1);
+  TZDateTime end = new TZDateTime(location, 2015,4,1);
+
+  var it = ptids.forEach((ptid) async {
+    var res = await getHourlyLmpByPtid(db, 4000, component: ['congestion']);
+
+  });
+
+}
 
 
 main() async {
@@ -68,27 +87,15 @@ main() async {
   String password = 'root';
   InfluxDb db = new InfluxDb(host, port, username, password);
 
-  TZDateTime dt = TZDateTime.parse(location, '2015-02-01T05:00:00Z');
-  print(dt);
+  // print(TZDateTime.parse(location, '2015-02-01T05:00:00Z'));
 
-  //print(await insertDays(db, new Date(2015,3,3), new Date(2015,3,31)));
+  // print(await insertDays(db, new Date(2015,3,3), new Date(2015,3,31)));
 
   print(await daysInserted(db));
 
-  var res = await getHourlyLmpByPtid(db, 4000, component: ['lmp'],
-      start: new TZDateTime(location, 2015, 2),
-      end: new TZDateTime(location, 2015, 2, 2));
+  //getOnePtid(db);
 
-//  var res = await db.showDatabases();
-  var aux = new InfluxDbResponse(res, location).toIterable();
-  aux.forEach(print);
-
-
-  //await db.createDatabase('junk');
-  //await db.dropDatabase('junk');
-
-//  print(res.body);
-
+  getManyPtids(db);
 
 
 
