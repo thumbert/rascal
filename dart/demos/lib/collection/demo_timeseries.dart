@@ -1,6 +1,11 @@
 import 'dart:collection';
 //import 'range.dart';
 
+class DailyTimeSeries {
+
+}
+
+
 
 List<DateTime> seq(DateTime startDt, DateTime endDt, Duration step) {
   List<DateTime> index = [];
@@ -90,24 +95,8 @@ class TimeSeries<K,V> extends ListBase<Obs<K,V>> {
   }
   Obs obsAtSlow(index) => data.firstWhere((obs) => obs.index == index);
 
-  
-  
   toString() => data.join("\n");
 }
 
-
-
-void main() {
-  TimeSeries ts = new TimeSeries();
-  ts.addAll([new Obs(new DateTime(2014), 1),
-             new Obs(new DateTime(2015), 2),
-             new Obs(new DateTime(2016), 3)]);
-  
-  print(ts);
-  ts.removeWhere((e) => e.value < 3);
-  print(ts);
-  
-  
-}
 
 

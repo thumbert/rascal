@@ -43,9 +43,9 @@ Future<Response> getHourlyLmpByPtid(InfluxDb db, int ptid, {TZDateTime start, TZ
 /// beginning.
 ///
 Future insertOneDay(InfluxDb db, Date day) async {
-  List<Map> data = oneDayRead( day );
+  List<Map> data = _oneDayRead( day );
   String str = data.map((e) => _makeLine(e)).join('\n');
-  return await db.write(dbName, str);
+  await db.write(dbName, str);
 }
 
 /// Insert a range of days into influxdb
@@ -58,6 +58,7 @@ Future<int> insertDayRange(InfluxDb db, Date start, Date end) async {
   });
   return Future.wait(ins).then((_) => 0);
 }
+
 
 /// Return the range of DA result days inserted into influxdb
 /// A map of this form: {first: 2015-01-01, last: 2015-01-03}
@@ -83,7 +84,7 @@ Future<Map<String,Date>> daysInserted(InfluxDb db) async {
  * Read the csv file and prepare it for ingestion into mongo.
  * DateTimes need to be hourBeginning UTC, etc.
  */
-List<Map<String,dynamic>> oneDayRead(Date date) {
+List<Map<String,dynamic>> _oneDayRead(Date date) {
   File file = new File(DIR + "/WW_DALMP_ISO_${_yyyymmdd(date)}.csv");
   if (file.existsSync()) {
     List<String> keys = ['hourBeginning', 'ptid', 'Lmp_Cong_Loss'];

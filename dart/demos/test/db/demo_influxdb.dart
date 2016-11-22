@@ -38,7 +38,7 @@ basicOperations(InfluxDb db) {
 
   test('write two points', () async {
     String data = 'isone_lmp_prices_1H,ptid=321,market=da lmp=63.24,congestion=0.0,loss=1.2 1420088400000000000' +
-        '\nisone_lmp_prices_1H,ptid=322,market=da lmp=63.24,congestion=0.0,loss=1.2 1420088400000000000';
+        '\\nisone_lmp_prices_1H,ptid=322,market=da lmp=63.24,congestion=0.0,loss=1.2 1420088400000000000';
     await db.write('test', data);
   });
 
@@ -96,14 +96,6 @@ main() async {
   //getOnePtid(db);
 
   getManyPtids(db);
-
-
-
-
-
-
-
-
 
 
 }
