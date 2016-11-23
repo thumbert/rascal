@@ -15,9 +15,6 @@ enum BuySell {
   Sell
 }
 
-num priceTemperatureSwap(Month month, num fixedLeg, num tick, num maxPayoff,
-  IndexType indexType, List<num>)
-
 
 class TemperatureLocation {
   String airportCode;
@@ -37,9 +34,13 @@ class TemperatureSwap {
   List<num> temperatureObservations;
 
   /// Price a monthly temperature swap.
-  /// [month] is the calendar month for this swap
+  /// [month] is the month for this swap
+  /// [tick] is the quantity multiplier
+  /// [indexType] CDD or HDD
+  /// [maxPayoff] the maximum payoff for this swap
   ///
-  TemperatureSwap(this.month, this.fixedLeg, this.tick, this.indexType, this.buySell) {
+  TemperatureSwap(this.month, this.fixedLeg, this.tick, this.indexType, this.buySell,
+      {this.maxPayoff: double.INFINITY}) {
     switch (indexType) {
       case IndexType.CDD:
         _indexFun = _indexCdd;

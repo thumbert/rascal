@@ -68,7 +68,7 @@ getManyPtids(InfluxDb db) {
   TZDateTime start = new TZDateTime(location, 2015,1,1);
   TZDateTime end = new TZDateTime(location, 2015,4,1);
 
-  var it = ptids.forEach((ptid) async {
+  ptids.forEach((ptid) async {
     var res = await getHourlyLmpByPtid(db, 4000, component: ['congestion']);
 
   });
