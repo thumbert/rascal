@@ -16,7 +16,6 @@ import 'test_period.dart' as test_period;
 
 main () {
   //initializeTimeZone().then((_) => test_bucket.test_bucket());
-//  test_bucket.main();
   test_calendar.main();
   test_date.main();
   test_dst.main();

@@ -2,9 +2,6 @@ library timeseries;
 
 import 'dart:collection';
 //import 'seq.dart';
-import 'package:timeseries/time/month.dart';
-import 'package:timeseries/time/interval.dart';
-import 'package:timeseries/time/period.dart';
 
 
 /**
@@ -46,35 +43,31 @@ class Obs<V> {
  */
 class TimeSeries<V> extends ListBase<Obs<V>> {
   List<Obs<V>> data = [];
-  final Period period;
-  bool _isUtc;
 
-  TimeSeries({Period this.period, bool isUtc: false}){
-    _isUtc = isUtc;
-  }
+  TimeSeries(){}
 
   /**
    * Create a TimeSeries given a List of DateTimes.  All DateTimes need to be in the same timezone. 
    */
-  TimeSeries.fill(List<DateTime> index, value, {Period this.period}) {
+  TimeSeries.fill(List<DateTime> index, value) {
     data = new List.generate(index.length, (i) => new Obs(index[i], value), growable: true);
-    _isUtc = index.first.isUtc;
   }
   /**
-   * Creates a TimeSeries of size length and fills it with observations observations created by 
-   * calling the generator for each index in the range 0 .. length-1 in increasing order. 
+   * Creates a TimeSeries of size length and fills it with observations
+   * created by calling the generator for each index in the range
+   * 0..length-1 in increasing order.
+   * The [generator] function needs to return Obs
    */
-  TimeSeries.generate(int length, Function generator, {Period this.period,
+  TimeSeries.generate(int length, Function generator, {
       bool growable: true}) {
     data = new List.generate(length, generator, growable: growable);
-    _isUtc = data.first.index.isUtc;
   }
   /**
    * Create a TimeSeries from components.
    */
-  TimeSeries.fromComponents(List<DateTime> index, List<V> value, {Period this.period}) {
+  TimeSeries.fromComponents(List<DateTime> index, List<V> value) {
     if (value.length !=
-        index.length) throw new Exception('TimeSeries value and index must have the same length');
+        index.length) throw new Exception('TimeSeries value and index don\'t have the same length');
 
     for (int i = 0; i < value.length; i++) {
       data.add(new Obs(index[i], value[i]));
@@ -99,12 +92,6 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
     if (!data.isEmpty &&
         obs.index.isBefore(
             data.last.index)) throw new StateError("You can only add at the end of the TimeSeries");
-    if (period != null &&
-        period.trunc(obs.index) !=
-            obs.index) throw new StateError("You can only add observations with the same period");
-    if (isUtc != obs.index.isUtc) 
-      throw new StateError("The observation UTC flag does not match the UTC flag for the timeseries");
-    
     data.add(obs);
   }
   void addAll(Iterable<Obs> all) => all.forEach((obs) => this.add(obs));
@@ -113,7 +100,7 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
   Iterable get values => data.map((obs) => obs.value);
 
 
-  // return the index of the key in the List _data or -1.
+  /// return the index of the key in the List _data or -1.
   int _comparableBinarySearch(Comparable key) {
     int min = 0;
     int max = data.length;
@@ -135,14 +122,11 @@ class TimeSeries<V> extends ListBase<Obs<V>> {
    * Expand each observation of this timeseries using a function f. 
    * For example, can be used to expand a monthly timeseries to a daily series. 
    */
-  TimeSeries expand(Iterable<Obs> f(Obs obs), {Period period}) {
-    
-    TimeSeries ts = new TimeSeries(period: period, isUtc: this.isUtc);
-    print(data);
+  TimeSeries expand(Iterable<Obs> f(Obs obs)) {
+    TimeSeries ts = new TimeSeries();
     data.forEach((Obs obs) {
       ts.addAll( f(obs) );  
     });
-    
     return ts;    
   }
     
