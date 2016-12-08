@@ -1,0 +1,16 @@
+:host {
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+.red {
+  background-color: #f44336;
+  color: white;
+}
+
+.blue {
+  background-color: #2196F3;
+  color: white;
+}
+
+.limited-width {
+  width: 50%;
+}

@@ -7,7 +7,11 @@ library test.db.demo_influxdb;
 /// >show series from isone_lmp_prices_1H where ptid='4000'
 /// >select * from isone_lmp_prices_1H where ptid='4000' limit 10
 /// >create database test
-
+/// >insert ncdc_daily,station=CA007025280 tmin=12,tmax=21 18810101
+/// >drop measurement ncdc_daily
+/// >select count(TMAX) from ncdc_daily
+/// >delete from ncdc_daily
+///
 /// Insertion is idempotent.  You insert the most recent data. (Great!)
 /// What if there is a conflict with data for the same timestamp?
 /// await insertOneDay(db, new Date(2015, 1, 2));
