@@ -97,7 +97,7 @@ class BlackScholes implements PricingModel {
 
   /// An European call option on a stock.
   /// TODO: Need to implement the put valuation, etc.
-  BlackScholes(this.optionType, this.strike, this.expirationDate, this.dataProvider){}
+  BlackScholes(this.optionType, this.strike, this.expirationDate){}
 
 //  set asOfDate(DateTime value) => _asOfDate = value;
 //  set interestRate(num value) => _interestRate = value;
