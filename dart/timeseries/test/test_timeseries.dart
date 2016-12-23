@@ -1,122 +1,119 @@
 library test_timeseries;
 
-import 'package:unittest/unittest.dart';
+import 'dart:io';
+import 'package:test/test.dart';
+import 'package:date/date.dart';
 import 'package:timeseries/timeseries.dart';
-import 'package:timeseries/time/year.dart';
-import 'package:timeseries/time/period.dart';
-import 'package:timeseries/time/interval.dart';
+import 'package:timezone/standalone.dart';
 
 main() {
-  
-  group('TimeSeries tests: ', () {
-    
+  Map env = Platform.environment;
+  String tzdb = env['HOME'] +
+      '/.pub-cache/hosted/pub.dartlang.org/timezone-0.4.3/lib/data/2015b.tzf';
+  initializeTimeZoneSync(tzdb);
+  Location location = getLocation('US/Eastern');
+
+  Hour firstHour = new Hour.beginning(new TZDateTime(location, 2016, 1));
+  Hour lastHour = new Hour.ending(new TZDateTime(location, 2017, 1));
+  var hours = new TimeIterable(firstHour, lastHour).toList();
+
+  group('TimeSeries tests:', () {
     test('create hourly timeseries using fill', () {
-      var index = new Year(2014).split(Period.HOUR, (x) => x.start);
-      var ts = new TimeSeries.fill(index, 1, period: Period.HOUR);
-      expect(ts.length, 8760);
-    }); 
-  
+      var ts = new TimeSeries.fill(hours, 1);
+      expect(ts.length, 8784);
+    });
+
+    test(
+        'Construct mixed daily and monthly series works as long as not overlapping',
+        () {
+      List x = [
+        new IntervalTuple(new Date(2016, 1, 20), 20),
+        new IntervalTuple(new Date(2016, 1, 21), 21),
+        new IntervalTuple(new Month(2016, 2), 2),
+        new IntervalTuple(new Month(2016, 3), 3)
+      ];
+      var ts = new TimeSeries.fromIterable(x);
+      expect(ts.length, 4);
+    });
+
     test('check indexing', () {
-      var index = new Year(2014).split(Period.HOUR, (x) => x.start);
-      var ts = new TimeSeries.fill(index, 1, period: Period.HOUR);
-      Obs a1 = ts[0];
-      expect(a1.index, index[0]);
-      expect(a1.value, 1);
-     }); 
-    
-    test('calculate the number of hours in some months', () {
-      var index = new Year(2014).split(Period.HOUR, (x) => x.start);
-      var ts = new TimeSeries.fill(index, 1, period: Period.HOUR);
-      
-      TimeSeries hrs = ts.toMonthly((x) => x.length);
-      expect(hrs.values, [744, 672, 743, 720, 744, 720, 744, 744, 720, 744, 721, 744]);      
+      var ts = new TimeSeries.fill(hours, 1);
+      IntervalTuple x1 = ts[0];
+      expect(x1.interval, hours[0]);
+      expect(x1.value, 1);
     });
- 
-    test('add observations', () {
-      var months = new Interval.fromStartEnd(new DateTime(2014,1,1), new DateTime(2014,4,1))
-        .split(Period.MONTH, (x) => x.start);
-      var ts = new TimeSeries.generate(3, (i) => new Obs(months[i], i));
-      ts.add(new Obs(new DateTime(2014,4,1), 4));
-      expect(ts.length, 4);
+
+    test('calculate the number of hours in a month', () {
+      var ts = new TimeSeries.fill(hours, 1);
+      var aux = ts
+          .groupByIndex((hour) => new Month(hour.start.year, hour.start.month));
+      var hrs = aux.map((x) => x.value.length).toList();
+      expect(hrs, [744, 696, 743, 720, 744, 720, 744, 744, 720, 744, 721, 744]);
     });
-    
-    test('adding to the middle of the tseries throws', () {
-      var months = new Year(2014).split(Period.MONTH, (x) => x.start);
-      var ts = new TimeSeries.generate(12, (i) => new Obs(months[i], i));
-      expect(() => ts.add(new Obs(new DateTime(2014,4,1), 4)), throwsStateError);
-      
+
+    test('slice the timeseries according to an interval (window)', () {
+      var months =
+          new TimeIterable(new Month(2014, 1), new Month(2014, 12)).toList();
+      var ts = new TimeSeries.fill(months, 1);
+
+      List<IntervalTuple> res =
+          ts.window(new Interval(new DateTime(2014, 3), new DateTime(2014, 7)));
+      expect(res.length, 4);
+      expect(res.join(", "), 'Mar14 -> 1, Apr14 -> 1, May14 -> 1, Jun14 -> 1');
     });
-    
+
+    test('add one observation at the end', () {
+      var start = new Month(2015, 1);
+      var end = new Month(2015, 12);
+      var ts = new TimeSeries.from(
+          new TimeIterable(start, end), new List.generate(12, (i) => i + 1));
+      ts.add(new IntervalTuple(new Month(2016, 1), 1));
+      expect(ts.length, 13);
+    });
+
+    test('add a bunch of days at once', () {
+      var start = new Date(2016, 1, 1);
+      var end = new Date(2016, 1, 31);
+      var days = new TimeIterable(start, end).toList();
+      var ts = new TimeSeries.from([days.first], [1]);
+      ts.addAll(days.skip(1).map((day) => new IntervalTuple(day, 1)));
+      expect(ts.length, 31);
+    });
+
     test('filter observations', () {
-      var months = new Interval.fromStartEnd(new DateTime(2014,1,1), new DateTime(2014,7,1))
-        .split(Period.MONTH, (x) => x.start);
-      var ts = new TimeSeries.generate(6, (i) => new Obs(months[i], i));
-      ts.add(new Obs(new DateTime(2014,7,1), 7));
+      var months =
+          new TimeIterable(new Month(2014, 1), new Month(2014, 7)).toList();
+      var ts =
+          new TimeSeries.generate(6, (i) => new IntervalTuple(months[i], i));
       ts.retainWhere((obs) => obs.value > 2);
-      expect(ts.values.toList()[0], 3);
-      expect(ts.length, 4);
-      var ts2 = new TimeSeries.generate(6, (i) => new Obs(months[i], i));
-      ts2.removeWhere((Obs e) => e.value > 2);
+      expect(ts.values.first, 3);
+      expect(ts.length, 3);
+
+      var ts2 =
+          new TimeSeries.generate(6, (i) => new IntervalTuple(months[i], i));
+      ts2.removeWhere((e) => e.value > 2);
       expect(ts2.length, 3);
     });
-    
-    
-  });
-  
-  group('Interval TimeSeries tests: ', () {
-    
-    test('create monthly interval timeseries using fill', () {
-      var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
-      var ts = new TimeSeries.fill(index, 1, period: Period.MONTH);
-      expect(ts.length, 12);
-      expect(ts.period, Period.MONTH);
-    }); 
-    
-    test('adding an existing index throws StateError', () {
-      var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
-      var ts = new TimeSeries.fill(index, 1);
-      expect(() => ts.add(new Obs(new DateTime(2014,5), 5)), throwsStateError);
-    }); 
-    
-    test('adding existing indexes with addAll throws StateError', () {
-      var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
-      var ts = new TimeSeries.fill(index, 1);
-      expect(() => ts.addAll(ts.data.sublist(3,4)), throwsStateError);
-    }); 
-    
-    
-    test('adding a middle of the month day to an existing monthly timeseries throws', () {
-      var index = Period.MONTH.seqFrom(new DateTime(2014,1), 12);
-      var ts = new TimeSeries.fill(index, 1, period: Period.MONTH);
-      expect(() => ts.add(new Obs(new DateTime(2015, 1, 5), 12)), throws);
-    }); 
-    
-  });
-  
-  
-  group('Aggregations/Expansion: ', () {
-    test('aggregate an hourly timeseries to monthly', () {
-      List<DateTime> hrs = new Year(2014).split(Period.HOUR, (x) => x.start);
-      var ts = new TimeSeries.fill(hrs, 1, period: Period.MONTH);
-         
-      TimeSeries res = ts.toMonthly((List obs) => obs.length);
-      expect(res.join(""),
-        "{2014-01-01 00:00:00.000, 744}{2014-02-01 00:00:00.000, 672}{2014-03-01 00:00:00.000, 743}{2014-04-01 00:00:00.000, 720}{2014-05-01 00:00:00.000, 744}{2014-06-01 00:00:00.000, 720}{2014-07-01 00:00:00.000, 744}{2014-08-01 00:00:00.000, 744}{2014-09-01 00:00:00.000, 720}{2014-10-01 00:00:00.000, 744}{2014-11-01 00:00:00.000, 721}{2014-12-01 00:00:00.000, 744}");
-    });
-    
-    solo_test('expand a monthly timeseries to daily data', () {
-      var ts = new TimeSeries(period: Period.MONTH);
-      ts.add(new Obs(new DateTime.utc(2014,3), 1.0));
-      
-      var tsDaily = ts.expand((obs) {
-        var days = Period.DAY.seq(obs.index, Period.MONTH.next(obs.index));
-        return new List.generate(days.length, (i) => new Obs(days[i], obs.value));
-      });
-      expect(tsDaily.length, 31);
-    });
-    
-  });
- 
 
-  
+    test('adding to the middle of the tseries throws', () {
+      var months =
+          new TimeIterable(new Month(2014, 1), new Month(2014, 12)).toList();
+      var ts =
+          new TimeSeries.generate(12, (i) => new IntervalTuple(months[i], i));
+      expect(() => ts.add(new IntervalTuple(new Date(2014, 4, 1), 4)),
+          throwsStateError);
+    });
+  });
+
+  group('Aggregations/Expansion:', () {
+    test('expand a monthly timeseries to a daily timeseries', () {
+      var ts =
+          new TimeSeries.from([new Month(2016, 1), new Month(2016, 2)], [1, 2]);
+      var tsDaily = ts.expand((obs) {
+        Month month = obs.interval;
+        return month.days().map((day) => new IntervalTuple(day, obs.value));
+      });
+      expect(tsDaily.length, 60);
+    });
+  });
 }
