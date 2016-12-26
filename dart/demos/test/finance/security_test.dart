@@ -1,9 +1,11 @@
 library finance.security_test;
 
 import 'package:demos/finance/security.dart';
+import 'package:demos/finance/black_scholes.dart';
+
 
 europeanOptionTests() {
-  CallOption c1 = new CallOption('ACM', 30, new DateTime(2015, 3, 18))
+  var c1 = new BlackScholes(CallPut.call, 30, new DateTime(2015, 3, 18))
     ..asOfDate = new DateTime(2015, 1, 1)
     ..volatility = 0.3
     ..interestRate = 0.01;

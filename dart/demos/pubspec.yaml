@@ -32,6 +32,9 @@ dependencies:
   stagexl: '^0.13.12'
   spreadsheet_decoder: '^0.3.1'
   timezone: "^0.4.3"
+  table:
+    git:
+      url: git://github.com/thumbert/table.git
   tuple: '^1.0.1'
 
 dev_dependencies:
