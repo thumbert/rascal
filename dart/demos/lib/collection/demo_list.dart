@@ -104,6 +104,18 @@ Map count(Iterable x) {
   return grp;
 }
 
+/// Merge [a] and [b] until [a] is fully consumed. Then add 42.
+Iterable<int> combine(Iterable<int> a, Iterable<int> b) sync* {
+  var aIterator = a.iterator;
+  var bIterator = b.iterator;
+  while (aIterator.moveNext()) {
+    yield aIterator.current;
+    if (bIterator.moveNext()) {
+      yield bIterator.current;
+    }
+  }
+  yield 42;
+}
 
 
 
