@@ -11,7 +11,7 @@ t1() {
     Map m = {"A": 1, "B": 2};
     var mv = new UnmodifiableMapView(m);
 
-    m["C"] = 3;          // add another entry
+    m["C"] = 3;          // add another entry in the first map
     expect(mv['C'], 3);  // {A: 1, B: 2, C: 3} it gets reflected in the view
     // mv["D"] = 4;      // throws
   });
@@ -43,7 +43,6 @@ main() {
   t1();
 
   copy();
-  
 }
 
 

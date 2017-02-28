@@ -11,12 +11,27 @@ import 'package:dygraphs_dart/dygraphs_dart.dart';
         width="300"
         height="100"></div>
     ''')
-class DygraphComponent implements AfterViewInit {
+class DygraphComponent implements OnInit {
 
   @ViewChild('dygraphvis')
   ElementRef dygraphvis;
 
-  ngAfterViewInit() {
+  ngOnInit() {
+    List data = getData(5, 200);
+    Option opt = new Option(
+        animatedZooms: true,
+        highlightSeriesOpts: new HighlightSeriesOpts(
+            pointSize: 30,
+            strokeWidth: 2,
+            strokeBorderWidth: 10,
+            highlightCircleSize: 3),
+        showLabelsOnHighlight: false
+    );
+    new Dygraph(dygraphvis.nativeElement, data, opt);
+  }
+
+  ngOnChanges(Map changes) {
+    print(changes);
     List data = getData(5, 200);
     Option opt = new Option(
         animatedZooms: true,

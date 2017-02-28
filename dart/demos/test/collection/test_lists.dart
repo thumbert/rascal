@@ -55,4 +55,15 @@ main() {
   List z = [3, 5, 1, 4, 7];
   print(z.fold(z.first, (a,b) => min(a,b)));
 
+
+  /// when you get an element from the List, it keeps the reference
+  /// make changes to the original list
+  List xx = [
+    {'id': 1, 'value': 'A'},
+    {'id': 2, 'value': 'B'},
+  ];
+  var a = xx.firstWhere((e) => e['id'] == 1);
+  a['value'] = 'AA';
+  print(xx.first['value'] == 'AA');  // true
+
 }
