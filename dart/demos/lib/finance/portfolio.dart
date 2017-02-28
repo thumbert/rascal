@@ -25,6 +25,7 @@ class Portfolio {
   Map<DateTime, List<Trade>> trades = {};
 
   /// Create a portfolio.  A portfolio has a list of trades and positions.
+  /// Always fund the portfolio with some cash.
   Portfolio({this.name});
 
   /// add a given trade to the portfolio
@@ -90,18 +91,43 @@ class Portfolio {
     return positions[maxTime];
   }
 
+  /// Get the positions as of a given time.
+  /// If the asOfDate is after last trade added, positions = currentPositions,
+  /// otherwise, it is searching for the last available timestamp.
+  List<Position> getPositions(DateTime asOfDate) {
+    if (positions.isEmpty) return [];
+    var tStamps = positions.keys.toList().reversed;
+    DateTime pick = tStamps.firstWhere((dt) => dt.isBefore(asOfDate) || dt.isAtSameMomentAs(asOfDate));
+    return positions[pick];
+  }
+
   /// Calculate the value of this portfolio as of a given time
   num value(DateTime asOfDate) {
+    List _positions = getPositions(asOfDate);
+    if (_positions.isEmpty) return 0;
     /// get the last positions right before or at the asOfDate
-    return positions[asOfDate]
+    return _positions
         .map((position) => position.value(asOfDate))
         .reduce((a, b) => a + b);
   }
 
   /// Calculate the deltas for this portfolio
   List<Tuple2<String,num>> delta(DateTime asOfDate) {
-    List aux = positions[asOfDate]
-        .map((position) => position.de);
+    List _positions = getPositions(asOfDate);
+    if (_positions.isEmpty) return [];
+    var aux = _positions
+        .skip(1)   /// always have some cash in the first spot
+        .expand((position) => position.delta(asOfDate));
+    Map<Security, List<Tuple2>> gAux = new Map();
+    aux.forEach((Tuple2 v) => gAux.putIfAbsent(v.item1, () => []).add(v));
+
+    List res = [];
+    gAux.keys.forEach((Security s) {
+      num delta = gAux[s].map((e) => e.item2).reduce((a,b)=>a+b);
+      res.add(new Tuple2(s,delta));
+    });
+
+    return res;
   }
 
 }

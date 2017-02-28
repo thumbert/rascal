@@ -85,7 +85,7 @@ class InMemoryDb implements SecDb {
     if (security.securityName == 'CASH')
       return 1;
     else if (security.securityName == 'STOCK')
-      return e['undelyingPrice'];
+      return e['underlyingPrice'];
     else if (security.securityName == 'CALL')
       return e['callPrice'];
     else if (security.securityName == 'PUT')
@@ -94,7 +94,7 @@ class InMemoryDb implements SecDb {
       throw 'Unknown security with name ${security.securityName}';
   }
   List<Tuple2> getDelta(Security security, DateTime asOfDate) {
-    Map e = hData.firstWhere((Map e) => e['day'] == asOfDate);
+    Map e = hData.firstWhere((Map e) => e['day'] == new Date.fromDateTime(asOfDate));
     if (security.securityName == 'STOCK' || security.securityName == 'CASH')
       return [new Tuple2(security,1)];
     else if (security.securityName == 'CALL') {
@@ -110,57 +110,60 @@ class InMemoryDb implements SecDb {
 
 /// Return the 4 securities: cash, stock shares, the calls, and the puts.
 List<Security> getSecurities(SecDb db) {
+  Stock stock = new Stock(db, 'STOCK');
   return [
     new Security(db, 'CASH', 'CASH'),
-    new Security(db, 'STOCK', 'STOCK'),
-    new Security(db, 'CALL', 'CALL', quantityMultiplier: 100),
-    new Security(db, 'PUT', 'CALL', quantityMultiplier: 100)
+    stock,
+    new Call(db, 'CALL', stock),
+    new Put(db, 'PUT', stock)
   ];
 }
 
-class Flatten implements Decision {
-  String name = 'Flatten delta';
-  int priority = 1;
-  BuySell buySell;
-  int quantity;
-  Security security;
-}
-
-class ShortGamma implements TradingAlgorithm {
-  final List<Decision> allowedDecisions = [new Flatten()];
+class ShortGamma {
   SecDb db;
   Portfolio portfolio;
+  List securities;
+  Stock stock;
 
   /// manage a short gamma portfolio by constantly delta-hedging
   ShortGamma(this.db) {
-    List sec = getSecurities(db);
+    securities = getSecurities(db);
+    stock = securities[1];
     DateTime start = new DateTime(2016, 1, 1);
 
     /// fund the portfolio at initial time with some cash
     portfolio = new Portfolio();
-    Trade cash = new Trade(start, BuySell.buy, 10000, sec[0], 1);
+    Trade cash = new Trade(start, BuySell.buy, 10000, securities[0], 1);
     portfolio.add(cash);
 
     /// sell 10 calls
-    num callPrice = db.getValue(sec[2], start);
-    Trade trade1 = new Trade(start, BuySell.sell, 10, sec[2], callPrice);
+    num callPrice = db.getValue(securities[2], start);
+    Trade trade1 = new Trade(start, BuySell.sell, 10, securities[2], callPrice);
     portfolio.add(trade1);
 
     /// sell 10 puts
-    num putPrice = db.getValue(sec[3], start);
-    Trade trade2 = new Trade(start, BuySell.sell, 10, sec[3], putPrice);
+    num putPrice = db.getValue(securities[3], start);
+    Trade trade2 = new Trade(start, BuySell.sell, 10, securities[3], putPrice);
     portfolio.add(trade2);
   }
 
+  /// run this algorithm from start to end
   void run(Date start, Date end) {
     List<Date> days = new TimeIterable(start, end).toList();
     days.forEach((Date day) {
       DateTime dt = day.toDateTime();
-
+      num delta = portfolio.delta(dt).first.item2;
+      print('day: $day, delta: $delta');
+      if (delta.abs() > 10) {
+        /// flatten the portfolio
+        BuySell buySell = delta > 0 ? BuySell.sell : BuySell.buy;
+        Trade trade = new Trade(dt, buySell, delta.round().abs(), stock, stock.value(dt));
+        portfolio.add(trade);
+        //print('trade: ${trade.buySell}, quantity: ${trade.quantity}');
+      }
+      print('   end of day portfolio value: ${portfolio.value(dt)}');
     });
   }
-
-
 }
 
 num _round2(num x) => (x*100).round()/100;
@@ -177,9 +180,12 @@ main() {
   var algo = new ShortGamma(db);
   var positions = algo.portfolio.currentPositions();
   positions.forEach((p) => print(p.toMap()));
+  print(algo.portfolio.delta(new DateTime(2016,1,1)));
 
-
-
+  Date start = new Date(2016,1,2);
+  Date end = new Date(2016,12,18);
+  algo.run(start, end);
+  // TODO: portfolio value is wrong
 
 
 

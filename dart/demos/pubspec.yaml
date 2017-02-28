@@ -22,6 +22,7 @@ dependencies:
         url: git://github.com/thumbert/dygraphs_dart.git
   intl: ">=0.14.0 <0.15.0"
   google_charts: '^0.2.1'
+  html: 0.13.1
   http: '0.11.3+9'
   js: '^0.6.0'
   #lightning: '^2.1.3'

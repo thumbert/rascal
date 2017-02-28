@@ -9,6 +9,17 @@ import 'package:demos/finance/position.dart';
 import 'package:demos/finance/security.dart';
 import 'package:demos/finance/securities_database.dart';
 
+
+SecDb getDb1() {
+  List hData = [
+    {'day': new Date(2016,1,1), 'price': 30},
+    {'day': new Date(2016,1,2), 'price': 40},
+    {'day': new Date(2016,1,3), 'price': 50},
+  ];
+  return new InMemoryDb(hData);
+}
+
+
 class InMemoryDb implements SecDb {
   List<Map> hData;
   InMemoryDb(this.hData);
@@ -30,6 +41,17 @@ class InMemoryDb implements SecDb {
       throw 'Unknown security with name ${security.securityName}';
   }
 }
+
+securityTests() {
+  SecDb db = getDb1();
+  group('Security tests:', () {
+    test('Stock value', () {
+      Stock stock = new Stock(db, 'STOCK');
+      expect(stock.value(new DateTime(2016,1,1)), 30);
+    });
+  });
+}
+
 
 positionTests() {
   List hData = [
@@ -89,7 +111,7 @@ portfolioTests() {
   var db = new InMemoryDb(hData);
   var cash = new Security(db, 'CASH', 'CASH');
   var stock = new Security(db, 'STOCK', 'STOCK');
-  var call = new Security(db, 'CALL', 'CALL', quantityMultiplier: 100);
+  var call = new Call(db, 'CALL', stock);
 
   group('Portfolio tests:', () {
     test('Add some cash on 1/1/2016', () {
@@ -180,6 +202,9 @@ portfolioTests() {
 
       var positions = portfolio.currentPositions();
       expect(positions.length, 3);
+      var deltas = portfolio.delta(new DateTime(2016,1,1));
+      expect(deltas.length, 1);
+      expect(deltas.first.item2, 600);
     });
 
 
@@ -190,6 +215,7 @@ portfolioTests() {
 
 
 main() {
+  securityTests();
   positionTests();
   portfolioTests();
 }

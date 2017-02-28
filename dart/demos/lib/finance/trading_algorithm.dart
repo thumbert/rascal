@@ -5,8 +5,8 @@ import 'security.dart';
 /// Represent a trading algorithm.  The algorithm needs to come up with a
 /// trading decision and then execute a transaction based on it.
 class TradingAlgorithm {
-  final List<Decision> allowedDecisions;
-  TradingAlgorithm(this.allowedDecisions);
+  //final List<Decision> allowedDecisions;
+  //TradingAlgorithm(this.allowedDecisions);
 }
 
 

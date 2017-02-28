@@ -29,27 +29,37 @@ last element.  I've seen this problem in the Numberphile video
 
 We want an algorithm to optimally select the best element (the element
 with the highest score) but it is prohibitive to scan the entire list
-of objects.  We are looking for an algorithm that ends before although
-it may not guarantee that it finds the absolute maximum score $M =
-\max_{i=1,N} X_i$.
+of objects.  We are looking for an algorithm that doesn't require a
+full scan of the list, and we are willing to accept that we won't get
+the absolute maximum score $M = \max_{i=1,N} X_i$.
 
 The algorithm is this: Scan the first $1$ to $K$ objects and record
 their highest score which we denote by $M_K$.  Keep inspecting the
-remaining objects and stop when the first element such that $X_i >
-M_K$ for $i>K$ is found.  What is the probability ${\cal P}_M(K)$ to
-find the object with the true maximum score $M$?
+remaining objects and stop when the first element such that 
+$X_i > M_K$ for $i>K$ is found.  What is the probability ${\cal P}_M(K)$ to
+find the object with the true maximum score $M$?  What is the optimal
+number of elements to inspect?  How close to the true maximum does
+this algorithm performs?
 
 \section{Optimal stopping $K$} 
- There is an optimal $K$ that maximizes the probability ${\cal
-   P}_M(K)$?  For a very small $K$, say $K=1$, you will find the true
- maximum $M$ with a probability of $1-1/N$, although you may need to
- scan a lot of elements.  For a large $K$ close to $N$ the probability
- to find the true maximum is again very small as most likely it was in
- the first $K$ and you skipped it.  So there is an optimal $K$ which
- maximizes this probability.
+
+ Is there an optimal $K$ that maximizes the probability ${\cal
+   P}_M(K)$?  If $K$ is very small, that is, when you inspect only a
+ few elements, the probability to find the true maximum is very small,
+ because many elements will be greater than what you've experienced
+ already so the chance that you'll stop at the true maximum is very
+ small. 
+
+%% For a very small $K$, say $K=1$, you will find the true
+%%  maximum $M$ with a probability of $1-1/N$.  
+
+For a large $K$ close to $N$ the probability to find the true maximum
+is also very small as most likely the maximum was in the first $K$ and
+you passed it already.  So there is an optimal $K$ which maximizes
+this probability.
 
 The probability ${\cal P}_M(K)$ to select the maximum element $M$ after
-you skip the first $K$ elements is calculated as the sum of the
+you inspect the first $K$ elements is calculated as the sum of a 
 probabilities of a series of disjoint events.  The disjoint events are
 the specific location of the selection.  The selected item can be in
 the spot $K+1$, or $K+2$, or $K+3$,\ldots or the $N$ spot. 
@@ -61,7 +71,7 @@ where $P_S(X_j)$ is the probability that variable $X_j$ is selected and
 $P_M(j)$ is the probability that the true maximum $M$ is at location $j$.
 As the items are distributed randomly, $P_M(j)=1/N$.
 
-If $j=K+1$, that is we select element $X_{K+1}$ the probability to
+If $j=K+1$, that is we select element $X_{K+1}$, the probability to
 select $X_{K+1}$ equals $1$.
 
 If $j=K+2$ spot, the probability to select $X_{K+2}$ is not $1$ as you
@@ -84,7 +94,7 @@ From Eq.\ \ref{prob} it follows that
   {\cal P}_M(K) = \frac{1}{N} + \frac{1}{N}\frac{K}{K+1}
   + \frac{1}{N}\frac{K}{K+2} 
   + \frac{1}{N}\frac{K}{K+3} 
-  + \cdots + \frac{1}{N}\frac{K}{N-1} 
+  + \cdots + \frac{1}{N}\frac{K}{K-1} 
 \end{equation}
 
 

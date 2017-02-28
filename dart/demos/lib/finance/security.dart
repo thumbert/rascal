@@ -28,8 +28,8 @@ class Stock implements Security {
   num quantityMultiplier = 1;
 
   Stock(this.db, this.ticker) : securityName = ticker {}
-  num value(DateTime asOfDate) => super.value(asOfDate);
-  List<Tuple2<Security,num>> delta(DateTime asOfDate) => super.delta(asOfDate);
+  num value(DateTime asOfDate) => db.getValue(this, asOfDate);
+  List<Tuple2<Security,num>> delta(DateTime asOfDate) => db.getDelta(this,asOfDate);
 }
 
 class Call implements Security {
@@ -42,8 +42,8 @@ class Call implements Security {
 
   /// A simple european call
   Call(this.db, this.securityName, this.underlier);
-  num value(DateTime asOfDate) => super.value(asOfDate);
-  List<Tuple2<Security,num>> delta(DateTime asOfDate) => super.delta(asOfDate);
+  num value(DateTime asOfDate) => db.getValue(this,asOfDate);
+  List<Tuple2<Security,num>> delta(DateTime asOfDate) => db.getDelta(this, asOfDate);
 }
 
 class Put implements Security {
@@ -56,8 +56,8 @@ class Put implements Security {
 
   /// A simple european put
   Put(this.db, this.securityName, this.underlier);
-  num value(DateTime asOfDate) => super.value(asOfDate);
-  List<Tuple2<Security,num>> delta(DateTime asOfDate) => super.delta(asOfDate);
+  num value(DateTime asOfDate) => db.getValue(this,asOfDate);
+  List<Tuple2<Security,num>> delta(DateTime asOfDate) => db.getDelta(this, asOfDate);
 }
 
 

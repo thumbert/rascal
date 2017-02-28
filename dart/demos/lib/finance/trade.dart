@@ -34,4 +34,14 @@ class Trade {
   num get cashLeg =>  -_sign()*quantity*security.quantityMultiplier*price;
 
   int _sign() => (buySell == BuySell.buy) ? 1 : -1;
+
+  Map toMap() {
+    Map res = {};
+    res['transactionTime'] = transactionTime;
+    res['buySell'] = buySell == BuySell.buy ? 'BUY' : 'SELL';
+    res['quantity'] = quantity;
+    res['security'] = security.securityName;
+    res['price'] = price;
+    return res;
+  }
 }
