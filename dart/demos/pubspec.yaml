@@ -9,6 +9,7 @@ dependencies:
   browser: '^0.10.0'
   chartjs: '^0.3.0'
   crypto: '^2.0.1'
+  csv: any
   #cryptoutils: '0.2.1'
   dama:
     git:
@@ -29,6 +30,7 @@ dependencies:
   mongo_dart: "^0.2.7"
   more: '^1.5.1'
   petitparser: ">=1.0.0 <2.0.0"
+  plotly: 0.7.3
   quiver: '>=0.22.0 <0.24.0'
   stagexl: '^0.13.12'
   spreadsheet_decoder: '^0.3.1'

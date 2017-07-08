@@ -60,8 +60,8 @@ select(InfluxDb db) async {
 
 getOnePtid(InfluxDb db) async {
   var res = await getHourlyLmpByPtid(db, 4000, component: ['lmp'],
-      start: new TZDateTime(location, 2015, 2),
-      end: new TZDateTime(location, 2015, 2, 2));
+      start: new TZDateTime(location, 2015, 1, 1),
+      end: new TZDateTime(location, 2015, 1, 2));
 
   var aux = new InfluxDbResponse(res, location).toIterable();
   aux.forEach(print);
@@ -97,9 +97,9 @@ main() async {
 
   print(await daysInserted(db));
 
-  //getOnePtid(db);
+  getOnePtid(db);
 
-  getManyPtids(db);
+  //getManyPtids(db);
 
 
 }

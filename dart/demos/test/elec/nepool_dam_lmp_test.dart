@@ -18,7 +18,7 @@ download_files() async {
   DamArchive  archive = new DamArchive();
   var range = new TimeIterable(new Date(2015,3,3), new Date(2015,3,3)).toList();
   Date current = range.first;
-  while (current <= range.last) {
+  while (current.isBefore(range.last)) {
     await archive.oneDayDownload( current );
     current = current.next;
   }
