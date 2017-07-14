@@ -2,7 +2,6 @@ import 'dart:js';
 import 'package:plotly/plotly.dart';
 
 main() {
-  var colors = new List.filled(7, '#00000');
 
   var data = [
     {
@@ -10,58 +9,56 @@ main() {
       'y': [1, 2, 3, 2, 3, 4, 3],
       'type': 'scatter',
       'mode': 'lines',
-      'marker': {'size': 16, 'color': colors},
-      'line': {'width': 1, 'color': '#000000'}
+      'line': {'width': 1, 'color': '#FF0000', 'opacity': 1}
     },
     {
       'x': [1, 2, 3, 4, 5, 6, 7],
       'y': [1, 2, 1, 2, 3, 4, 3],
       'type': 'scatter',
       'mode': 'lines',
-      'marker': {'size': 16, 'color': '#F44283'},
-      'line': {'width': 1, 'color': '#F44283'}
+      'line': {'width': 1, 'color': '#0000FF', 'opacity': 1}
     }
   ];
 
   var layout = {
     'hovermode': 'closest',
+    'showlegend': false,
     'title': 'Hover on a Point to Change Color'
   };
 
   var plot = new Plot.id('myDiv', data, layout);
 
   plot.onHover.listen((data) {
-    var pn = '', tn = '', width;
-    List size = new List.filled(7, 16);
+    var lineId, color, width;
     /// data['points'].length == 1, only one point is hovered at a time
     /// the curve number is 0 because there is only one trace.
     /// https://plot.ly/javascript/plotlyjs-events/#event-data
     for (var i = 0; i < data['points'].length; i++) {
-      pn = data['points'][i]['pointNumber'];
-      tn = data['points'][i]['curveNumber'];
       width = data['points'][i]['data']['line']['width'];
-      print('pn:$pn, tn:$tn, width:$width');
+      lineId = data['points'][i]['curveNumber'];
+      color = data['points'][i]['data']['line']['color'];
+      print('line:$lineId, width:$width');
     }
 
     var update = {
-      'line': {'color': '#FF0000', 'width': 3}
+      'line': {'width': 5, 'color': color}
     };
-    plot.restyle(update, [tn]);
+    plot.restyle(update, [lineId]);
   });
 
   plot.onUnhover.listen((data) {
-    var pn = '', tn = '', colors = [];
+    var lineId, color, width;
     for (var i = 0; i < data['points'].length; i++) {
-      pn = data['points'][i]['pointNumber'];
-      tn = data['points'][i]['curveNumber'];
-      colors = data['points'][i]['data']['marker']['color'];
+      width = data['points'][i]['data']['line']['width'];
+      lineId = data['points'][i]['curveNumber'];
+      color = data['points'][i]['data']['line']['color'];
+      print('line:$lineId, width:$width');
     }
-    colors[pn] = '#00000';
 
     var update = {
-      'line': {'color': '#FF0000', 'width': 1}
+      'line': {'width': 1, 'color': color}
     };
 
-    plot.restyle(update, [tn]);
+    plot.restyle(update, [lineId]);
   });
 }
