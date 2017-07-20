@@ -26,10 +26,13 @@ main() {
   var layout = {
     'hovermode': 'closest',
     'showlegend': false,
-    'title': 'Hover on a Point to Change Color'
+    'title': 'Hover on a Point to highlight a series'
   };
 
   var plot = new Plot.id('myDiv', data, layout);
+  /// Didn't succeed to put the highlighted series on top.
+  /// Didn't see a way to control mouse-wheel, doubleclick, etc.
+
 
   plot.onHover.listen((data) {
     var lineId, color, width;

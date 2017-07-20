@@ -3,6 +3,8 @@
 import 'package:stagexl/stagexl.dart';
 
 import 'scale.dart';
+import 'axis.dart';
+import 'axis_numeric.dart';
 
 class PlotArea extends Sprite {
 
@@ -13,8 +15,10 @@ class PlotArea extends Sprite {
 
   Scale myScaleX, myScaleY;
 
+  num width, height;
 
-  PlotArea(num width, num height) {
+
+  PlotArea(this.width, this.height) {
     graphics.rect(0, 0, width, height);
     graphics.strokeColor(Color.Black);
     graphics.fillColor(Color.White);
@@ -38,14 +42,26 @@ class PlotArea extends Sprite {
     print('Selection is $topLeft to $bottomRight');
     rect.graphics.clear();
     isSelected = false;
+    ///TODO:  if the bottomRight is to the left of topLeft, switch the points!!!
+
+    /// trigger a redraw by rescaling the xAxis
+    myScaleX = new LinearScale(topLeft[0], bottomRight[0], 0, width);
+    Axis xAxis = new NumericAxis(myScaleX, Position.bottom);
+    xAxis.y = height;
+    xAxis.name = 'xAxis';
+    removeChildAt(0);
+    addChildAt(xAxis, 0);
+    /// TODO: fixme, almost works!
+
+
   }
   _onMouseMove(Event e) {
     bottomRight = [mouseX, mouseY];
     rect.graphics.clear();
     if (isSelected) {
-      rect.graphics.rect(topLeft[0], topLeft[1],
-          bottomRight[0]-topLeft[0], bottomRight[1]-topLeft[1]);
-      rect.graphics.strokeColor(Color.Blue);
+      rect.graphics.rect(topLeft[0], 0,
+          bottomRight[0]-topLeft[0], height);
+      rect.graphics.fillColor(0xFF75dff5);
     }
   }
 
