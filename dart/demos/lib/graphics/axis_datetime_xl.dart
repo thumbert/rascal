@@ -5,9 +5,7 @@ import 'package:stagexl/stagexl.dart';
 import 'package:demos/graphics/axis_datetime.dart';
 import 'package:demos/graphics/axis_datetime_utils.dart';
 
-/**
- * An implementation of a DateTime axis that should be used from StageXL.
- */
+/// An implementation of DateTime axis for StageXL
 class DateTimeAxisXl extends Sprite with DateTimeAxis {
   final fmt =
     new TextFormat("Arial", 20, Color.Black, align: TextFormatAlign.CENTER);

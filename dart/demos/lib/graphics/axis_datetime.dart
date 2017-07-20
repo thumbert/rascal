@@ -46,9 +46,6 @@ class DateTimeAxis {
   /// header height in px
   num headerHeight = 20;
 
-  DateTimeAxis() {
-
-  }
 
   /**
    * Calculate the ticks, the headers and the label.

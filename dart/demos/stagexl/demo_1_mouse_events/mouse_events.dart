@@ -51,34 +51,6 @@ class LineWithHighlight extends Sprite {
   }
 }
 
-class AreaWithSelection extends Sprite {
-  num firstX;
-  List<num> selection;
-
-  AreaWithSelection() {
-    graphics.rect(300, 50, 300, 200);
-    graphics.strokeColor(Color.Blue, 1, JointStyle.MITER);
-
-//    onMouseDown.listen(_onMouseDown);
-//    onMouseUp.listen(_onMouseUp);
-  }
-//  _onMouseDown(Event e) {
-//    print('inside');
-//    graphics.fillColor(Color.Pink);
-//    selection = [];
-//    if (stage.mouseX >300 && stage.mouseX < 600) {
-//      firstX ??= stage.mouseX;
-//      graphics.rect(firstX, 50, stage.mouseX-300, 200);
-//      graphics.fillColor(Color.Pink);
-//    }
-//  }
-//  _onMouseUp(Event e) {
-//    selection = [firstX, min(stage.mouseX, 600)];
-//    print('Selection is $selection');
-//    firstX = null;
-//    graphics.fillColor(Color.Beige);
-//  }
-}
 
 main() {
   StageOptions stageOptions = new StageOptions()
@@ -112,19 +84,16 @@ main() {
   shape3.graphics.strokeColor(Color.Tomato);
   stage.addChild(shape3);
 
-  ///simple animation
+  ///simple animation of a ball
   var tween = new Tween(shape2, 2.0, Transition.linear);
   tween.animate.x.to(100);
   tween.animate.y.to(100);
   juggler.add(tween);
 
-  var area = new AreaWithSelection();
-
-  stage.addChild( area );
   stage.addChild( new LineWithHighlight() );
 
 
-  /// some info
+  /// some info about this webpage
   stage.addChild(new TextField(
       'Move the mouse over the red circle to see its color change to orange',
       new TextFormat("Arial", 20, Color.Black))
@@ -143,32 +112,10 @@ main() {
   txt.x = 100;
   txt.y = stage.contentRectangle.height - 50;
   stage.addChild(txt);
-  _onEnterFrame(Event e) {
+  stage.onEnterFrame.listen((e) {
     txt.text = "(x=${stage.mouseX}, y=${stage.mouseY})";
-  }
-  stage.onEnterFrame.listen(_onEnterFrame);
+  });
 
-
-  num firstX;
-  List selection;
-
-  _onMouseDown(Event e) {
-    print('inside');
-    selection = [];
-    if (stage.mouseX >300 && stage.mouseX < 600) {
-      firstX ??= stage.mouseX;
-      area.graphics.rect(firstX, 50, stage.mouseX-300, 200);
-      area.graphics.fillColor(Color.Pink);
-    }
-  }
-  _onMouseUp(Event e) {
-    selection = [firstX, min(stage.mouseX, 600)];
-    print('Selection is $selection');
-    firstX = null;
-    area.graphics.fillColor(Color.Beige);
-  }
-  area.onMouseDown.listen(_onMouseDown);
-  area.onMouseUp.listen(_onMouseUp);
 
 
 

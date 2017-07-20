@@ -8,15 +8,18 @@ main() {
       'x': [1, 2, 3, 4, 5, 6, 7],
       'y': [1, 2, 3, 2, 3, 4, 3],
       'type': 'scatter',
+      'name': '1st line - red',
       'mode': 'lines',
-      'line': {'width': 1, 'color': '#FF0000', 'opacity': 1}
+      'line': {'width': 1, 'color': '#FF0000'}
     },
     {
       'x': [1, 2, 3, 4, 5, 6, 7],
       'y': [1, 2, 1, 2, 3, 4, 3],
       'type': 'scatter',
+      'name': '2nd line - blue',
       'mode': 'lines',
-      'line': {'width': 1, 'color': '#0000FF', 'opacity': 1}
+      'marker': {'opacity': 1},
+      'line': {'width': 1, 'color': '#0000FF'}
     }
   ];
 
@@ -30,8 +33,6 @@ main() {
 
   plot.onHover.listen((data) {
     var lineId, color, width;
-    /// data['points'].length == 1, only one point is hovered at a time
-    /// the curve number is 0 because there is only one trace.
     /// https://plot.ly/javascript/plotlyjs-events/#event-data
     for (var i = 0; i < data['points'].length; i++) {
       width = data['points'][i]['data']['line']['width'];
@@ -44,6 +45,8 @@ main() {
       'line': {'width': 5, 'color': color}
     };
     plot.restyle(update, [lineId]);
+    ///plot.moveTrace(lineId, 0);   /// put it on top!
+
   });
 
   plot.onUnhover.listen((data) {

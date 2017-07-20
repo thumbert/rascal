@@ -5,9 +5,7 @@ import 'dart:math';
 import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart';
 
-/**
- * Select a rectangular area on the screen with the mouse.
- */
+/// Select a rectangular area on the screen with the mouse
 main() {
   StageOptions stageOptions = new StageOptions()
     ..inputEventMode = InputEventMode.MouseAndTouch

@@ -10,9 +10,7 @@ import 'axis.dart';
 import 'scale.dart';
 
 
-/**
- * A Numeric axis.
- */
+/// A numeric axis
 class NumericAxis extends Axis {
 
   /// the ticks for the axis
@@ -46,7 +44,8 @@ class NumericAxis extends Axis {
 
     ticks ??= _defaultNumericTicks();
 
-    //print('ticks are: ${ticks.join(',')}');
+    print('ticks are: ${ticks.join(',')}');
+    draw();
   }
 
   /// Extend the limits of a numeric axis, so the data is contained in
@@ -63,11 +62,11 @@ class NumericAxis extends Axis {
   /// limits.
   static Tuple2<num,num> getLimits(Iterable<num> x, {Tuple2<num,num> lim}) {
     if (x.isEmpty)
-      throw 'Cannot calculate the limits of an empty iterable';
+      throw 'Cannot calculate axis limits of an empty iterable';
     if (x.length == 1 && (x.first.isNaN || x.first == null))
       throw 'Cannot calculate the limits';
-    num min = lim.i1;
-    num max = lim.i2;
+    num min = lim.item1;
+    num max = lim.item2;
     x.where((e) => !(e.isNaN || e == null)).forEach((num e){
       if (e > max || max == null) max = e;
       if (e < min || min == null) min = e;
@@ -88,7 +87,7 @@ class NumericAxis extends Axis {
       graphics.lineTo(_axisLength-0.5, 0);
 
     } else if (position == Position.left) {
-      graphics.moveTo(0, 0.5-_axisLength);
+      graphics.moveTo(0, 0.5 -_axisLength);
       graphics.lineTo(0, 0.5);
     }
 

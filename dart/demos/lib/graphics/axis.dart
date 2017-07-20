@@ -108,5 +108,4 @@ class Axis extends Sprite {
     return type;
   }
 
-
 }

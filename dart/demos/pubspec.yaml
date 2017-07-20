@@ -32,7 +32,7 @@ dependencies:
   petitparser: ">=1.0.0 <2.0.0"
   plotly: 0.7.3
   quiver: '>=0.22.0 <0.24.0'
-  stagexl: '^0.13.12'
+  stagexl: 1.2.0+3
   spreadsheet_decoder: '^0.3.1'
   timezone: "^0.4.3"
   table:
