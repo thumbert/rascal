@@ -22,8 +22,12 @@ main() {
   print("contentRectange = ${stage.contentRectangle}");
 
   Chart chart =  new Chart()
-   ..xLimit( new Tuple2(0,100) )
-   ..yLimit( new Tuple2(0,50) );
+   ..xLimit(0,100)
+   ..yLimit(0,50);
+
+//  Chart chart =  new Chart()
+//    ..xLimit( new Tuple2(0,100) )
+//    ..yLimit( new Tuple2(0,50) );
 
 
 

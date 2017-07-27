@@ -10,7 +10,8 @@ enum HeaderType {
   YEAR,
   MONTH,
   DAY,
-  HOUR
+  HOUR,
+  NONE
 }
 
 /**

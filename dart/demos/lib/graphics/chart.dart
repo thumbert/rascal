@@ -4,6 +4,7 @@ import 'package:tuple/tuple.dart';
 
 import 'axis.dart';
 import 'axis_numeric.dart';
+import 'axis_datetime_xl.dart';
 import 'scale.dart';
 import 'plot_area.dart';
 
@@ -14,17 +15,12 @@ class Chart extends Sprite {
   Axis yAxis;
   PlotArea _plotArea;
 
-  /// data range
-  DateTime startDate, endDate;
-  num yMin, yMax;
 
   /// default values
   num margin = 100;
   num _plotAreaWidth;
   num _plotAreaHeight;
 
-  /// axis limits
-  Tuple2<num,num> _xlim, _ylim;
 
 
   Chart() {
@@ -40,20 +36,29 @@ class Chart extends Sprite {
   }
 
 
-  void xLimit(Tuple2<num,num> x) {
-    _xlim = x;
+  void xLimit(xMin, xMax) {
     /// Add an axis to the plot area
-    _plotArea.myScaleX = new LinearScale(x.item1, x.item2, 0, _plotAreaWidth);
-    xAxis = new NumericAxis(_plotArea.myScaleX, Position.bottom);
+    if (xMin is num) {
+      Scale myScaleX = new LinearScale(xMin, xMax, 0, _plotAreaWidth);
+      xAxis = new NumericAxis(myScaleX, Position.bottom);
+
+    } else if ((xMin is DateTime) && (xMax is DateTime)) {
+      Scale myScaleX = new LinearScale(xMin.millisecondsSinceEpoch, xMax.millisecondsSinceEpoch, 0, _plotAreaWidth);
+      xAxis = new DateTimeAxisXl(myScaleX, Position.bottom);
+
+
+    } else {
+      throw 'Only numeric and DateTime xLimits are allowed';
+    }
+
     xAxis.y = _plotArea.height;
     xAxis.name = 'xAxis';
     _plotArea.addChildAt(xAxis, 0);
   }
 
-  void yLimit(Tuple2<num,num> x) {
-    _ylim = x;
+  void yLimit(num yMin, num yMax) {
     /// Add an axis to the plot area
-    Scale scaleY = new LinearScale(x.item1, x.item2, _plotAreaHeight, 0);
+    Scale scaleY = new LinearScale(yMin, yMax, _plotAreaHeight, 0);
     yAxis = new NumericAxis(scaleY, Position.left);
     yAxis.name = 'yAxis';
     _plotArea.addChildAt(yAxis, 1);

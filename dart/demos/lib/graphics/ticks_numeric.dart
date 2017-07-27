@@ -4,9 +4,9 @@ import 'dart:math';
 import 'package:demos/math/utils.dart';
 
 
-/**
- * Calculate the location of default numerical ticks.
- */
+
+/// Calculate the location of default numerical ticks.
+///
 List<num> defaultNumericTicks(num min, num max) {
 
   num range10 = log10(max - min);
@@ -15,12 +15,15 @@ List<num> defaultNumericTicks(num min, num max) {
 
   if (range10 < 0.0) {
     // a small range
-    int multiple10 = log10(min).ceil();
-    num restRange = range10 - multiple10;   // between (0,1)
+    int multiple10 = range10.ceil();
+    num restRange = -(range10 - multiple10);   // between (0,1)
     step = _getCustomStep(restRange)*pow(10.0, multiple10);
+    if (step > (max - min)) step = step/10;
+    //print(step);
 
   } else if (range10 >= 0.0 && range10 <= 2.0) {
     step = _getCustomStep(range10);
+
 
   } else if (range10 > 2.0) {
     // go back to what you did for the range10 in [0,2] interval
@@ -30,16 +33,13 @@ List<num> defaultNumericTicks(num min, num max) {
     step = _getCustomStep(restRange)*pow(10.0, multiple10);
   }
 
-  return _coverWithStep(step, min, max);
+
+  return coverWithStep(step, min, max);
 }
 
 
-/**
- * Custom split when range10 is between [0, 2].
- *
- */
+/// Custom split when range10 is between [0, 2].
 num _getCustomStep(num range10) {
-
   num step;
 
   if (range10 >= 0 && range10 <= 0.46) {
@@ -81,9 +81,9 @@ num _getCustomStep(num range10) {
  *  the interval (x1,x2).  The first generated value rounds down x1
  *  and the last generated value rounds up x2.
  */
-List<num> _coverWithStep(num step, num x1, num x2) {
+List<num> coverWithStep(num step, num x1, num x2) {
   num xLow  = (x1/step).floor()*step;
   num xHigh = (x2/step).ceil()*step;
-  //print('xLow: $xLow, xHigh: $xHigh, step: $step');
+//  print('xLow: $xLow, xHigh: $xHigh, step: $step');
   return seqNum(xLow, xHigh, step);
 }

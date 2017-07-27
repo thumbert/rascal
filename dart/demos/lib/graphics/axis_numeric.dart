@@ -10,10 +10,13 @@ import 'axis.dart';
 import 'scale.dart';
 
 
-/// A numeric axis
+/// A numeric axis for StageXL
 class NumericAxis extends Axis {
 
-  /// the ticks for the axis
+  /// the tick locations, in case you want to set them by hand
+  List<num> tickLocations;
+
+  /// the ticks for the axis, the stagexl sprites
   List<Tick> ticks;
 
 //  TextFormat fmt;
@@ -33,18 +36,16 @@ class NumericAxis extends Axis {
   /// the position of the axis
   Position position;
 
-  /**
-   * A numeric axis.
-   * [scale] is the scale that converts data points to screen coordinates.
-   * [position] is a Position
-   *
-   */
-  NumericAxis(Scale scale, this.position, {this.ticks}) {
+
+  /// A numeric axis.
+  /// [scale] is the scale that converts data points to screen coordinates.
+  /// [position] is a Position
+  /// [tickLocations] a List of numeric
+  ///
+  NumericAxis(Scale scale, this.position, {this.tickLocations}) {
     this.scale = scale;
-
-    ticks ??= _defaultNumericTicks();
-
-    print('ticks are: ${ticks.join(',')}');
+    tickLocations ??= defaultNumericTicks(scale.x1, scale.x2);
+    ticks = makeTicks();
     draw();
   }
 
@@ -125,8 +126,8 @@ class NumericAxis extends Axis {
     graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.SQUARE);
   }
 
-  /// default ticks
-  List<Tick> _defaultNumericTicks() {
+  /// default ticks, keep only the ticks inside the scale
+  List<Tick> makeTicks() {
 
     int direction;   // tick direction
     switch (position) {
@@ -145,16 +146,15 @@ class NumericAxis extends Axis {
     }
 
     List<Tick> _ticks = [];
-    List<num> tickNum = defaultNumericTicks(scale.x1, scale.x2);
-    List<String> tickLabels = tickNum.map((e) => _defaultNumericTickLabel(e)).toList();
+    List<String> tickLabels = tickLocations.map((e) => _defaultNumericTickLabel(e)).toList();
     //print(tickLabels);
 
 
     /// construct the ticks
     num _left = 0;
-    for (int i = 0; i < tickNum.length; i++) {
+    for (int i = 0; i < tickLocations.length; i++) {
       //print('i: $i, ${tickNum[i]}, ${scale(tickNum[i])}');
-      var coord = scale(tickNum[i]);
+      var coord = scale(tickLocations[i]);
       Tick tick = new Tick(text: tickLabels[i])
         ..direction = direction;
 
@@ -211,7 +211,5 @@ class NumericAxis extends Axis {
     }
     return fmtLabel(value);
   }
-
-
 
 }

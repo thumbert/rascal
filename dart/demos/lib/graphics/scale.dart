@@ -38,6 +38,6 @@ class LinearScale implements Scale<num> {
   num call(num x) => _fun(x);
 
   /// calculate the x given a value for y
-  num inverse(num y) => (y - y1)/_slope;
+  num inverse(num y) => (y - y1)/_slope + x1;
 
 }

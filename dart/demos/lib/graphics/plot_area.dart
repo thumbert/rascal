@@ -5,6 +5,7 @@ import 'package:stagexl/stagexl.dart';
 import 'scale.dart';
 import 'axis.dart';
 import 'axis_numeric.dart';
+import 'ticks_numeric.dart';
 
 class PlotArea extends Sprite {
 
@@ -13,14 +14,15 @@ class PlotArea extends Sprite {
   List<num> topLeft = [];
   List<num> bottomRight = [];
 
-  Scale myScaleX, myScaleY;
+
+  //Scale myScaleX, myScaleY;
 
   num width, height;
 
   List<num> _xLimOriginal;
   Duration _delayClicks = new Duration(milliseconds: 400);
   var _clicks = 0;
-  bool _isDoubleClick = false;
+//  bool _isDoubleClick = false;
 
 
   PlotArea(this.width, this.height) {
@@ -36,15 +38,23 @@ class PlotArea extends Sprite {
     onMouseMove.listen(_onMouseMove);
   }
 
+  Axis get xAxis => getChildAt(0);
+  Axis get yAxis => getChildAt(1);
+  // go from x data to screen x coordinates
+  Scale get myScaleX => xAxis.scale;
+  // go from y data to screen y coordinates
+  Scale get myScaleY => yAxis.scale;
+
+
   /// on DoubleClicks revert to the original xLimits
   _onMouseDoubleClick(Event e) {
     if (_xLimOriginal != null) {
-      myScaleX = new LinearScale(_xLimOriginal[0], _xLimOriginal[1], 0, width);
-      Axis xAxis = new NumericAxis(myScaleX, Position.bottom);
-      xAxis.y = height;
-      xAxis.name = 'xAxis';
+      Scale scaleX = new LinearScale(_xLimOriginal[0], _xLimOriginal[1], 0, width);
+      Axis newAxis = new NumericAxis(scaleX, Position.bottom);
+      newAxis.y = height;
+      newAxis.name = 'xAxis';
       removeChildAt(0);
-      addChildAt(xAxis, 0);
+      addChildAt(newAxis, 0);
     }
   }
 
@@ -62,23 +72,23 @@ class PlotArea extends Sprite {
       return;
 
     } else {
-      print('Start selection');
       isSelected = true;
       topLeft = [mouseX, mouseY];
+      print('Start selection at (${xAxis.scale.inverse(mouseX)}, ${yAxis.scale.inverse(mouseY)})');
 
       /// set the original x axis limits, so you can revert to them later
       if (_xLimOriginal == null && myScaleX != null) {
         _xLimOriginal = [myScaleX.x1, myScaleX.x2];
       }
-      print(_xLimOriginal);
     }
   }
 
-  _onMouseUp(Event e) {
 
-    /// only if the rectangle is
-    if (topLeft[0] != bottomRight[0] || topLeft[1] != bottomRight[1]) {
-      print('Selection is $topLeft to $bottomRight');
+  _onMouseUp(Event e) {
+    bottomRight = [mouseX, mouseY];
+    /// only if you have a change in x coords
+    if (topLeft[0] != bottomRight[0]) {
+      print('Selection ends at (${myScaleX.inverse(bottomRight[0])}, ${myScaleX.inverse(bottomRight[1])}) ');
       rectZoom.graphics.clear();
 
       if (topLeft[0] > bottomRight[0]) {
@@ -90,20 +100,19 @@ class PlotArea extends Sprite {
 
 
       /// trigger a redraw by rescaling the xAxis
-      num x1 = myScaleX.inverse(topLeft[0]);
-      num x2 = myScaleX.inverse(bottomRight[0]);
+      num x1 = xAxis.scale.inverse(topLeft[0]);
+      num x2 = xAxis.scale.inverse(bottomRight[0]);
+      print('from MouseUp, the xAxis data limits are (${x1},${x2})');
+      List<num> _xTicks = defaultNumericTicks(x1, x2);
+      print('the new ticks: $_xTicks');
 
-      myScaleX = new LinearScale(x1, x2, 0, width);
-      print('from MouseUp, myScaleX.x1=${myScaleX.x1}');
+      Scale newScale = new LinearScale(_xTicks.first, _xTicks.last, 0, width);
       print('_clicks=${_clicks}');
-      Axis xAxis = new NumericAxis(myScaleX, Position.bottom);
-      xAxis.y = height;
-      xAxis.name = 'xAxis';
+      Axis newAxis = new NumericAxis(newScale, Position.bottom, tickLocations: _xTicks);
+      newAxis.y = height;
+      newAxis.name = 'xAxis';
       removeChildAt(0);
-      addChildAt(xAxis, 0);
-
-      /// TODO: fixme, almost works!
-
+      addChildAt(newAxis, 0);
     }
     isSelected = false;
   }
