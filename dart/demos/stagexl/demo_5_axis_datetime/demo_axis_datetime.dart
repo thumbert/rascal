@@ -2,12 +2,9 @@ library demo_axis_datetime;
 
 import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart';
-import 'dart:html';
 import 'package:demos/graphics/axis_datetime.dart';
-import 'package:demos/graphics/axis_datetime_xl.dart';
-
-//CanvasElement canvas = html.querySelector('#stage');
-//Stage stage = new Stage(canvas);
+import 'package:demos/graphics/scale.dart';
+import 'package:demos/graphics/axis.dart';
 
 
 class PlotArea extends DisplayObjectContainer {
@@ -44,9 +41,22 @@ main() {
     ..addTo(stage);
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
-//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 1, 2))
-//    ..addTo(area)
-//    ..draw();
+
+  DateTime start = new DateTime(2015, 1, 1);
+  DateTime end = new DateTime(2015, 1, 2);
+  Scale scale1 = new DateTimeScale(start, end, 0, 700);
+  var a1 = new DateTimeAxis(scale1, Position.bottom);
+  area.addChild(a1);
+
+
+  Scale scale2 = new DateTimeScale(new DateTime(2015,1,1), new DateTime(2015,12,31), 0, 700);
+  var a2 = new DateTimeAxis(scale2, Position.bottom)..y = 100;
+  area.addChild(a2);
+
+
+
+
+//
 //
 //  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 2, 1))
 //    ..y = 75

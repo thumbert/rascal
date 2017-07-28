@@ -1,5 +1,6 @@
 library graphics.axis_datetime;
 
+import 'dart:math' show max, min;
 import 'package:stagexl/stagexl.dart';
 import 'package:intl/intl.dart';
 import 'package:demos/datetime/utils.dart';
@@ -7,15 +8,15 @@ import 'package:demos/math/utils.dart';
 
 import 'axis_datetime_utils.dart';
 import 'axis.dart';
+import 'scale.dart';
 
-
-
- /// A DateTime axis
+/// A DateTime axis
 /// Currently only for the x axis.
 class DateTimeAxis extends Axis {
-
   static DateFormat dMMMyy = new DateFormat('dMMMyy');
   static DateFormat MMMyy = new DateFormat('MMMyy');
+  final fmt =
+      new TextFormat("Arial", 20, Color.Black, align: TextFormatAlign.CENTER);
 
   DateTime start, end;
   Position position;
@@ -28,7 +29,7 @@ class DateTimeAxis extends Axis {
   //DateTime extStart, extEnd;
 
   /// go from a DateTime to a screen coordinate;
-  Function scale;
+  Scale scale;
 
   /// the label gets under the ticks to clarify the meaning of the ticks
 //  String label = '';
@@ -42,11 +43,11 @@ class DateTimeAxis extends Axis {
   HeaderType headerType;
 
   /// header height in px
-  num headerHeight = 20;
+  num headerHeight = 24;
 
   DateTimeAxis(this.scale, this.position, {List<DateTime> tickLocations}) {
-    start = new DateTime.fromMillisecondsSinceEpoch(scale.x1);
-    end = new DateTime.fromMillisecondsSinceEpoch(scale.x2);
+    start = scale.x1;
+    end = scale.x2;
     assert(start.isBefore(end));
 
     if (tickLocations == null) defaultTicks();
@@ -54,11 +55,12 @@ class DateTimeAxis extends Axis {
     draw();
   }
 
-
   draw() {
     var _width = scale.y2 - scale.y1;
-    print(tickLocations);
-    print(tickLabels);
+    print('drawing the datetime axis');
+    print('tickLocations: $tickLocations');
+    print('tickLabels: $tickLabels');
+    print('headers: $headers');
 
     /// draw the headers
     for (int h = 0; h < headers.length; h++) {
@@ -82,17 +84,17 @@ class DateTimeAxis extends Axis {
         ..autoSize = TextFieldAutoSize.CENTER
         ..text = tickLabels[i]
         ..y = headerHeight + 10;
-      text.x = scale(tickLocations[i]) - text.width/2;
+      text.x = scale(tickLocations[i]) - text.width / 2;
       addChild(text);
     }
   }
-
 
   /// Calculate the ticks, the headers and the label.
   defaultTicks() {
     Duration duration = end.difference(start);
     int _nDays = duration.inDays;
-    int _nMths = (12 * end.year + end.month) - (12 * start.year + start.month) + 1;
+    int _nMths =
+        (12 * end.year + end.month) - (12 * start.year + start.month) + 1;
     int _nYears = end.year - start.year + 1;
 
     //print('nDays: $_nDays, nMths: $_nMths, nYears: $_nYears');
@@ -113,9 +115,9 @@ class DateTimeAxis extends Axis {
     switch (headerType) {
       case HeaderType.DAY:
         headers = seqDays(start, end)
-          .map((dt) => new DateTimeAxisHeader(dt, HeaderType.DAY)).toList();
-        if (isBeginningOfDay(end))
-          headers.removeLast();
+            .map((dt) => new DateTimeAxisHeader(dt, HeaderType.DAY))
+            .toList();
+        if (isBeginningOfDay(end)) headers.removeLast();
         if (_nDays < 1) {
           tickLocations = coverHours(start, end, 1);
         } else if (_nDays == 1) {
@@ -125,57 +127,63 @@ class DateTimeAxis extends Axis {
         } else if (_nDays <= 6) {
           tickLocations = coverHours(start, end, 12);
         }
-        tickLabels = tickLocations.map((DateTime tick) => tick.hour.toString()).toList();
+        tickLabels =
+            tickLocations.map((DateTime tick) => tick.hour.toString()).toList();
         break;
-
 
       case HeaderType.MONTH:
         headers = seqMonths(start, end)
-          .map((dt) => new DateTimeAxisHeader(dt, HeaderType.MONTH)).toList();;
-        if (isBeginningOfMonth(end))
-          headers.removeLast();
+            .map((dt) => new DateTimeAxisHeader(dt, HeaderType.MONTH))
+            .toList();
+        ;
+        if (isBeginningOfMonth(end)) headers.removeLast();
         if (_nMths <= 3) {
           tickLocations = coverDays(start, end, 7);
         } else {
           tickLocations = coverDays(start, end, 14);
         }
-        tickLabels = tickLocations.map((DateTime tick) => tick.day.toString()).toList();
+        tickLabels =
+            tickLocations.map((DateTime tick) => tick.day.toString()).toList();
         break;
-
 
       case HeaderType.YEAR:
         headers = seqNum(start.year, end.year)
-          .map((yr) => new DateTimeAxisHeader(new DateTime(yr), HeaderType.YEAR)).toList();
+            .map((yr) =>
+                new DateTimeAxisHeader(new DateTime(yr), HeaderType.YEAR))
+            .toList();
         DateTime to = end;
-        if (!isBeginningOfMonth(end))
-          to = nextMonth(end);
+        if (!isBeginningOfMonth(end)) to = nextMonth(end);
         if (_nMths <= 12) {
           /// 1 month ticks
           tickLocations = seqMonths(new DateTime(start.year, start.month),
-          new DateTime(to.year, to.month));
+              new DateTime(to.year, to.month));
         } else if (_nYears <= 3) {
           /// ticks separated by 3 months
           tickLocations = seqMonths(new DateTime(start.year, start.month),
-          new DateTime(to.year, to.month), step: 3);
+              new DateTime(to.year, to.month),
+              step: 3);
         } else if (_nYears <= 5) {
           /// ticks separated by 6 months
           tickLocations = coverMonths(start, end, 6);
         } else {
-          tickLocations = seqNum(start.year, end.year + 1).map((year) => new DateTime(year)).toList();
+          tickLocations = seqNum(start.year, end.year + 1)
+              .map((year) => new DateTime(year))
+              .toList();
         }
-        tickLabels = tickLocations.map((DateTime tick) => tick.month.toString()).toList();
+        tickLabels = tickLocations
+            .map((DateTime tick) => tick.month.toString())
+            .toList();
         break;
 
       default:
-        throw('Unknown header!');
+        throw ('Unknown header!');
     }
   }
 }
 
-
 class HeaderXl extends Sprite {
   final fmt =
-  new TextFormat("Arial", 20, Color.Black, align: TextFormatAlign.CENTER);
+      new TextFormat("Arial", 20, Color.Black, align: TextFormatAlign.CENTER);
 
   /**
    * Draw the header.
@@ -191,9 +199,10 @@ class HeaderXl extends Sprite {
       ..defaultTextFormat = fmt
       ..autoSize = TextFieldAutoSize.CENTER
       ..text = header.text;
-    text.x = width/2 - text.width/2;
+    text.x = width / 2 - text.width / 2;
+    text.y = -1;
+
     /// check if the label fits before adding it
-    if (width > text.width)
-      addChild(text);
+    if (width > text.width) addChild(text);
   }
 }

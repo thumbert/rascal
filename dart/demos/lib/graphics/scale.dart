@@ -26,18 +26,35 @@ class LinearScale implements Scale<num> {
 
   num _slope;
 
-  Function _fun;
-
   LinearScale(this.x1, this.x2, this.y1, this.y2) {
     if (x1 == x2)
       throw 'Can\'t have the same value for x1 and x2';
     _slope = (y2 - y1)/(x2 - x1);
-    _fun = (x) => _slope * (x - x1) + y1;
   }
 
-  num call(num x) => _fun(x);
+  num call(num x) => _slope * (x - x1) + y1;
 
   /// calculate the x given a value for y
   num inverse(num y) => (y - y1)/_slope + x1;
+}
 
+class DateTimeScale implements Scale<DateTime> {
+  DateTime x1, x2;
+  int _x1m, _x2m;
+  num y1, y2;
+
+  num _slope;
+
+  DateTimeScale(this.x1, this.x2, this.y1, this.y2) {
+    if (x1 == x2)
+      throw 'Can\'t have the same value for x1 and x2';
+    _x1m = x1.millisecondsSinceEpoch;
+    _x2m = x2.millisecondsSinceEpoch;
+    _slope = (y2 - y1)/(_x2m - _x1m);
+  }
+
+  num call(DateTime x) => _slope * (x.millisecondsSinceEpoch - _x1m) + y1;
+
+  /// calculate the x given a value for y
+  DateTime inverse(num y) => new DateTime.fromMillisecondsSinceEpoch(((y - y1)/_slope).round() + _x1m);
 }
