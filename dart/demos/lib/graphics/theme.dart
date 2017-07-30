@@ -2,6 +2,7 @@ library graphics.theme;
 
 import 'package:stagexl/stagexl.dart';
 import 'package:demos/graphics/tick.dart';
+import 'package:demos/graphics/tick_utils.dart';
 import 'package:demos/graphics/layout.dart';
 
 enum Margin { bottom, left, top, right }

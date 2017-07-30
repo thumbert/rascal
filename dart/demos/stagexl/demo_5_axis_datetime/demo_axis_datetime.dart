@@ -15,7 +15,7 @@ class PlotArea extends DisplayObjectContainer {
       ..width = width
       ..height = height
       ..graphics.rect(0, 0, width-1, height-1)
-      ..graphics.strokeColor(Color.Black, 1, JointStyle.MITER)
+      ..graphics.strokeColor(Color.Red, 1, JointStyle.MITER)
       ..graphics.fillColor(Color.White);
     addChild(background);
   }
@@ -44,32 +44,19 @@ main() {
 
   DateTime start = new DateTime(2015, 1, 1);
   DateTime end = new DateTime(2015, 1, 2);
-  Scale scale1 = new DateTimeScale(start, end, 0, 700);
+  Scale scale1 = new DateTimeScale(start, end, 15, 700-15);
   var a1 = new DateTimeAxis(scale1, Position.bottom);
   area.addChild(a1);
+  print(a1.tickLocations.map((e) => scale1(e)));
 
-
-  Scale scale2 = new DateTimeScale(new DateTime(2015,1,1), new DateTime(2015,12,31), 0, 700);
-  var a2 = new DateTimeAxis(scale2, Position.bottom)..y = 100;
-  area.addChild(a2);
-
-
-
-
-//
-//
-//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 2, 1))
-//    ..y = 75
-//    ..addTo(area)
-//    ..draw();
-//
-//  new DateTimeAxisXl(new DateTime(2015, 1, 1), new DateTime(2015, 4, 1))
-//    ..y = 150
-//    ..addTo(area)
-//    ..draw();
+//  Scale scale2 = new DateTimeScale(new DateTime(2015,1,1), new DateTime(2015,12,31), 0, 700);
+//  var a2 = new DateTimeAxis(scale2, Position.bottom)..y = 100;
+//  area.addChild(a2);
 
 
 
-  print('stage width: ${stage.width}, stage height: ${stage.height}');
+
+
+
 
 }

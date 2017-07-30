@@ -2,17 +2,9 @@ library graphics.tick;
 
 import 'dart:math';
 import 'package:stagexl/stagexl.dart';
-import 'package:demos/graphics/theme.dart';
 
-enum TickOrientation { outside, inside }
-
-class TickDirection {
-  static const int up = 3;
-  static const int down = 1;
-  static const int left = 2;
-  static const int right = 4;
-}
-
+import 'theme.dart';
+import 'tick_utils.dart';
 
 /// Format a tick
 class TickFormat {
@@ -40,16 +32,13 @@ class TickFormat {
 
   /// Tick format.
   TickFormat(this.length, this.padding, this.color, this.textFormat,
-      {this.width: 1, this.tickOrientation: TickOrientation.outside}) {}
+      {this.width: 1, this.tickOrientation: TickOrientation.outside});
 }
 
-/**
- * An axis tick.  Draws the line tick and the text label.
- *
- * [text] is the tick label.
- * [tickFormat] is the format of the tick
- *
- */
+
+ /// An axis tick.  Draws the line tick and the text label.
+ /// [text] is the tick label.
+ /// [tickFormat] is the format of the tick
 class Tick extends Sprite {
   String text;
   TickFormat tickFormat;
@@ -63,12 +52,12 @@ class Tick extends Sprite {
     TextField textField;
     var fmt = tickFormat.textFormat;
     Shape line = new Shape();
-    line.graphics.moveTo(0, 0);
+    line.graphics.moveTo(-0.5, 0);
 
     /// TODO:  implement tick angle, tickOrientation
     switch (direction) {
       case TickDirection.down:
-        line.graphics.lineTo(0, tickFormat.length);
+        line.graphics.lineTo(-0.5, tickFormat.length);
         textField = new TextField()
           ..defaultTextFormat = fmt
           ..y = tickFormat.length + tickFormat.padding

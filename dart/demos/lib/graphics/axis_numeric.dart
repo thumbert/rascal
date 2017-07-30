@@ -19,7 +19,8 @@ class NumericAxis extends Axis {
   /// the ticks for the axis, the stagexl sprites
   List<Tick> ticks;
 
-//  TextFormat fmt;
+  /// go from the data to the screen coordinates
+  LinearScale scale;
 
   /// margin in points from the edges of the parent (what is this for??)
   num margin = 30;
@@ -41,11 +42,14 @@ class NumericAxis extends Axis {
   /// [scale] is the scale that converts data points to screen coordinates.
   /// [position] is a Position
   /// [tickLocations] a List of numeric
-  ///
-  NumericAxis(Scale scale, this.position, {this.tickLocations}) {
-    this.scale = scale;
+  /// TODO: copy the DateTimeAxis setup where you can pass on the ticks directly
+  NumericAxis(this.scale, this.position, {this.tickLocations}) {
+    width = scale.y2 - scale.y1;
     tickLocations ??= defaultNumericTicks(scale.x1, scale.x2);
     ticks = makeTicks();
+
+    /// shouldn't have the draw here, or else you can't set properties
+    /// for example the axis label.
     draw();
   }
 
@@ -172,8 +176,13 @@ class NumericAxis extends Axis {
         tick.x = coord;
       else if (position == Position.left)
         tick.y = coord;
+      else if (position == Position.right) {
+        tick.x = width;
+        tick.y = coord;
+      }
 
-      tick.name = 'draw-tick-{i}';
+
+      tick.name = 'draw-tick-$i';
       _left = x + tick.width/2;
       _ticks.add(tick);
     }
@@ -183,7 +192,6 @@ class NumericAxis extends Axis {
 
 
   /// Construct the default tick label for a given value
-  ///
   List<String> _defaultNumericTickLabel(num value) {
     Function fmtLabel;
     num range10 = (math.log(scale.x2 - scale.x1)*math.LOG10E);
