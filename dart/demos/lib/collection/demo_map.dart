@@ -66,23 +66,12 @@ make3() {
 }
 
 
-// extract one "column"
-make4() {
-  var m4 = [{"Sepal.Length":5.1,"Sepal.Width":3.5,"Petal.Length":1.4,"Petal.Width":0.2,"Species":"setosa"},
-  {"Sepal.Length":4.9,"Sepal.Width":3,"Petal.Length":1.4,"Petal.Width":0.2,"Species":"setosa"},
-  {"Sepal.Length":4.7,"Sepal.Width":3.2,"Petal.Length":1.3,"Petal.Width":0.2,"Species":"setosa"},
-  {"Sepal.Length":4.6,"Sepal.Width":3.1,"Petal.Length":1.5,"Petal.Width":0.2,"Species":"setosa"},
-  {"Sepal.Length":5,"Sepal.Width":3.6,"Petal.Length":1.4,"Petal.Width":0.2,"Species":"setosa"},
-  {"Sepal.Length":5.4,"Sepal.Width":3.9,"Petal.Length":1.7,"Petal.Width":0.4,"Species":"setosa"}];
-  
-  print(m4.map((e) => e["Species"]));
-  
-  var fun = (e) => e["Species"];
-  print(m4.map( fun ));
-  
-  
-  
-}
+Map sortMapByKey(Map x){
+    Map y = {};
+    var sKeys = x.keys.toList()..sort();
+    sKeys.forEach((k) => y[k] = x[k]);
+    return y;
+  }
 
 main() {
   
@@ -103,5 +92,9 @@ main() {
   print(x);       // {A: [1, 2], null: [2, 3], C: [4, 5, 6]}  
   print(x.keys);  // (A, null, C)
   print(x[null]); // [2,3]
+  
+  /// sort a map by keys
+  Map x = {4: 'D', 1: 'A', 3: 'C', 2: 'B'};
+  print(sortMapByKey(x));
   
 }
