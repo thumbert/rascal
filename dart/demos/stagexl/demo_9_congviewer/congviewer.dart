@@ -21,13 +21,13 @@ main() {
   print("stage width = ${stage.width}, height=${stage.height}");
   print("contentRectange = ${stage.contentRectangle}");
 
-//  Chart chart =  new Chart()
-//   ..xLimit(0,100)
-//   ..yLimit(0,50);
+  Chart chart =  new Chart(800,600)
+   ..xLimit(0,100)
+   ..yLimit(0,50);
 
-  Chart chart =  new Chart()
-    ..xLimit(new DateTime(2017,1,1), new DateTime(2017,7,1))
-    ..yLimit(0, 50);
+//  Chart chart =  new Chart(800,600)
+//    ..xLimit(new DateTime(2017,1,1), new DateTime(2017,7,1))
+//    ..yLimit(0, 50);
 
 
 

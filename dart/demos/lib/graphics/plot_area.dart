@@ -9,16 +9,16 @@ import 'ticks_numeric.dart';
 
 class PlotArea extends Sprite {
 
+  /// the highlighted area
   Sprite rectZoom;
   bool isSelected = false;
   List<num> topLeft = [];
   List<num> bottomRight = [];
 
 
-  //Scale myScaleX, myScaleY;
-
   num width, height;
 
+  /// the original x-limit of the chart (where you go back with a double-click)
   List<num> _xLimOriginal;
   Duration _delayClicks = new Duration(milliseconds: 400);
   var _clicks = 0;
@@ -27,7 +27,7 @@ class PlotArea extends Sprite {
 
   PlotArea(this.width, this.height) {
     graphics.rect(0, 0, width, height);
-    graphics.strokeColor(Color.Black);
+    graphics.strokeColor(Color.Red);
     graphics.fillColor(Color.White);
 
     rectZoom = new Sprite();
@@ -49,8 +49,8 @@ class PlotArea extends Sprite {
   /// on DoubleClicks revert to the original xLimits
   _onMouseDoubleClick(Event e) {
     if (_xLimOriginal != null) {
-      Scale scaleX = new LinearScale(_xLimOriginal[0], _xLimOriginal[1], 0, width);
-      Axis newAxis = new NumericAxis(scaleX, Position.bottom);
+      Scale scaleX = new LinearScale(_xLimOriginal[0], _xLimOriginal[1], xAxis.scale.y1, xAxis.scale.y2);
+      Axis newAxis = new NumericAxis(scaleX, xAxis.axisFormat);
       newAxis.y = height;
       newAxis.name = 'xAxis';
       removeChildAt(0);
@@ -106,9 +106,9 @@ class PlotArea extends Sprite {
       List<num> _xTicks = defaultNumericTicks(x1, x2);
       print('the new ticks: $_xTicks');
 
-      Scale newScale = new LinearScale(_xTicks.first, _xTicks.last, 0, width);
+      Scale newScale = new LinearScale(_xTicks.first, _xTicks.last, xAxis.scale.y1, xAxis.scale.y2);
       print('_clicks=${_clicks}');
-      Axis newAxis = new NumericAxis(newScale, Position.bottom, tickLocations: _xTicks);
+      Axis newAxis = new NumericAxis(newScale, xAxis.axisFormat, tickLocations: _xTicks);
       newAxis.y = height;
       newAxis.name = 'xAxis';
       removeChildAt(0);

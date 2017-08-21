@@ -73,7 +73,8 @@ class InfluxDb {
   /// Insert data into the database [dbName] with a timestamp precision [precision].
   /// The precision can be one of [n,u,ms,s,m,h] for nanoseconds, microseconds,
   /// milliseconds, seconds, minute, hour frequency respectively.
-  ///
+  /// [data] needs to follow the line protocol, and have the timestamp in the
+  /// correct precision.
   Future<Response> write(String dbName, String data, {String precision}) async {
     String url = '$_connectionString$host:$port/write?db=$dbName';
     if (precision != null)
@@ -82,6 +83,7 @@ class InfluxDb {
         headers: {'Content-Type': 'application/text'},
         body: data);
   }
+
 }
 
 class InfluxDbResponse {

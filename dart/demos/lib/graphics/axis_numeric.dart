@@ -6,12 +6,15 @@ import 'package:stagexl/stagexl.dart';
 
 import 'ticks_numeric.dart';
 import 'tick.dart';
+import 'tick_utils.dart';
 import 'axis.dart';
 import 'scale.dart';
+import 'theme.dart';
 
 
 /// A numeric axis for StageXL
 class NumericAxis extends Axis {
+  AxisFormat axisFormat;
 
   /// the tick locations, in case you want to set them by hand
   List<num> tickLocations;
@@ -34,71 +37,38 @@ class NumericAxis extends Axis {
   num minSpaceBetweenLabels = 10;
 
 
-  /// the position of the axis
-  Position position;
-
-
   /// A numeric axis.
   /// [scale] is the scale that converts data points to screen coordinates.
-  /// [position] is a Position
   /// [tickLocations] a List of numeric
   /// TODO: copy the DateTimeAxis setup where you can pass on the ticks directly
-  NumericAxis(this.scale, this.position, {this.tickLocations}) {
+  NumericAxis(this.scale, this.axisFormat, {this.tickLocations, this.ticks}) {
     width = scale.y2 - scale.y1;
-    tickLocations ??= defaultNumericTicks(scale.x1, scale.x2);
-    ticks = makeTicks();
 
-    /// shouldn't have the draw here, or else you can't set properties
-    /// for example the axis label.
+    tickLocations ??= defaultNumericTicks(scale.x1, scale.x2);
+//    print(tickLocations);
+    ticks = makeTicks(tickLocations);
+
     draw();
   }
 
-  /// Extend the limits of a numeric axis, so the data is contained in
-  /// a 'nice' interval.  For example if the lim of the data is [0.5,9]
-  /// a nice extended limit would be [0,10].
-  static Tuple2<num,num> extendLimits(Tuple2<num,num> lim) {
-    Tuple2<num,num> limExt = lim;
-
-    return limExt;
-  }
-
-  /// Calculate the [min,max] of the iterable for axis limits
-  /// You can pass in some existing limits from the previous lines to extend the
-  /// limits.
-  static Tuple2<num,num> getLimits(Iterable<num> x, {Tuple2<num,num> lim}) {
-    if (x.isEmpty)
-      throw 'Cannot calculate axis limits of an empty iterable';
-    if (x.length == 1 && (x.first.isNaN || x.first == null))
-      throw 'Cannot calculate the limits';
-    num min = lim.item1;
-    num max = lim.item2;
-    x.where((e) => !(e.isNaN || e == null)).forEach((num e){
-      if (e > max || max == null) max = e;
-      if (e < min || min == null) min = e;
-    });
-
-    return new Tuple2(min,max);
-  }
 
   /// the actual length of the axis in pixels
   num get _axisLength => scale.y2 - scale.y1;
 
   /// Draw this axis
   draw() {
-
     /// draw the axis line
-    if (position == Position.bottom) {
-      graphics.moveTo(0.5, 0);
-      graphics.lineTo(_axisLength-0.5, 0);
+    if (axisFormat.axisPosition == Position.bottom) {
+      graphics.moveTo(-0.5+scale.y1, 0.5);
+      graphics.lineTo(-0.5+scale.y2, 0.5);
 
-    } else if (position == Position.left) {
-      graphics.moveTo(0, 0.5 -_axisLength);
-      graphics.lineTo(0, 0.5);
+    } else if (axisFormat.axisPosition == Position.left) {
+      graphics.moveTo(-0.5, 0.5+scale.y1);
+      graphics.lineTo(-0.5, 0.5+scale.y2);
     }
 
     /// add the ticks
     ticks.forEach((tick) => addChild(tick));
-    ticks.forEach((tick) => tick.draw());
 
     /// add the axis label if it exists
     if (label != null) {
@@ -106,7 +76,7 @@ class NumericAxis extends Axis {
       //label.alignPivot(HorizontalAlign.Center);
       //label.border = true;
       addChild(label);
-      switch (position) {
+      switch (axisFormat.axisPosition) {
         case Position.bottom:
           label.x = (this.width - label.width)~/2;
           label.y = theme.tickFormat.length + 2*theme.fontSize;
@@ -124,17 +94,15 @@ class NumericAxis extends Axis {
 
           break;
       }
-
     }
-
     graphics.strokeColor(Color.Black, 1, JointStyle.MITER, CapsStyle.SQUARE);
   }
 
   /// default ticks, keep only the ticks inside the scale
-  List<Tick> makeTicks() {
+  List<Tick> makeTicks(List tickLocations) {
 
-    int direction;   // tick direction
-    switch (position) {
+    TickDirection direction;   // tick direction
+    switch (axisFormat.axisPosition) {
       case Position.bottom:
         direction = TickDirection.down;
         break;
@@ -151,39 +119,26 @@ class NumericAxis extends Axis {
 
     List<Tick> _ticks = [];
     List<String> tickLabels = tickLocations.map((e) => _defaultNumericTickLabel(e)).toList();
-    //print(tickLabels);
-
+    print('tickLabels:$tickLabels');
 
     /// construct the ticks
-    num _left = 0;
     for (int i = 0; i < tickLocations.length; i++) {
       //print('i: $i, ${tickNum[i]}, ${scale(tickNum[i])}');
       var coord = scale(tickLocations[i]);
-      Tick tick = new Tick(text: tickLabels[i])
-        ..direction = direction;
+      TickFormat tickFormat = Theme.basic.tickFormat
+        ..text = tickLabels[i]
+        ..tickDirection = direction;
+      Tick tick = new Tick(tickFormat);
 
-      // if the label doesn't fit, remove the label
-//      if (x - tick.width/2 < _left + minSpaceBetweenLabels) {
-//        tick = new Tick(text: '')
-//          ..direction = TickDirection.down;
-//      }
-//      if (x + tick.width/2 > _axisLength) {
-//        tick = new Tick(text: '')
-//          ..direction = TickDirection.down;
-//      }
-
-      if (position == Position.bottom)
+      if (axisFormat.axisPosition == Position.bottom){
         tick.x = coord;
-      else if (position == Position.left)
+      } else if (axisFormat.axisPosition == Position.left)
         tick.y = coord;
-      else if (position == Position.right) {
+      else if (axisFormat.axisPosition == Position.right) {
         tick.x = width;
         tick.y = coord;
       }
-
-
       tick.name = 'draw-tick-$i';
-      _left = x + tick.width/2;
       _ticks.add(tick);
     }
 
@@ -198,7 +153,6 @@ class NumericAxis extends Axis {
     //print('range10: $range10');
     if (range10 <= 0.6) {
       int precision = math.max(range10, 1).ceil();
-      print('precision: $precision');
       fmtLabel = (num x) {
         String res;
         if (x.abs() >= 1000000)
@@ -221,3 +175,41 @@ class NumericAxis extends Axis {
   }
 
 }
+
+
+// if the label doesn't fit, remove the label
+//      if (x - tick.width/2 < _left + minSpaceBetweenLabels) {
+//        tick = new Tick(text: '')
+//          ..direction = TickDirection.down;
+//      }
+//      if (x + tick.width/2 > _axisLength) {
+//        tick = new Tick(text: '')
+//          ..direction = TickDirection.down;
+//      }
+
+/// Extend the limits of a numeric axis, so the data is contained in
+/// a 'nice' interval.  For example if the lim of the data is [0.5,9]
+/// a nice extended limit would be [0,10].
+//  static Tuple2<num,num> extendLimits(Tuple2<num,num> lim) {
+//    Tuple2<num,num> limExt = lim;
+//
+//    return limExt;
+//  }
+
+/// Calculate the [min,max] of the iterable for axis limits
+/// You can pass in some existing limits from the previous lines to extend the
+/// limits.
+//  static Tuple2<num,num> getLimits(Iterable<num> x, {Tuple2<num,num> lim}) {
+//    if (x.isEmpty)
+//      throw 'Cannot calculate axis limits of an empty iterable';
+//    if (x.length == 1 && (x.first.isNaN || x.first == null))
+//      throw 'Cannot calculate the limits';
+//    num min = lim.item1;
+//    num max = lim.item2;
+//    x.where((e) => !(e.isNaN || e == null)).forEach((num e){
+//      if (e > max || max == null) max = e;
+//      if (e < min || min == null) min = e;
+//    });
+//
+//    return new Tuple2(min,max);
+//  }

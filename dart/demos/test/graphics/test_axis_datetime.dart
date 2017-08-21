@@ -1,113 +1,79 @@
 library graphics.test_axis_datetime;
 
 import 'package:test/test.dart';
-import 'package:demos/graphics/axis_datetime_utils.dart';
-import 'package:demos/graphics/axis_datetime.dart';
+import 'package:demos/graphics/ticks_datetime.dart';
 
 
-test_header() {
-  group('datetime axis headers', () {
-    test('year', () {
-      expect(new DateTimeAxisHeader(new DateTime(2015), HeaderType.YEAR).text, '2015');
+testTicksDateTime() {
+  group('default datetime axis ticks', (){
+    test('1 day', () {
+      var start = new DateTime(2015,1,1);
+      var end = new DateTime(2015,1,2);
+      var freq = getTickFrequency(start, end);
+      expect(freq, DateTimeTickFrequency.hour);
+      var aux = defaultTicksDateTime(start, end);
+      expect(aux.item1, DateTimeTickFrequency.hour);
+      expect(aux.item2.length, 5);
+      expect((aux.item2 as List)[1], new DateTime(2015,1,1,6));
     });
-    test('month', () {
-      expect(new DateTimeAxisHeader(new DateTime(2015,3), HeaderType.MONTH).text, 'Mar15');
+    test('1 day and 2 hours', (){
+      var aux = defaultTicksDateTime(new DateTime(2015,1,1), new DateTime(2015,1,2,2));
+      expect(aux.item1, DateTimeTickFrequency.hour);
+      expect(aux.item2.length, 5);
+      expect((aux.item2 as List)[1], new DateTime(2015,1,1,6));
+      expect((aux.item2 as List).last, new DateTime(2015,1,2));
     });
-    test('day', () {
-      expect(new DateTimeAxisHeader(new DateTime(2015,3,2), HeaderType.DAY).text, '2Mar15');
-      expect(new DateTimeAxisHeader(new DateTime(2015,3,12), HeaderType.DAY).text, '12Mar15');
+    test('2 days', (){
+      var aux = defaultTicksDateTime(new DateTime(2015,1,1), new DateTime(2015,1,3));
+      expect(aux.item1, DateTimeTickFrequency.day);
+      expect(aux.item2.length, 3);
+      expect((aux.item2 as List)[1], new DateTime(2015,1,2));
+      expect((aux.item2 as List).last, new DateTime(2015,1,3));
     });
+    test('6 days', (){
+      var aux = defaultTicksDateTime(new DateTime(2015,1,1), new DateTime(2015,1,6));
+      expect(aux.item1, DateTimeTickFrequency.day);
+      expect(aux.item2.length, 6);
+      expect((aux.item2 as List)[1], new DateTime(2015,1,2));
+      expect((aux.item2 as List).last, new DateTime(2015,1,6));
+    });
+    test('20 days', (){
+      var aux = defaultTicksDateTime(new DateTime(2015,1,1), new DateTime(2015,1,20));
+      expect(aux.item1, DateTimeTickFrequency.day);
+      expect(aux.item2.length, 4);
+      expect((aux.item2 as List)[1], new DateTime(2015,1,6));
+      expect((aux.item2 as List).last, new DateTime(2015,1,16));
+    });
+    test('62 days', (){
+      var aux = defaultTicksDateTime(new DateTime(2017,1,15), new DateTime(2017,3,18));
+      expect(aux.item1, DateTimeTickFrequency.month);
+      print(aux.item2);
+      expect(aux.item2.length, 2);
+      expect((aux.item2 as List)[1], new DateTime(2015,2,1));
+      expect((aux.item2 as List).last, new DateTime(2015,3,1));
+    });
+
+
   });
-}
-
-test_axis_datetime() {
-  group('datetime axis ticks', () {
-    test('2 months (2015-01-01 to 2015-03-01), 7 days tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2015,1)
-        ..end = new DateTime(2015,3)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['Jan15', 'Feb15']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 10);
-      expect(ax.ticks.map((dt) => dt.day).toList(), [1,8,15,22,29,1,8,15,22,1]);
-    });
-    test('2 months (2015-01-16 to 2015-02-10), 7 days tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2015,1,16)
-        ..end = new DateTime(2015,2,10)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['Jan15', 'Feb15']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 6);
-      expect(ax.ticks.map((dt) => dt.day).toList(), [15,22,29,1,8,15]);
-
-    });
-    test('4 months (2015-01-01 to 2015-05-01), 14 days tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2015,1)
-        ..end = new DateTime(2015,5)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['Jan15', 'Feb15', 'Mar15', 'Apr15']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 12);
-      expect(ax.ticks.map((dt) => dt.day).toList(), [1,15,29,1,15,1,15,29,1,15,29,1]);
-    });
-    test('6 months (2015-01-01 to 2015-07-01), 1 month tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2015,1)
-        ..end = new DateTime(2015,7)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['2015']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 7);
-      expect(ax.ticks.map((dt) => dt.month).toList(), [1,2,3,4,5,6,7]);
-    });
-    test('6 months (2014-10-10 to 2015-03-15), 1 month tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2014,10,10)
-        ..end = new DateTime(2015,3,15)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['2014', '2015']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 7);
-      expect(ax.ticks.map((dt) => dt.month).toList(), [10,11,12,1,2,3,4]);
-    });
-    test('15 months (2014-01-10 to 2015-03-15), 3 month tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2014,1,10)
-        ..end = new DateTime(2015,3,15)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['2014', '2015']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 6);
-      expect(ax.ticks.map((dt) => dt.month).toList(), [1,4,7,10,1,4]);
-    });
-    test('13 months (2014-03-10 to 2015-03-15), 3 month tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2014,3,10)
-        ..end = new DateTime(2015,3,15)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['2014', '2015']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 5);
-      expect(ax.ticks.map((dt) => dt.month).toList(), [3,6,9,12,3]);
-    });
-    test('4 years (2012-01-10 to 2015-03-15), 6 month tick separation', (){
-      DateTimeAxis ax = new DateTimeAxis()
-        ..start = new DateTime(2012,1,10)
-        ..end = new DateTime(2015,3,15)
-        ..defaultTicks();
-      expect(ax.headers.map((h) => h.text).toList(), ['2012', '2013', '2014', '2015']);
-      //print(ax.ticks);
-      expect(ax.ticks.length, 8);
-      expect(ax.ticks.map((dt) => dt.month).toList(), [1,7,1,7,1,7,1,7]);
-    });
-  });
-
 }
 
 main() {
-  test_header();
-  test_axis_datetime();
+  testTicksDateTime();
 }
+
+
+
+//test_header() {
+//  group('datetime axis headers', () {
+//    test('year', () {
+//      expect(new DateTimeAxisHeader(new DateTime(2015), HeaderType.YEAR).text, '2015');
+//    });
+//    test('month', () {
+//      expect(new DateTimeAxisHeader(new DateTime(2015,3), HeaderType.MONTH).text, 'Mar15');
+//    });
+//    test('day', () {
+//      expect(new DateTimeAxisHeader(new DateTime(2015,3,2), HeaderType.DAY).text, '2Mar15');
+//      expect(new DateTimeAxisHeader(new DateTime(2015,3,12), HeaderType.DAY).text, '12Mar15');
+//    });
+//  });
+//}

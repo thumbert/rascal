@@ -21,6 +21,7 @@ String DIR = env['HOME'] + '/Downloads/Archive/DA_LMP/Raw/Csv';
 Location location = getLocation('US/Eastern');
 String dbName = 'test';
 String measurement = 'isone_lmp_prices_1H';
+int millisToHour = 3600*1000;
 
 /// Get the hour beginning DA LMP prices for a given ptid between a [start, end) TZDateTime interval.
 /// http://localhost:8086/query?db=test&q=select * from isone_lmp_prices_1H where ptid='4000' limit 10
@@ -45,7 +46,7 @@ Future<Response> getHourlyLmpByPtid(InfluxDb db, int ptid, {TZDateTime start, TZ
 Future insertOneDay(InfluxDb db, Date day) async {
   List<Map> data = _oneDayRead( day );
   String str = data.map((e) => _makeLine(e)).join('\n');
-  await db.write(dbName, str);
+  await db.write(dbName, str, precision: 'h');
 }
 
 /// Insert a range of days into influxdb
@@ -116,11 +117,11 @@ List<Map<String,dynamic>> _oneDayRead(Date date) {
 /// 'isone_lmp_prices_1H,ptid=321,market=da lmp=63.24,congestion=0.0,loss=1.2 1420088400000000000'
 /// so the measurement is 'isone_lmp_prices_1H', the tag keys are: 'market', 'ptid', and the
 /// field keys are 'lmp', 'congestion', 'loss'
-///
+/// Precision is hourly data!
 String _makeLine(Map row) {
   return '$measurement,ptid=${row['ptid']},market=da' +
       ' lmp=${row['Lmp_Cong_Loss'][0]},congestion=${row['Lmp_Cong_Loss'][1]},loss=${row['Lmp_Cong_Loss'][2]}' +
-      ' ${row['hourBeginning'].millisecondsSinceEpoch*1000000}';
+      ' ${(row['hourBeginning'].millisecondsSinceEpoch/millisToHour).round()}';
 }
 
 

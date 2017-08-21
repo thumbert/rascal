@@ -24,7 +24,6 @@ List<num> defaultNumericTicks(num min, num max) {
   } else if (range10 >= 0.0 && range10 <= 2.0) {
     step = _getCustomStep(range10);
 
-
   } else if (range10 > 2.0) {
     // go back to what you did for the range10 in [0,2] interval
     // and multiply by the appropriate power of 10.
@@ -32,7 +31,6 @@ List<num> defaultNumericTicks(num min, num max) {
     num restRange = range10 - multiple10;   // between (0,1)
     step = _getCustomStep(restRange)*pow(10.0, multiple10);
   }
-
 
   return coverWithStep(step, min, max);
 }

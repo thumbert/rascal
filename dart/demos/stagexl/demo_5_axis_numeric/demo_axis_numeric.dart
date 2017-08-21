@@ -1,105 +1,82 @@
 library demo_axis_numeric;
 
-import 'dart:html';
+
+import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart';
 import 'package:demos/graphics/axis_numeric.dart';
 import 'package:demos/graphics/scale.dart';
 import 'package:demos/graphics/axis.dart';
 
-CanvasElement canvas = querySelector('#stage');
-Stage stage = new Stage(canvas);
-
-class FigureArea extends DisplayObjectContainer {
-  FigureArea(int width, int height) {
-    Shape background = new Shape()
-      ..graphics.rect(0, 0, width, height)
-      ..graphics.fillColor(Color.Beige);
-    addChild(background);
-  }
-}
-
 
 class PlotArea extends DisplayObjectContainer {
+
   PlotArea(int width, int height) {
+    print("Plot area width={$width} and heigth={$height}");
     Shape background = new Shape()
-      ..graphics.rect(0, 0, width, height)
-    //..graphics.strokeColor(Color.Black, 1, JointStyle.MITER)
+      ..width = width
+      ..height = height
+      ..graphics.rect(0, 0, width-1, height-1)
+      ..graphics.strokeColor(Color.Red, 1, JointStyle.MITER)
       ..graphics.fillColor(Color.White);
     addChild(background);
   }
 }
 
+NumericAxis axis1() {
+  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+  Scale scale1 = new LinearScale(0, 1, 15, 700-15);
+  return new NumericAxis(scale1, axisFormat);
+}
+//NumericAxis axis2() {
+//  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+//  Scale scale1 = new LinearScale(0, 1, 15, 700-15);
+//  return new NumericAxis(scale1, axisFormat);
+//}
+//NumericAxis axis3() {
+//  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+//  Scale scale1 = new LinearScale(0, 1, 15, 700-15);
+//  return new NumericAxis(scale1, axisFormat);
+//}
+//NumericAxis axis4() {
+//  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+//  Scale scale1 = new LinearScale(0, 1, 15, 700-15);
+//  return new NumericAxis(scale1, axisFormat);
+//}
+//NumericAxis axis5() {
+//  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+//  Scale scale1 = new LinearScale(0, 1, 15, 700-15);
+//  return new NumericAxis(scale1, axisFormat);
+//}
+
 
 
 main() {
+
+  StageOptions stageOptions = new StageOptions()
+    ..backgroundColor = Color.Beige
+    ..antialias = true
+    ..renderEngine = RenderEngine.Canvas2D;
+
+  Stage stage = new Stage(html.querySelector('#stage'), options: stageOptions);
+
   RenderLoop renderLoop = new RenderLoop();
   renderLoop.addStage(stage);
 
-  var figure = new FigureArea(800, 600)
-    ..name = 'FigureArea'
-    ..addTo(stage);
-//  print('After adding figure, stage width: ${stage.width}, stage height: ${stage.height}');  /// OK
 
-  var plotArea = new PlotArea(400, 550)
-    ..x = 100
-    ..y = 25
+  var area = new PlotArea(700, 500)
+    ..x = 50
+    ..y = 50
     ..name = 'PlotArea'
-    ..addTo(figure);
-  print('plot area width=${plotArea.width} and plot area height=${plotArea.height}');
-//  print('After adding PlotArea, stage width: ${stage.width}, stage height: ${stage.height}'); /// OK
-
-
-  print(plotArea.width);
-  int N = 400;
-  new NumericAxis(new LinearScale(0, 1, 0, N), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 25;
-  print(plotArea.width);
-
-  new NumericAxis(new LinearScale(0, 100, 0, N), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 75;
-  print(plotArea.width);
-
-  new NumericAxis(new LinearScale(0, 3, 0, N), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 125;
-  print(plotArea.width);
-
-  new NumericAxis(new LinearScale(0, 3000, 0, N), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 175;
-  print(plotArea.width);
-
-  new NumericAxis(new LinearScale(65, 66, 0, N), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 225;
-  print(plotArea.width);
-
-  new NumericAxis(new LinearScale(1000, 1000000, 0, N), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 275;
-  print(plotArea.width);
-
-  new NumericAxis(new LinearScale(100000, 100000000, 0, N), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 325;
-  print(plotArea.width);
-
-  new NumericAxis(new LinearScale(-1000000, 1000000, 0, 600), Position.bottom)
-    ..addTo(plotArea)
-    ..draw()
-    ..y = 375;
-  print(plotArea.width);
-
+    ..addTo(stage);
   print('stage width: ${stage.width}, stage height: ${stage.height}');
+
+
+  area.addChild( axis1() );
+//  area.addChild( axis2()..y = 75 );
+//  area.addChild( axis3()..y = 150 );
+//  area.addChild( axis4()..y = 225 );
+//  area.addChild( axis5()..y = 300 );
+
 
 }
 

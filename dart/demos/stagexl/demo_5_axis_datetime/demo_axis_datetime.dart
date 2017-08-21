@@ -21,6 +21,42 @@ class PlotArea extends DisplayObjectContainer {
   }
 }
 
+DateTimeAxis axis1() {
+  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+  DateTime start = new DateTime(2015, 1, 1);
+  DateTime end = new DateTime(2015, 1, 2);
+  Scale scale1 = new DateTimeScale(start, end, 15, 700-15);
+  return new DateTimeAxis(scale1, axisFormat);
+}
+DateTimeAxis axis2() {
+  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+  DateTime start = new DateTime(2015, 1, 1);
+  DateTime end = new DateTime(2015, 1, 2, 2);
+  Scale scale1 = new DateTimeScale(start, end, 15, 700-15);
+  return new DateTimeAxis(scale1, axisFormat);
+}
+DateTimeAxis axis3() {
+  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+  DateTime start = new DateTime(2015, 1, 1);
+  DateTime end = new DateTime(2015, 1, 3);
+  Scale scale1 = new DateTimeScale(start, end, 15, 700-15);
+  return new DateTimeAxis(scale1, axisFormat);
+}
+DateTimeAxis axis4() {
+  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+  DateTime start = new DateTime(2015, 1, 1);
+  DateTime end = new DateTime(2015, 1, 10);
+  Scale scale1 = new DateTimeScale(start, end, 15, 700-15);
+  return new DateTimeAxis(scale1, axisFormat);
+}
+DateTimeAxis axis5() {
+  AxisFormat axisFormat = new AxisFormat(Position.bottom);
+  DateTime start = new DateTime(2015, 1, 10);
+  DateTime end = new DateTime(2015, 5, 15);
+  Scale scale1 = new DateTimeScale(start, end, 15, 700-15);
+  return new DateTimeAxis(scale1, axisFormat);
+}
+
 
 
 main() {
@@ -42,12 +78,15 @@ main() {
   print('stage width: ${stage.width}, stage height: ${stage.height}');
 
 
-  DateTime start = new DateTime(2015, 1, 1);
-  DateTime end = new DateTime(2015, 1, 2);
-  Scale scale1 = new DateTimeScale(start, end, 15, 700-15);
-  var a1 = new DateTimeAxis(scale1, Position.bottom);
-  area.addChild(a1);
-  print(a1.tickLocations.map((e) => scale1(e)));
+  area.addChild( axis1() );
+  area.addChild( axis2()..y = 75 );
+  area.addChild( axis3()..y = 150 );
+  area.addChild( axis4()..y = 225 );
+  area.addChild( axis5()..y = 300 );
+
+
+
+
 
 //  Scale scale2 = new DateTimeScale(new DateTime(2015,1,1), new DateTime(2015,12,31), 0, 700);
 //  var a2 = new DateTimeAxis(scale2, Position.bottom)..y = 100;

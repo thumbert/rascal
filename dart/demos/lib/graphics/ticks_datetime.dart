@@ -6,14 +6,12 @@ import 'package:date/date.dart';
 
 import 'tick_utils.dart';
 
+/// Some common datetime tick frequencies
 enum DateTimeTickFrequency {
   year,
   month,
   day,
   hour,
-  m30, // 30 minutes
-  m15, // 15 minutes
-  m5, //  5 minutes
   minute, //  1 minute
   second //  1 second
 }
@@ -32,42 +30,77 @@ Map<DateTimeTickFrequency, List<DateFormat>> _dateTimeTickFormat = {
     new DateFormat('d'),
   ],
   DateTimeTickFrequency.hour: [
-    new DateFormat('dMMMyy HH'),
-    new DateFormat('HH')
+    new DateFormat('dMMMyy H:00'),
+    new DateFormat('dMMM H:00'),
+    new DateFormat('H:00')
   ],
   DateTimeTickFrequency.minute: [
-    new DateFormat('dMMMyy HH:MM'),
-    new DateFormat('HH:MM'),
+    new DateFormat('dMMMyy H:MM'),
+    new DateFormat('H:MM'),
   ],
   DateTimeTickFrequency.second: [
-    new DateFormat('dMMMyy HH:MM:SS'),
-    new DateFormat('HH:MM:SS'),
+    new DateFormat('dMMMyy H:MM:SS'),
+    new DateFormat('H:MM:SS'),
   ]
 };
 
 /// Calculate the location and format for default datetime ticks.
 /// Note that both start/end datetimes are inclusive.
-/// All returned ticks will be in the [start,end] interval.
+/// All returned ticks will be in the [start,end] interval, but
+/// the [start] and [end] are not guaranteed to be a tick.
 Tuple2<DateTimeTickFrequency, List<DateTime>> defaultTicksDateTime(
     DateTime start, DateTime end,
     {TickCoverType tickCoverType: TickCoverType.undercover}) {
-  var res4 = _coverWithHours(start, end, tickCoverType: tickCoverType);
-  if (res4.item2.length <= 25)
-    return res4;
-  else {
-    var res3 = _coverWithDays(start, end, tickCoverType: tickCoverType);
-    if (res3.item2.length <= 31)
-      return res3;
-    else {
-      var res2 = _coverWithMonths(start, end, tickCoverType: tickCoverType);
-      if (res2.item2.length <= 12)
-        return res2;
-      else {
-        var res1 = _coverWithYears(start, end, tickCoverType: tickCoverType);
-        return res1;
-      }
+  Tuple2 res;
+  DateTimeTickFrequency frequency = getTickFrequency(start, end);
+  switch (frequency) {
+    case DateTimeTickFrequency.year:
+      res = _coverWithYears(start, end, tickCoverType: tickCoverType);
+      break;
+    case DateTimeTickFrequency.month:
+      res = _coverWithMonths(start, end, tickCoverType: tickCoverType);
+      break;
+    case DateTimeTickFrequency.day:
+      res = _coverWithDays(start, end, tickCoverType: tickCoverType);
+      break;
+    case DateTimeTickFrequency.hour:
+      res = _coverWithHours(start, end, tickCoverType: tickCoverType);
+      break;
+    case DateTimeTickFrequency.minute:
+      res = _coverWithMonths(start, end, tickCoverType: tickCoverType);
+      break;
+    case DateTimeTickFrequency.second:
+      res = _coverWithMonths(start, end, tickCoverType: tickCoverType);
+      break;
+  }
+
+  return res;
+}
+
+DateTimeTickFrequency getTickFrequency(DateTime start, DateTime end) {
+  Duration duration = end.difference(start);
+  DateTimeTickFrequency freq;
+  if (duration.inDays >= 3) {
+    if (duration.inDays <= 60) {
+      freq = DateTimeTickFrequency.day;
+    } else if (duration.inDays <= 400) {
+      freq = DateTimeTickFrequency.month;
+    } else {
+      freq = DateTimeTickFrequency.year;
+    }
+  } else {
+    if (duration.inSeconds <= 6) {
+      freq = DateTimeTickFrequency.second;
+    } else if (duration.inSeconds <= 6 * 60) {
+      freq = DateTimeTickFrequency.minute;
+    } else if (duration.inSeconds <= 26 * 3600) {
+      freq = DateTimeTickFrequency.hour;
+    } else {
+      freq = DateTimeTickFrequency.day;
     }
   }
+
+  return freq;
 }
 
 /// cover the interval with years, see if you get more than 1 year.
@@ -110,8 +143,20 @@ Tuple2<DateTimeTickFrequency, List<DateTime>> _coverWithDays(
     startDate = startDate.next;
   if (tickCoverType == TickCoverType.overcover && !isBeginningOfDay(end))
     endDate = endDate.next;
-  List days =
-      new TimeIterable(startDate, endDate).map((Date e) => e.start).toList();
+  int nDays = endDate.value - startDate.value;
+  int step ;
+  if (nDays <= 6) {
+    step = 1;
+  } else if (nDays <= 10) {
+    step = 2;
+  } else if (nDays <= 25) {
+    step = 5;
+  } else {
+    step = 10;
+  }
+  List days = new TimeIterable(startDate, endDate, step: step)
+      .map((Date e) => e.start)
+      .toList();
   return new Tuple2(DateTimeTickFrequency.day, days);
 }
 
@@ -126,12 +171,20 @@ Tuple2<DateTimeTickFrequency, List<DateTime>> _coverWithHours(
     startHour = startHour.add(h1);
   if (tickCoverType == TickCoverType.overcover && !isBeginningOfHour(end))
     endHour = endHour.add(h1);
-  var nHours = endHour.difference(startHour).inHours;
-  List hours = [];
-  var current = startHour;
-  for (int h = 0; h <= nHours; h++) {
-    hours.add(current);
-    current = current.add(h1);
+  int nHours = endHour.difference(startHour).inHours;
+  int step = 1;
+  if (nHours >= 6 && nHours <= 27) {
+    step = 6;
+  } else if (nHours <= 50) {
+    step = 12;
   }
+  List hours = [];
+  var duration = new Duration(hours: step);
+  var current = startHour;
+  while (!endHour.isBefore(current)) {
+    hours.add(current);
+    current = current.add(duration);
+  }
+
   return new Tuple2(DateTimeTickFrequency.hour, hours);
 }

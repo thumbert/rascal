@@ -55,15 +55,29 @@ class AxisLimits {
       throw 'Unknown axis type for this data';
     }
   }
-
-
-
 }
+
+
+class AxisFormat {
+  /// position of the axis
+  Position axisPosition;
+
+  /// format of the axis label
+  TextFormat labelFormat;
+
+  AxisFormat(this.axisPosition) {
+    labelFormat = new TextFormat("Arial", 20, Color.Black, align: TextFormatAlign.CENTER);
+  }
+
+  //static getDefault() => theme.getAxisFormat();  // maybe
+}
+
 
 
 /// General Axis class, with subclasses NumericalAxis, CategoricalAxis, DateTimeAxis, etc.
 /// An Axis has a fixed length that
 class Axis extends Sprite {
+  AxisFormat axisFormat;
   Position axisPosition;
   List<Tick> ticks;
   Theme theme = Theme.basic;

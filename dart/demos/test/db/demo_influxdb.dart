@@ -1,5 +1,8 @@
 library test.db.demo_influxdb;
 
+import 'package:elec_server/src/utils/timezone_utils.dart';
+
+
 /// >show databases
 /// >use test
 /// >show measurements
@@ -81,9 +84,7 @@ getManyPtids(InfluxDb db) {
 
 
 main() async {
-  Map env = Platform.environment;
-  String tzdb = env['HOME'] + '/.pub-cache/hosted/pub.dartlang.org/timezone-0.4.3/lib/data/2015b.tzf';
-  initializeTimeZoneSync(tzdb);
+  initializeTimeZoneSync( getLocationTzdb() );
 
   String host = 'localhost';
   int port = 8086;
@@ -91,13 +92,14 @@ main() async {
   String password = 'root';
   InfluxDb db = new InfluxDb(host, port, username, password);
 
-  // print(TZDateTime.parse(location, '2015-02-01T05:00:00Z'));
+//  await db.createDatabase('test');
+//  await insertOneDay(db, new Date(2016, 1, 1));
 
-  // print(await insertDays(db, new Date(2015,3,3), new Date(2015,3,31)));
+  print(await insertDayRange(db, new Date(2017,1,1), new Date(2017,7,31)));
 
-  print(await daysInserted(db));
-
-  getOnePtid(db);
+//  print(await daysInserted(db));
+//
+//  getOnePtid(db);
 
   //getManyPtids(db);
 

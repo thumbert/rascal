@@ -21,6 +21,9 @@ dependencies:
   dygraphs_dart:
       git:
         url: git://github.com/thumbert/dygraphs_dart.git
+  elec_server:
+        git:
+          url: git://github.com/thumbert/elec-server.git
   intl: ">=0.14.0 <0.15.0"
   google_charts: '^0.2.1'
   html: 0.13.1
