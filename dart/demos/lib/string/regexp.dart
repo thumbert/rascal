@@ -27,3 +27,15 @@ tminOrTmax() {
 
   return x.where((String line) => line.contains(reg));
 }
+
+parseFilename() {
+  /// parse the date from this filename: 'pnode_table_2017_08_03.xlsx'
+  RegExp regExp = new RegExp(r'pnode_table_(\d{4})_(\d{2})_(\d{2})\.xlsx');
+  var matches = regExp.allMatches('pnode_table_2017_08_03.xlsx');
+  var match = matches.elementAt(0);
+  print(match.groupCount);  // 3
+  print(match.group(0));    // pnode_table_2017_08_03.xlsx
+  print(match.group(1));    // 2017
+  print(match.group(2));    // 08
+  print(match.group(3));    // 03
+}
