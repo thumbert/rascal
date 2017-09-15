@@ -2,7 +2,7 @@ library test.db.demo_influxdb;
 
 import 'package:elec_server/src/utils/timezone_utils.dart';
 
-
+/// start influx with: influx -precision=rfc3339 to show pretty datetime labels!
 /// >show databases
 /// >use test
 /// >show measurements

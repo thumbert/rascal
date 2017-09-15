@@ -10,6 +10,8 @@ import 'package:timezone/standalone.dart';
 import 'package:demos/elec/iso_timestamp.dart';
 import 'package:demos/db/influxdb.dart';
 
+/// start influx with: influx -precision=rfc3339 to show pretty datetime labels!
+///
 /// Test how influx db works
 /// 3 fields: lmp, congestion, loss  -- keep the prices
 /// 3 tags: ptid, market (DA/RT), asOfTime
@@ -22,6 +24,8 @@ Location location = getLocation('US/Eastern');
 String dbName = 'test';
 String measurement = 'isone_lmp_prices_1H';
 int millisToHour = 3600*1000;
+
+/// http://localhost:8086/query?db=test&q=select first(lmp) from isone_lmp_prices_1H
 
 /// Get the hour beginning DA LMP prices for a given ptid between a [start, end) TZDateTime interval.
 /// http://localhost:8086/query?db=test&q=select * from isone_lmp_prices_1H where ptid='4000' limit 10

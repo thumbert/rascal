@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:timezone/standalone.dart';
+import 'package:date/date.dart';
 
 
 
@@ -17,10 +18,13 @@ import 'package:demos/elec/nepool_da_lmp_influx.dart';
 
 
 /// get the data from influx
-Future<List> getData(InfluxDb db, List<int> ptids, TZDateTime start, TZDateTime end) async {
+Future<List> getData(InfluxDb db, List<int> ptids, Interval interval) async {
+  Location location = getLocation('US/Eastern');
+
   var res = await getHourlyLmpByPtid(db, 4000, component: ['lmp'],
-      start: new TZDateTime(location, 2015, 1, 1),
-      end: new TZDateTime(location, 2015, 1, 2));
+      start: new TZDateTime(location, 2016, 1, 1),
+      end: new TZDateTime(location, 2016, 1, 2));
+  print(res.body);
 
   var aux = _formatResponse(new InfluxDbResponse(res, location));
   aux.forEach((print));
@@ -41,12 +45,13 @@ main() async {
 
   InfluxDb db = new InfluxDb('localhost', 8086, 'root', 'root');
 
-  Location location = getLocation('US/Eastern');
   List<int> ptids = new List.generate(8, (i) => 4000 + i);
-  TZDateTime start = new TZDateTime(location, 2015,1,1);
-  TZDateTime end = new TZDateTime(location, 2015,1,2);
+  TZDateTime start = new TZDateTime(location, 2016,1,1);
+  TZDateTime end = new TZDateTime(location, 2016,1,2);
 
-  getData(db, [ptids], start, end);
+  Interval interval = new Interval(start, end);
+
+  getData(db, [ptids], interval);
 
   //new Dygraph(html.querySelector('#canvas'), data, opt);
 

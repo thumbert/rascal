@@ -6,7 +6,7 @@ mockData() {
   var r = new Random();
   List years = new List.generate(30, (i) => 2017-i).reversed.toList();
 
-  Map data = {}
+  Map data = {};
   years.forEach((year) => data[year] = r.nextInt(100));
 
 
