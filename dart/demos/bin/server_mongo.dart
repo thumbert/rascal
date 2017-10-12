@@ -24,6 +24,21 @@ listenForRequests(HttpServer _server) {
       request.response.close();
     }
   }, onDone: () => print('No more requests.'), onError: (e) => print(e.toString()));
+//  server.listen((HttpRequest request) async {
+//    if (request.method == 'GET') {
+//      print('request.uri=${request.uri}');
+//      request.response.statusCode = HttpStatus.OK;
+//      final String path = request.uri.toFilePath();
+//      print('uri path: $path');
+//      File file = new File('${basePath.path}$path');
+//      print('Reading file $file');
+////      await file.openRead().pipe(request.response);
+//      await request.response.write(file.readAsString());
+//    }
+//  });
+  
+  
+  
 }
 
 // get the data
