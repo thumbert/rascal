@@ -82,7 +82,7 @@ List<Message> readFile() {
   aux = aux.replaceAll('\$', '\\\$');
 
   XmlDocument doc = parse(aux);
-  List<XmlElement> x = doc.children[1].children;  // messages
+  List<XmlElement> x = doc.children[6].children;  // messages
 
   List<Message> res = [];
   x.forEach((msg) {

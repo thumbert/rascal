@@ -56,6 +56,9 @@ main() {
 
   parsingDateTimes();
 
+  //final DateFormat fmt = new DateFormat("yyyy-MM-ddTHH:00:00.000-ZZZZ");
+
+
 //  var fmt4 = new DateFormat("yyyy-MM-ddTHH:mm:ss.SSS-ZZZZ");
 //  print(fmt4.parse("2015-01-01T10:00:00.000-0600",false));
 
