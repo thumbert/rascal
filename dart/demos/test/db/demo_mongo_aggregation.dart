@@ -2,11 +2,47 @@ library demo_mongo_aggregation;
 
 import 'package:mongo_dart/mongo_dart.dart';
 
+filterAndAggregateExample() {
+    List pipeline = [];
+    pipeline.add({
+      '\$match': {
+        'timestamp': {
+          '\$gte': DateTime.parse(startDate),
+          '\$lte': DateTime.parse(endDate),
+      }}});
+    pipeline.add({
+      '\$match': {
+        'zone': {'\$eq': zone}
+      }});
+    pipeline.add({
+      '\$group': {
+        '_id': '\$timestamp',
+        'customersOut': {'\$sum': '\$customersOut'},
+        'totalCustomers': {'\$sum': '\$totalCustomers'}
+      }
+    });
+    pipeline.add({
+      '\$sort': {'_id': 1}
+    });
+//    pipeline.add({
+//      '\$project': {'timestamp': '\$_id', 'customersOut': 1, 'totalCustomers': 1}
+//    });
+//    pipeline.add({
+//      '\$project': {'_id': 0}
+//    });
+
+    Map v = await coll.aggregate(pipeline);
+    print(v);
+ 
+
+}
+
+
+
 /**
  * An example of using the aggregation pipeline.  Aggregate timeseries
  * by month and id.
  */
-
 List<Map> data = [
   {'day': '2015-01-01', 'id': 'A', 'value': 1},
   {'day': '2015-01-02', 'id': 'A', 'value': 2},
