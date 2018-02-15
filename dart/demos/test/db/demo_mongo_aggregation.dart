@@ -2,7 +2,7 @@ library demo_mongo_aggregation;
 
 import 'package:mongo_dart/mongo_dart.dart';
 
-filterAndAggregateExample() {
+filterAndAggregateExample(DbCollection coll, String startDate, String endDate, String zone) async {
     List pipeline = [];
     pipeline.add({
       '\$match': {

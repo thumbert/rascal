@@ -65,7 +65,6 @@ class TermGrammar extends GrammarParser {
 }
 class TermGrammarDefinition extends GrammarDefinition {
   const TermGrammarDefinition();
-
   start() => ref(value).end();
   token(Parser p) => p.flatten().trim();
   simpleDayToken() => ref(dayToken) & ref(monthToken) & ref(yearToken);
