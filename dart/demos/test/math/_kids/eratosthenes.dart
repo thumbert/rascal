@@ -4,10 +4,10 @@
 
 main() {
   print('Hello');
-  int n = 17;
+  int n = 100;
 
   List x = new List.generate(n-1, (i)=> i+2);
-  print(x);
+  //print(x);
   List primes = [];
 
   Set excluded = new Set();
