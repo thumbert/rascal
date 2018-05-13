@@ -41,6 +41,26 @@ table(List x){
   return out;
 }
 
+///
+String playDice(Random random){
+  int lara = random.nextInt(6) + 1;
+  int dad = random.nextInt(6) + 1;
+  String winner;
+  
+ /// print('lara= $lara,  Dad= $dad');
+  if (lara > dad) {
+    print('lara wins ');
+    winner = 'lara';
+  } else if (dad > lara) {
+    print('Dad wins');
+    winner= 'dad';
+  } else {
+    print('tie');
+    winner = 'tie';
+  }
+  return winner;
+}
+
 
 main(){
   int n = 5;
@@ -48,7 +68,11 @@ main(){
 
 
   Random random = new Random();
+  for (int n=0; n<5; n++) {
+    playDice(random);
+  }
 
+  //playDice(random);
 //  List draw=roll(random,n);
 //  print(draw);
 //  print(gameOver(draw));

@@ -26,8 +26,8 @@ realMain() {
 
 
 main() {
-
-  initializeTimeZone().whenComplete(() => realMain());
+  initializeTimeZoneSync();
+  realMain();
 
 
 }
