@@ -50,9 +50,11 @@ class NercIndependenceDay implements Holiday {
     var res = [];
     TZDateTime start = interval.start;
     var current = new Date(start.year, 7, 4, location: start.location);
+    if (current.weekday == 7) current = current.next;
     if (current.isBefore(new Date.fromTZDateTime(interval.end))) {
       res.add(current);
       current = new Date(current.year + 1, 7, 4);
+      if (current.weekday == 7) current = current.next;
     }
     return res;
   }
