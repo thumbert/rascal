@@ -5,6 +5,7 @@ enum HolidayType { state, federal }
 abstract class Holiday {
   Date date;
   String name;
+
   /// Get all the holidays in this DateTime interval
   List<Date> getHolidays(Interval interval);
 }
