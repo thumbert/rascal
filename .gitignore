@@ -29,17 +29,7 @@ dart/utilio/pubspec.lock
 dart/demos/.pub
 dart/demos/pubspec.lock
 dart/demos/build
-dart/demos/packages
-dart/demos/bin/packages
-dart/demos/test/packages
-dart/demos/test/collection/packages
-dart/demos/test/math/combinatorics/packages
-dart/demos/test/math/packages
-dart/demos/pubspec.lock
-dart/demos/web/packages
-dart/demos/web/autocomplete/packages
-dart/demos/polymer/trex/.pub/
-
+dart/demos/.dart_tool/
 
 // all temporary folders to be ignored
 tmp/
