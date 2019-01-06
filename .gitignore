@@ -21,15 +21,13 @@ dart/chartxl/test/datasets/20150206_20150206_PRC_LMP_DAM_LMP_short.csv
 dart/chartxl/test/datasets/20150206_20150206_PRC_LMP_DAM_LMP_v1.csv
 dart/demos/test/io/20150206_20150206_PRC_LMP_DAM_LMP_v1.csv
 
-packages/
-dart/utilio/bin/packages
-dart/utilio/test/packages
-dart/utilio/pubspec.lock
 
 dart/demos/.pub
 dart/demos/pubspec.lock
 dart/demos/build
 dart/demos/.dart_tool/
+
+.dart_tool/
 
 // all temporary folders to be ignored
 tmp/

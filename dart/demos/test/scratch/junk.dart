@@ -5,8 +5,8 @@ main() {
   num x = 7*0.8;
   print(x.round());
 
-  print(double.NAN > 1.0); // false
-  print(double.NAN < 1.0);  // false
+  print(double.nan > 1.0);  // false
+  print(double.nan < 1.0);  // false
 
   final _initialHeroes = [
     {'id': 11, 'name': 'Mr. Nice'},

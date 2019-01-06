@@ -11,12 +11,12 @@ var data = [
 main() {
   
   data.forEach((String e) {    
-    var bytes = UTF8.encode(e);
+    var bytes = utf8.encode(e);
    
-    var hash = new SHA1()..add(bytes);
-    var res = hash.close();
+    var hash = sha1.convert(bytes);
+    var res = hash.bytes;
     
-    print( CryptoUtils.bytesToBase64(res) );  // print the computed hash
+    print( base64.encode(res) );  // print the computed hash
   });
   
 }

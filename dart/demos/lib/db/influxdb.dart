@@ -93,7 +93,7 @@ class InfluxDbResponse {
 
   /// location keeps track of the timezone of the timestamps in the response.
   InfluxDbResponse(Response response, this._location) {
-    _resJson = (((JSON.decode(response.body)['results'] as List)
+    _resJson = (((json.decode(response.body)['results'] as List)
         .first as Map)['series'] as List).first;
   }
 
@@ -106,7 +106,7 @@ class InfluxDbResponse {
   List<List> get values => _resJson['values'];
 
   Iterable<Map<String,dynamic>> toIterable() {
-    return (_resJson['values'] as List).map((List e) {
+    return (_resJson['values'] as List).map((e) {
       e[0] = TZDateTime.parse(_location, e[0]);
       return new Map.fromIterables(columns, e);
     });

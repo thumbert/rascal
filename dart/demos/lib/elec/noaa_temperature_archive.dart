@@ -25,14 +25,14 @@ num celsiusToFahrenheit(num celsius) => 9*celsius/5 + 32;
 
 /// Doesn't seem that you can do ftp using HttpClient, so just use wget
 /// Each recent year is about 200 MB of compressed data (large file) 33MM rows.
-Future<ProcessResult>  downloadFileYear(int year) async {
+Future<int>  downloadFileYear(int year) async {
   String url = 'ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/$year.csv.gz';
   File file = new File(getDefaultArchiveDirectory() + '/$year.csv.gz');
   if (!file.existsSync()) {
-    return await Process.run('wget', [url],
-      workingDirectory:  getDefaultArchiveDirectory());
+    return (await Process.run('wget', [url],
+      workingDirectory:  getDefaultArchiveDirectory())).exitCode;
   } else {
-    return new Future.value(0);
+    return Future.value(0);
   }
 }
 
@@ -49,7 +49,7 @@ Future<List<String>> extractData(int year, String wban,
   File csv = new File('${getDefaultArchiveDirectory()}/$year.csv');
 
   Stream stream = csv.openRead()
-      .transform(UTF8.decoder)
+      .transform(utf8.decoder)
       .transform(ls)
       .where((String line) => line.startsWith(wban))
       .where((String line) => line.contains(regexp));

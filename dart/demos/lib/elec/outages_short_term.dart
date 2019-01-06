@@ -65,7 +65,8 @@ class Archiver {
     try {
       data = oneDayRead(yyyymmdd);
     } catch (e) {
-      return new Future.value(print('ERROR:  No file for day $yyyymmdd'));
+      print('ERROR:  No file for day $yyyymmdd');
+      return new Future.value(1);
     }
 
     print('Inserting day $yyyymmdd into db');
@@ -112,7 +113,8 @@ class Archiver {
     File fileout = new File(DIR + "/outages_shortterm_$yyyymmdd.csv");
 
     if (fileout.existsSync()) {
-      return new Future.value(print('Day $yyyymmdd was already downloaded.'));
+      print('Day $yyyymmdd was already downloaded.');
+      return new Future.value(1);
     } else {
       String URL =
           'http://www.iso-ne.com/transform/csv/outages?outageType=short-term&start=$yyyymmdd';

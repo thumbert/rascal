@@ -15,6 +15,9 @@ _printCertificate(cert) {
 }
 
 oneDayDownload(String yyyymmdd) {
+  var _user = 'antennaMan';
+  var _pwd = 'ultra_secret';
+
   File fileout = new File("nepool_da_bc_${yyyymmdd}.json");
 
   String URL = "https://webservices.iso-ne.com/api/v1.1/dayaheadconstraints/day/${yyyymmdd}";
@@ -30,7 +33,7 @@ oneDayDownload(String yyyymmdd) {
   client.userAgent = "Mozilla/4.0";
   client.getUrl( Uri.parse( URL))
   .then((HttpClientRequest request) {
-    request.headers.set(HttpHeaders.ACCEPT, "application/json");
+    request.headers.set(HttpHeaders.acceptHeader, "application/json");
     return request.close();
   })
   .then((HttpClientResponse response) =>

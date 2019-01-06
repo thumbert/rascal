@@ -23,7 +23,7 @@ Future<List<Map>> downloadStockPrices(
   '&g=${freqMap[freq]}&ignore=.csv';
   HttpClientRequest request = await new HttpClient().getUrl(Uri.parse(url));
   HttpClientResponse response = await request.close();
-  String res = await response.transform(UTF8.decoder).join();
+  String res = await response.transform(utf8.decoder).join();
 
   List keys = [
     'date',

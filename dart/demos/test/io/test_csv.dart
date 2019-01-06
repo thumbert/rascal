@@ -122,8 +122,7 @@ main() {
   List<List<String>> x = decoder.convert(loadSeatac());
   //print(x);
 
-  var z = decoder.convert('"March",29,NA,553', 
-      parseNumbers: false);
+  var z = decoder.convert('"March",29,NA,553');
   var res = z.map((e)=>[I(e[0])].addAll(e.sublist(1).map((x) => toNumeric(x)))); // addAll returns void!
   print(res);
   

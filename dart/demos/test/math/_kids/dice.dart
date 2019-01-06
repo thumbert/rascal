@@ -13,7 +13,7 @@ List roll(Random random, int n) {
 
 /// Decide when game is over.
 bool gameOver(List draw) {
-  if (draw.where((e) => e == 6).) return true;
+//  if (draw.where((e) => e == 6)) return true;
   return false;
 }
 

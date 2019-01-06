@@ -12,7 +12,7 @@ class Security {
   SecDb db;
   String securityName;
   String securityType;
-  int quantityMultiplier;
+  num quantityMultiplier;
 
   Security(this.db, this.securityName, this.securityType,
       {int this.quantityMultiplier: 1});

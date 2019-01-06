@@ -71,7 +71,7 @@ List<Map> generateScenarios(int scenarioId) {
   return mockHistoricalData(seed);
 }
 
-List<Map<int,String>> scenarios = [
+List<Map> scenarios = [
   {'scenarioId': 1, 'description': 'Call expires in the money'},
   {'scenarioId': 2, 'description': 'Put expires in the money'},
   {'scenarioId': 3, 'description': 'Call and Put expire close to the money'},
@@ -81,7 +81,7 @@ class InMemoryDb implements SecDb {
   List<Map> hData;
   InMemoryDb(this.hData);
   num getValue(Security security, DateTime asOfDate) {
-    Map e = hData.firstWhere((Map e) => e['day'] == new Date.fromDateTime(asOfDate));
+    Map e = hData.firstWhere((Map e) => e['day'] == Date.fromTZDateTime(asOfDate));
     if (security.securityName == 'CASH')
       return 1;
     else if (security.securityName == 'STOCK')
@@ -93,8 +93,8 @@ class InMemoryDb implements SecDb {
     else
       throw 'Unknown security with name ${security.securityName}';
   }
-  List<Tuple2> getDelta(Security security, DateTime asOfDate) {
-    Map e = hData.firstWhere((Map e) => e['day'] == new Date.fromDateTime(asOfDate));
+  List<Tuple2<Security,num>> getDelta(security, asOfDate) {
+    Map e = hData.firstWhere((Map e) => e['day'] == new Date.fromTZDateTime(asOfDate));
     if (security.securityName == 'STOCK' || security.securityName == 'CASH')
       return [new Tuple2(security,1)];
     else if (security.securityName == 'CALL') {
@@ -171,7 +171,7 @@ num _round2(num x) => (x*100).round()/100;
 
 main() {
 
-  List hData = generateScenarios(1);
+  var hData = generateScenarios(1);
   var table = new Table.from(hData);
   print(table.head());
 

@@ -1,7 +1,7 @@
 library finance.blackscholes;
 
 import 'dart:math';
-import 'package:demos/math/special/erf.dart';
+import 'package:dama/special/erf.dart';
 import 'security.dart';
 
 class BlackScholes {
@@ -151,7 +151,7 @@ double _d1(num tExp, num volatility, num underlyingPrice, num strike,
     num interestRate) {
   double d1;
   if (tExp == 0.0 || volatility == 0)
-    d1 = double.INFINITY;
+    d1 = double.infinity;
   else
     d1 = (log(underlyingPrice / strike) +
         (interestRate + 0.5 * volatility * volatility) * tExp) /
@@ -166,7 +166,7 @@ double _d2(num tExp, num volatility, num underlyingPrice, num strike,
     num interestRate) {
   double d2;
   if (tExp == 0 || volatility == 0)
-    d2 = double.INFINITY;
+    d2 = double.infinity;
   else
     d2 = (log(underlyingPrice / strike) +
         (interestRate + 0.5 * volatility * volatility) * tExp) /
@@ -181,7 +181,7 @@ double _nd2(num tExp, num volatility, num underlyingPrice, num strike,
 double _dNd1(num tExp, num volatility, num underlyingPrice, num strike,
     num interestRate) {
   num d1 = _d1(tExp, volatility, underlyingPrice, strike, interestRate);
-  return exp(-0.5 * d1 * d1) / sqrt(2 * PI);
+  return exp(-0.5 * d1 * d1) / sqrt(2 * pi);
 }
 
 num _timeToExpiration(DateTime asOfDate, DateTime expirationDate) {

@@ -9,7 +9,7 @@ Future readUrl(String url) async {
   HttpClient client = new HttpClient();
   var request = await client.getUrl(Uri.parse(url));
   var response = await request.close();
-  response.transform(UTF8.decoder).listen((contents){
+  response.transform(utf8.decoder).listen((contents){
     print(contents);
   });
 }
@@ -30,7 +30,7 @@ Future readUrl2() async {
   client.userAgent = "Mozilla/4.0";
 
   HttpClientRequest request = await client.getUrl(Uri.parse(URL));
-  request.headers.set(HttpHeaders.ACCEPT, 'application/json');
+  request.headers.set(HttpHeaders.acceptHeader, 'application/json');
   HttpClientResponse response = await request.close();
   await response.pipe(fileout.openWrite());
 }

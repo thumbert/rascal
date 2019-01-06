@@ -51,8 +51,8 @@ formatDateTimes() {
 }
 
 
-main() {
-  initializeTimeZoneSync();
+main() async {
+  await initializeTimeZone();
 
   parsingDateTimes();
 

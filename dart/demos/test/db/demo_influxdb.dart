@@ -56,7 +56,7 @@ select(InfluxDb db) async {
 
   Response aux = await db.select('test', "select * from isone_lmp_prices_1H where ptid='4000'");
   print(aux.body);
-  List res = JSON.decode(aux.body)['results'];
+  var res = json.decode(aux.body)['results'];
   res.forEach(print);
 
 }
@@ -84,7 +84,7 @@ getManyPtids(InfluxDb db) {
 
 
 main() async {
-  initializeTimeZoneSync( getLocationTzdb() );
+  await initializeTimeZone();
 
   String host = 'localhost';
   int port = 8086;

@@ -1,7 +1,7 @@
 library test.elec.temperature_archive;
 
 import 'dart:io';
-import 'package:demos/elec/temperature_archive.dart';
+import 'package:demos/elec/noaa_temperature_archive.dart';
 
 /// Boston Logan International airport
 insert_boston(int year) async {

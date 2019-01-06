@@ -23,7 +23,7 @@ unicornsTest() async {
   await db.open();
   print("\nInsert original data (2 unicorns) in the db.");
   coll = db.collection("unicorns");
-  await coll.remove(); // clean up previous mess
+  await coll.remove({}); // clean up previous mess
 
   print("Force the index (the unicorn name) to be unique.");
   /** This guarantees that if you try to insert a unicorn with
@@ -153,7 +153,7 @@ selectFromArray() async {
 
   await db.open();
   coll = db.collection("grades");
-  await coll.remove();
+  await coll.remove({});
   await coll.insertAll(grades);
 
   print('Select all docs with midterm grades > 89');

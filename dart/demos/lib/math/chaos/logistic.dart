@@ -12,8 +12,8 @@ class Attractor {
   Attractor(this.r, this.x);
 }
 
-logistic() {
-  List<Attractor> res = [];
+List<Attractor> logistic() {
+  var res = <Attractor>[];
   
   double r = 3.5;
   while (r <= 4.0) {
@@ -40,10 +40,9 @@ logistic() {
 main() {
   
   // very fast, just an iteration over 51*1500 points
-  List<Attractor> res = logistic();
+  var res = logistic();
   print(res.length.toString());
-  
-  res.first.x.forEach((e)=>print(e));
-  
-  print("Done");
+
+  res.first.x.forEach(print);
+
 }

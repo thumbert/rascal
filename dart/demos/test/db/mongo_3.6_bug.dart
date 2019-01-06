@@ -22,7 +22,7 @@ aggTest() async {
       await coll.insertAll(data);
     });
     tearDown(() async {
-      await coll.remove();
+      await coll.remove({});
       await db.close();
     });
     test('check data', () async {

@@ -25,8 +25,8 @@ realMain() {
 }
 
 
-main() {
-  initializeTimeZoneSync();
+main() async {
+  await initializeTimeZone();
   realMain();
 
 

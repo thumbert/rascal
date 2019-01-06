@@ -6,7 +6,7 @@ import 'position.dart';
 import 'security.dart';
 
 /// A portfolio is a collection of positions (cash, stocks, options, etc.)
-/// that originate from trades (transactions).
+/// that originate from individual trades (transactions).
 /// You keep track of individual trades, and you can look at the positions
 /// which give you the average price for that particular security.
 ///
@@ -119,7 +119,7 @@ class Portfolio {
         .skip(1)   /// always have some cash in the first spot
         .expand((position) => position.delta(asOfDate));
     Map<Security, List<Tuple2>> gAux = new Map();
-    aux.forEach((Tuple2 v) => gAux.putIfAbsent(v.item1, () => []).add(v));
+    aux.forEach((v) => gAux.putIfAbsent(v.item1, () => []).add(v));
 
     List res = [];
     gAux.keys.forEach((Security s) {

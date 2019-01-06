@@ -60,7 +60,7 @@ sorting2() {
   
   // Sort with nulls
   var natural = new Ordering.natural();  
-  var ordering = natural.nullsLast();
+  var ordering = natural.nullsLast;
   print(ordering.sorted([2, null, 3, 1])); 
 
   // explicit sort
@@ -123,12 +123,12 @@ void main() {
 
   sorting2();
   
-  // replicate values
-  print([1,2,3].expand((e) => new List.filled(5, e)));  
+  // replicate each value 5 times
+  print([1,2,3].expand((e) => List.filled(5, e)));
   // (1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3)
   
   // flat map.  Extract the first 2 elements of each sublist
-  List<int> links = [[1,3,1], [2,3,4], [3,4,4], [5,3,3]];
+  var links = [[1,3,1], [2,3,4], [3,4,4], [5,3,3]];
   print(links.expand((e) => [e[0], e[1]]));
   
   

@@ -15,8 +15,8 @@ getPictures() {
   List li = ul.getElementsByClassName('hip-photo');
   print(li);
 
-  List links = li.map((Element e) {
-    Map attr = e.attributes;
+  List links = li.map((e) {
+    var attr = e.attributes;
     if (attr.containsKey('src')) return e.attributes['src'];
     else if (attr.containsKey('href')) return e.attributes['href'];
   }).toList();

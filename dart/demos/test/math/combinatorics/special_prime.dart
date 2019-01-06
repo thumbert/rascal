@@ -20,15 +20,15 @@ int findSpecialPrime(List<num> tokens) {
     for (var item in items) {
       var allTokens = tokens..addAll(item);
       var permutations = new Permutations(allTokens.length, allTokens);
-      for (var permutation in permutations) {
-        var n = num.parse(permutation.join());
-        print('trying number $n');
-        if (isProbablyPrime(n)) {
-          res = n;
-          return n;
-        }
-
-      }
+//      for (var permutation in permutations) {
+//        var n = num.parse(permutation.join());
+//        print('trying number $n');
+//        if (isProbablyPrime(n)) {
+//          res = n;
+//          return n;
+//        }
+//
+//      }
     }
   }
 
@@ -39,5 +39,4 @@ int findSpecialPrime(List<num> tokens) {
 main() {
   int res = findSpecialPrime([1001, 505, 1207]);
   print('Number 50510011207 is prime!');
-  print('Number 100150501207 is prime!');
 }

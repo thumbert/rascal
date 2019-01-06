@@ -289,7 +289,7 @@ class Board {
       int jb = (b ~/ _blockSize) * _blockSize;
 
       List coords = [];
-      _rows.forEach((int r) {
+      _rows.forEach((r) {
         coords.addAll(
             new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i)));
       });
@@ -326,16 +326,16 @@ class Board {
   _makePeers() {
     /// row peers
     for (int r = 0; r < n; r++) {
-      List aux = new List.generate(n, (i) => new Coord(r, i));
-      aux.forEach((Coord t) {
+      var aux = new List.generate(n, (i) => new Coord(r, i));
+      aux.forEach((t) {
         peers[t] = new Set.from(aux)..removeWhere((e) => e == t);
       });
     }
 
     /// column peers
     for (int c = 0; c < n; c++) {
-      List aux = new List.generate(n, (i) => new Coord(i, c));
-      aux.forEach((Coord t) {
+      var aux = new List.generate(n, (i) => new Coord(i, c));
+      aux.forEach((t) {
         peers[t].addAll(new Set.from(aux)..removeWhere((e) => e == t));
       });
     }
@@ -349,7 +349,7 @@ class Board {
 
       /// all the cells in this block
       List<Coord> aux = [];
-      _rows.forEach((int r) {
+      _rows.forEach((r) {
         aux.addAll(
             new List.generate(_blockSize, (i) => new Coord(ib + r, jb + i)));
       });
@@ -371,7 +371,7 @@ class Coord {
   }
 
   int get hashCode => _value;
-  bool operator ==(Coord other) =>
+  bool operator ==(other) =>
       other != null && row == other.row && column == other.column;
   String toString() => '($row, $column)';
 }
@@ -382,7 +382,7 @@ class Cell {
   Cell(this.coord, this.value);
 
   int get hashCode => 1024 * coord._value + value;
-  bool operator ==(Cell other) =>
+  bool operator ==(other) =>
       other != null && value == other.value && coord == other.coord;
   String toString() => coord.toString() + ': $value';
 }

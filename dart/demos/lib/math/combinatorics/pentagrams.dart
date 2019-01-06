@@ -11,23 +11,29 @@ library pentagrams;
 
 
 /*
- * Represent an Ngram as a series of (N-1) directed connections/links/joins.  
- * For example the 3-gram ABC is represented as the 2 links [[1, 2, 4], [2, 3, 4]] 
- * which specify that the side 4 of block 1 is joined with block 2 (side 2) and 
- * side 4 of block 2 is joined with block 3 (side 2). 
+ * Represent an Ngram as a List of (N-1) directed links/connections/joins.
+ *
+ * Each link is a List with 3 elements
+ * [index_block_from, index_block_to, side_of_block_from_connected]
+ * Sides are labelled as follows: bottom = 1, left = 2, top = 3, right =4.
+ * By convention the blocks are indexed row-wise from top left corner of the
+ * Ngram.
+ *
+ * For example the 3-gram ABC has two links represented as
+ * [[1, 2, 4], [2, 3, 4]]
+ * which specify that the side 4 of block 1 is joined with block 2 and that
+ * side 4 of block 2 is joined with block 3.
+ *
  * The pentagram:
  * A
  * BC
- * DE  can be represented as the (minimal) links: 
+ * DE  can be represented as the four links:
  *   [[1,2,1], [2,3,4], [2,4,1], [4,5,4]]
  *   and has the view "X \nXX\nXX\n"
  * And the pentagram:
  *    A  
  *   BCD    links: [[1,3,1], [2,3,4], [3,4,4], [3,5,1]]
  *    E
- * So each element of the links List is a list with 3 elements 
- * [index_block_from, index_block_to, side_of_block_from_connected]
- * By convention the blocks are indexed from top left corner of the Ngram   
  */
 class Ngram {
   int order;                  // the number of blocks of the N-gram
@@ -161,7 +167,7 @@ class Ngram {
    */
   toString() => view;
   
-  bool operator ==(Ngram that) {
+  bool operator ==(that) {
     return view == that.view;
   }
   
@@ -187,7 +193,6 @@ Map<int, Set<Ngram>> generate(int order) {
     Set<Ngram> prev = results[i-1]; 
     prev.forEach((Ngram g) {
       var aux = g.extend();
-      var bux = results[i].union(aux);
       results[i] = results[i].union(aux);
     });
   }
@@ -339,7 +344,7 @@ class Matrix<A> {
     return out.join("\n");  
   }
 
-  bool operator ==(Matrix that) {
+  bool operator ==(that) {
     if (that.nrow != nrow || that.ncol != ncol)
       return false;
     

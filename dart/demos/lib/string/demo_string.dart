@@ -6,7 +6,7 @@ codeUnits() {
   String x = "One, two, three";
   print(x.codeUnits);
 
-  List<int> bytes = UTF8.encode(x);
+  List<int> bytes = utf8.encode(x);
   print(bytes);
 
   // convert to codeUnits and back

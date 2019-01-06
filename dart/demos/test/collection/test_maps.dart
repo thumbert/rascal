@@ -57,7 +57,7 @@ class Coord {
     _value = 1024*column + row;
   }
   int get hashCode => _value;
-  bool operator ==(Coord other) => other != null && row == other.row && column == other.column;
+  bool operator ==(other) => other != null && row == other.row && column == other.column;
   String toString() => '($row, $column)';
 }
 

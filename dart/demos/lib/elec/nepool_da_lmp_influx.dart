@@ -6,8 +6,6 @@ import 'dart:convert';
 import 'package:http/src/response.dart';
 import 'package:date/date.dart';
 import 'package:timezone/standalone.dart';
-
-import 'package:demos/elec/iso_timestamp.dart';
 import 'package:demos/db/influxdb.dart';
 
 /// start influx with: influx -precision=rfc3339 to show pretty datetime labels!
@@ -70,12 +68,12 @@ Future<int> insertDayRange(InfluxDb db, Date start, Date end) async {
 ///
 Future<Map<String,Date>> daysInserted(InfluxDb db) async {
   var first = db.select(dbName, 'select first(lmp) from isone_lmp_prices_1H').then((response) {
-    var m = (((((JSON.decode(response.body)['results'] as List).first as Map)['series'] as List).first as Map)['values'] as List)[0][0];
-    return new Date.fromDateTime(TZDateTime.parse(location, m));
+    var m = (((((json.decode(response.body)['results'] as List).first as Map)['series'] as List).first as Map)['values'] as List)[0][0];
+    return new Date.fromTZDateTime(TZDateTime.parse(location, m));
   });
   var last = db.select(dbName, 'select last(lmp) from isone_lmp_prices_1H').then((response) {
-    var m = (((((JSON.decode(response.body)['results'] as List).first as Map)['series'] as List).first as Map)['values'] as List)[0][0];
-    return new Date.fromDateTime(TZDateTime.parse(location, m));
+    var m = (((((json.decode(response.body)['results'] as List).first as Map)['series'] as List).first as Map)['values'] as List)[0][0];
+    return new Date.fromTZDateTime(TZDateTime.parse(location, m));
   });;
 
   return Future.wait([first, last]).then((List d) {
@@ -100,7 +98,8 @@ List<Map<String,dynamic>> _oneDayRead(Date date) {
         .where((List row) => row.first == '"D"')
         .map((List row) {
       return new Map.fromIterables(keys, [
-        parseHourEndingStamp(_unquote(row[1]), _unquote(row[2]), location),
+        //parseHourEndingStamp(_unquote(row[1]), _unquote(row[2]), location),
+        _unquote(row[1]),
         int.parse(_unquote(row[3])), // ptid
         [
           num.parse(row[6]),

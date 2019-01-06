@@ -24,7 +24,7 @@ main() async {
 
   print("\nInsert original data (2 unicorns) in the db.");
   coll = db.collection("unicorns");
-  await coll.remove(); // clean up previous mess
+  await coll.remove({}); // clean up previous mess
 
   print("Force the index (the unicorn name) to be unique.");
   /** This guarantees that if you try to insert a unicorn with

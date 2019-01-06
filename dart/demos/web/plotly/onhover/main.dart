@@ -1,4 +1,3 @@
-import 'dart:js';
 import 'package:plotly/plotly.dart';
 
 main() {

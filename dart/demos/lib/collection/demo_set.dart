@@ -8,7 +8,7 @@ class Point {
 
   toString() => "($x,$y)";
 
-  bool operator ==(Point that) {
+  bool operator ==(that) {
     return (x == that.x && y == that.y);
   }
 
@@ -25,7 +25,7 @@ class Ngram {
     }).join("");
   }
   
-  bool operator ==(Ngram that) {
+  bool operator ==(that) {
     return view == that.view;
   }
 }

@@ -4,6 +4,6 @@ import 'package:demos/finance/yahoo.dart';
 
 
 main() {
-  download_yahoo('AAPL', new DateTime(2014), new DateTime(2015));
+  downloadStockPrices('AAPL', new DateTime(2014), new DateTime(2015));
 
 }

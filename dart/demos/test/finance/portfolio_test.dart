@@ -24,7 +24,7 @@ class InMemoryDb implements SecDb {
   List<Map> hData;
   InMemoryDb(this.hData);
   num getValue(Security security, DateTime asOfDate) {
-    Map e = hData.firstWhere((Map e) => e['day'] == new Date.fromDateTime(asOfDate));
+    Map e = hData.firstWhere((Map e) => e['day'] == new Date.fromTZDateTime(asOfDate));
     if (security.securityName == 'CASH')
       return 1;
     else if (security.securityName == 'STOCK')

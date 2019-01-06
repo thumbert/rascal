@@ -1,6 +1,6 @@
 library test_pentagrams;
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:demos/math/combinatorics/pentagrams.dart';
 
 main() {
@@ -50,7 +50,7 @@ main() {
     res[4].forEach((g) => print(g.toString() + "\n"));
   });
 
-  solo_test("generate order 5", () {  
+  test("generate order 5", () {
     int order = 10;
     var res = generate(order);
     res[order].forEach((g) => print(g.toString() + "\n"));

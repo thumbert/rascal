@@ -68,13 +68,13 @@ class Line extends Sprite {
   _onMouseOver(MouseEvent e) {
     graphics.clear();
     draw(strokeWidth: 5);
-    parent.setChildIndex(this, parent.numChildren - 1); // put this line in front of all lines
+    //parent.setChildIndex(this, parent.numChildren - 1); // put this line in front of all lines
 
     tooltip.text = name;
     tooltip.x = e.localX + 15;
     tooltip.y = e.localY - 15;
     tooltip.alpha = 1;
-    parent.setChildIndex(tooltip, parent.numChildren - 1); // put the tooltip in the forefront
+    //parent.setChildIndex(tooltip, parent.numChildren - 1); // put the tooltip in the forefront
 
   }
 

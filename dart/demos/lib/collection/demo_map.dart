@@ -94,7 +94,7 @@ main() {
   print(x[null]); // [2,3]
   
   /// sort a map by keys
-  Map x = {4: 'D', 1: 'A', 3: 'C', 2: 'B'};
-  print(sortMapByKey(x));
+  Map x1 = {4: 'D', 1: 'A', 3: 'C', 2: 'B'};
+  print(sortMapByKey(x1));
   
 }
