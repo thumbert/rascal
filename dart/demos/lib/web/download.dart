@@ -2,6 +2,8 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 
 /// example of how to read a file from the web into memory
 /// using dart:io
@@ -13,6 +15,24 @@ Future readUrl(String url) async {
     print(contents);
   });
 }
+
+
+Future<List<String>> getLinks(String url, {Pattern pattern}) async {
+  var aux = await http.get(url);
+  var body = aux.body;
+  var document = parse(body);
+  var links = <String>[];
+  for (var linkElement in document.querySelectorAll('a')) {
+    var link = linkElement.attributes['href'];
+    print(link);
+    if (link != null && link.contains(pattern) && !link.startsWith('http'))
+      links.add(link);
+  }
+  links.sort();
+  return links;
+}
+
+
 
 /// Read a site by passing in basic credentials
 Future readUrl2() async {
