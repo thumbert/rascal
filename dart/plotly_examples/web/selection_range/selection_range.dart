@@ -39,8 +39,8 @@ main() {
 
   plot.on('plotly_relayout').listen((data) {
     print(data);
-    var start = data["xaxis.range[0]"];  // a String
-    var end = data["xaxis.range[1]"];
+    var start = DateTime.parse(data["xaxis.range[0]"]);  
+    var end = DateTime.parse(data["xaxis.range[1]"]);
     print(start);
     print(end);
     print(start.runtimeType);
