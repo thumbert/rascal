@@ -15,7 +15,6 @@ class LmpService extends LmpServiceBase {
 
   Future<NumericTimeSeries> getLmp(
       ServiceCall call, HistoricalLmpRequest request) async {
-    print('Server says hi!');
     var ptid = request.ptid;
     var start = Date.fromTZDateTime(TZDateTime.fromMillisecondsSinceEpoch(
         _location, request.start.toInt()));
