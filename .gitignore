@@ -35,6 +35,9 @@ tmp/
 // all output should be recreated
 out/
 
+// all generated files should be regenerated
+lib/src/generated/
+
 // no build folders
 build/
 

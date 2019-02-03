@@ -24,9 +24,10 @@ dependencies:
   elec_server:
         git:
           url: git://github.com/thumbert/elec-server.git
-  intl: ">=0.15.7 <0.16.0"
+  grpc: '>=1.0.0 <2.0.0'
   html: 0.13.3+3
   http: '>=0.11.1 <0.13.0'
+  intl: ">=0.15.7 <0.16.0"
   js: '>=0.6.0 <0.7.0'
   mongo_dart: ^0.3.3
   more: '>=1.12.0 <2.0.0'
@@ -34,7 +35,7 @@ dependencies:
   plotly:
     git:
       url: git://github.com/thumbert/plotly.git
-#  quiver: '>=0.22.0 <0.24.0'
+  quiver: '>=2.0.0 <3.0.0'
   stagexl: 1.4.0+2
 #  spreadsheet_decoder: '^0.3.1'
   timezone: "^0.5.0-dev-3"
@@ -45,4 +46,6 @@ dependencies:
   tuple: '^1.0.2'
 
 dev_dependencies:
+  build_runner: '>=0.8.10 <2.0.0'
+  build_web_compilers: '>=0.3.6 <2.0.0'
   test: '>=1.0.0 <2.0.0'
