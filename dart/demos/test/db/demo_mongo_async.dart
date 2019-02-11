@@ -42,3 +42,16 @@ main() async {
 
   await db.close();
 }
+
+/// Find unique fields in a collection (distinct for several variables)
+// var pipeline = [];
+//     pipeline.add({
+//       '\$group': {
+//         '_id': {'zone': '\$zone', 'service': '\$service', 
+//           'rateClass': '\$rateClass'},
+//       }
+//     });
+//     var res = await coll.aggregateToStream(pipeline);
+//     print(await res.toList());
+
+
