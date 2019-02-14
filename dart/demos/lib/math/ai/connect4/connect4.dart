@@ -2,6 +2,7 @@ library math.ai.connect4;
 
 import 'dart:math' show min, Random;
 import 'package:more/iterable.dart';
+import 'strategy.dart';
 
 class Connect4Game {
   Board board;
@@ -11,8 +12,8 @@ class Connect4Game {
 
   Connect4Game(this.player1, this.player2) {
     board = Board();
-    player1 ??= Player('red', RandomStrategy(), name: 'A');
-    player2 ??= Player('yellow', RandomStrategy(), name: 'B');
+    player1 ??= Player(Chip('red', 'X'), RandomStrategy(), name: 'A');
+    player2 ??= Player(Chip('yellow', 'O'), RandomStrategy(), name: 'B');
   }
 
   bool move(Player player) {
@@ -21,7 +22,8 @@ class Connect4Game {
   }
 
   bool isWinner(Player player) {
-    /// look at all his chips and determine if he won
+    /// look at all this player's chips and determine if he won
+    ///
   }
 
   /// Play until a winner is found or the board is filled.
@@ -53,31 +55,41 @@ class Board {
   /// Check if the board is filled
   bool isFilled() => columns.any((e) => !isFilled());
 
+  bool addChip(int columnIndex, Player player) {
+    return columns[columnIndex].add(player.chip);
+  }
+
+  @override
+  String toString() {
+    var sb = StringBuffer();
+    sb.write('-------\n');
+    for (int r=0; r<nRows; r++) {
+      for (int c=0; c<nColumns; c++) {
+        if (columns[c].chips.length > r) {
+          var cell = columns[c].chips[r];
+          sb.write(cell.printChar);
+        } else {
+          sb.write(' ');
+        }
+      }
+      sb.write('\n');
+    }
+    return sb.toString().split('\n').reversed.join('\n');
+  }
 }
 
 class Player {
   String name;
-  String chipColor;
+  Chip chip;
   Strategy strategy;
-  Player(this.chipColor, this.strategy, {this.name}) {
+  Player(this.chip, this.strategy, {this.name}) {
+  }
+  @override
+  String toString() {
+    return 'Player: $name, chip: {${chip.toString()}}';
   }
 }
 
-abstract class Strategy {
-  String name;
-  /// the location of the next chip
-  int nextMove(Board board);
-}
-
-class RandomStrategy implements Strategy {
-  String name;
-  Random random;
-  RandomStrategy() {
-    name = 'Random strategy';
-    random = Random();
-  }
-  int nextMove(Board board) => random.nextInt(board.nColumns);
-}
 
 
 class Column {
@@ -103,5 +115,8 @@ class Column {
 
 class Chip {
   String color;
-  Chip(this.color);
+  String printChar;
+  Chip(this.color, this.printChar);
+  @override
+  String toString() => 'color: $color, char: $printChar';
 }
