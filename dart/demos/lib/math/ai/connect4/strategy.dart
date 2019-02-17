@@ -15,5 +15,16 @@ class RandomStrategy implements Strategy {
     name = 'Random strategy';
     random = Random();
   }
-  int nextMove(Board board) => random.nextInt(board.nColumns);
+
+  // if the column is filled, pick another column
+  int nextMove(Board board) {
+    bool isOk;
+    int columnIndex;
+    do {
+      columnIndex = random.nextInt(board.nColumns);
+      isOk = !board.columns[columnIndex].isFilled;
+    } while (!isOk);
+
+    return columnIndex;
+  }
 }
