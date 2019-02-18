@@ -20,19 +20,11 @@ Board addChips(Board board, List<int> columnIds, Player player1, Player player2)
 
 tests() {
 
-//  var board = game.board;
-//  board.addChip(3, player1);
-//  board.addChip(4, player2);
-//  board.addChip(3, player1);
-//  print(board);
-
   test('is winning 4-vertical', (){
     var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
     var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
     var game = Connect4Game(player1, player2);
     addChips(game.board, [3, 0, 3, 1, 3, 4, 3], player1, player2);
-//    print(game.board);
-//    print(player1.coordinates);
     expect(player1.coordinates.contains(Tuple2(0,3)), true);
     expect(player1.coordinates.length, 4);
     expect(player2.coordinates.length, 3);
@@ -55,12 +47,10 @@ tests() {
     var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
     var game = Connect4Game(player1, player2);
     addChips(game.board, [0, 1, 1, 2, 5, 2, 2, 3, 6, 3, 5, 3, 3], player1, player2);
-//    print(game.board);
-//    print(player1.coordinates);
     expect(game.board.isWinner(player1), true);
   });
 
-  test('play game', (){
+  test('play random/random game', (){
     var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
     var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
     var game = Connect4Game(player1, player2);
@@ -68,6 +58,17 @@ tests() {
     print(game.board);
     print(outcome);
   });
+
+  test('play foresight1/random game', (){
+    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
+    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+    var game = Connect4Game(player1, player2);
+    var outcome = game.play();
+    print(game.board);
+    print(outcome);
+  });
+
+
 }
 
 
@@ -75,7 +76,8 @@ compareStrategies() {
   var n = 1000;
   var outcomes = [];
   for (var i=0; i<n; i++) {
-    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
+    //var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
+    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
     var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
     var game = Connect4Game(player1, player2);
     outcomes.add(game.play());
@@ -86,7 +88,7 @@ compareStrategies() {
 
 
 main() {
-  //tests();
+  tests();
 
-  compareStrategies();
+  //compareStrategies();
 }
