@@ -58,27 +58,28 @@ tests() {
     expect(game.isWinner(player1), true);
   });
 
-
-  test('play random/random game', (){
-    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
-    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
-    var game = Connect4Game(player1, player2);
-    var outcome = game.play();
-    print(game.showBoard());
-    print(outcome);
-  });
-
-
-
-
-//  test('play foresight1/random game', (){
-//    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
+//
+//  test('play random/random game', (){
+//    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
 //    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
 //    var game = Connect4Game(player1, player2);
 //    var outcome = game.play();
-//    print(game.board);
+//    print(game.showBoard());
 //    print(outcome);
 //  });
+
+
+
+
+  test('play foresight1/random game', (){
+    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
+    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+    var game = Connect4Game(player1, player2);
+    addChips(game, [2,1,3,2,5,3]);
+    print(game.showBoard());
+    //var outcome = game.play();
+    //print(outcome);
+  });
 
 
 }

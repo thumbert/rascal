@@ -26,31 +26,39 @@ class Connect4Game {
 
   /// Play until a winner is found or the board is filled.
   GameOutcome play() {
-    int _move = 0;
-    Player winner;
-    for (var _playerToMove in cycle([player1, player2])) {
-      _move += 1;
-      playerToMove = _playerToMove;
-      // if you run out of moves, the game ends in a tie
-      if (_move > nColumns * nRows) return GameOutcome.tie;
-      int columnIndex = _playerToMove.strategy.nextMove(this);
+    for (int _move=0; _move < nRows*nColumns; _move++) {
+      int columnIndex = playerToMove.strategy.nextMove(this);
       if (!frontier.contains(columnIndex))
         throw IndexError(columnIndex, frontier);
 
-      var _rowInd = nextRow(columnIndex);
-      moves.add(Tuple3(_rowInd, columnIndex, playerToMove));
-      // remove from frontier if it's the last row
-      if (_rowInd == nRows) frontier.remove(columnIndex);
+      addChip(columnIndex);
 
       // check if you have a winner
-      if (isWinner(_playerToMove)) {
-        winner = _playerToMove;
-        break;
+      if (isWinner(playerToMove)) {
+        if (playerToMove == player1)
+          return GameOutcome.winnerPlayer1;
+        else
+          return GameOutcome.winnerPlayer2;
       }
+      playerToMove = otherPlayer(playerToMove);
     }
-    return winner == player1
-        ? GameOutcome.winnerPlayer1
-        : GameOutcome.winnerPlayer2;
+
+    // filled the board and no winner?  It's a tie!
+    return GameOutcome.tie;
+  }
+
+
+  addChip(int columnIndex) {
+    var _rowInd = nextRow(columnIndex);
+    moves.add(Tuple3(_rowInd, columnIndex, playerToMove));
+    // remove from frontier if it's the last row
+    if (_rowInd == nRows) frontier.remove(columnIndex);
+  }
+
+
+  removeLastChip() {
+    var e = moves.removeLast();
+    if (!frontier.contains(e.item2)) frontier.add(e.item2);
   }
 
 
