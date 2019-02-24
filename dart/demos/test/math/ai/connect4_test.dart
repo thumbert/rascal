@@ -8,83 +8,95 @@ import 'package:demos/math/ai/connect4/connect4.dart';
 import 'package:demos/math/ai/connect4/strategy.dart';
 
 /// Add a bunch a chips at once.
-Board addChips(Board board, List<int> columnIds, Player player1, Player player2) {
-  var players = [player1, player2];
+Connect4Game addChips(Connect4Game game, List<int> columnIds) {
+  var players = [game.player1, game.player2];
   for (var e in indexed(columnIds)) {
     var player = players[e.index % 2];
-    board.addChip(e.value, player);
+    game.moves.add(Tuple3(game.nextRow(e.value), e.value, player));
   }
-  return board;
+  return game;
 }
 
 
 tests() {
 
   test('is winning 4-vertical', (){
-    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
-    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'Adrian');
+    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'Lara');
     var game = Connect4Game(player1, player2);
-    addChips(game.board, [3, 0, 3, 1, 3, 4, 3], player1, player2);
-    expect(player1.coordinates.contains(Tuple2(0,3)), true);
-    expect(player1.coordinates.length, 4);
-    expect(player2.coordinates.length, 3);
-    expect(game.board.isWinner(player1), true);
+    addChips(game, [3, 0, 3, 1, 3, 4, 3]);
+    expect(game.moves.contains(Tuple3(0, 3, player1)), true);
+    expect(game.moves.length, 7);
+    expect(game.coordinates(player2).length, 3);
+    expect(game.isWinner(player1), true);
   });
 
   test('is winning 4-horizontal', (){
-    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
-    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'Adrian');
+    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'Lara');
     var game = Connect4Game(player1, player2);
-    addChips(game.board, [0, 1, 0, 2, 1, 3, 2, 4], player1, player2);
-    expect(player1.coordinates.contains(Tuple2(0,0)), true);
-    expect(player1.coordinates.length, 4);
-    expect(player2.coordinates.length, 4);
-    expect(game.board.isWinner(player2), true);
+    addChips(game, [1, 0, 2, 0, 3, 0, 4]);
+    expect(game.moves.contains(Tuple3(0, 1, player1)), true);
+    expect(game.moves.length, 7);
+    expect(game.coordinates(player2).length, 3);
+    expect(game.isWinner(player1), true);
   });
 
   test('is winning slope +1', (){
     var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
     var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
     var game = Connect4Game(player1, player2);
-    addChips(game.board, [0, 1, 1, 2, 5, 2, 2, 3, 6, 3, 5, 3, 3], player1, player2);
-    expect(game.board.isWinner(player1), true);
+    addChips(game, [0, 1, 1, 2, 5, 2, 2, 3, 6, 3, 5, 3, 3]);
+    expect(game.isWinner(player1), true);
   });
+
+  test('is winning slope -1', (){
+    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
+    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+    var game = Connect4Game(player1, player2);
+    addChips(game, [5, 4, 4, 3, 3, 2, 3, 2, 2, 0, 2]);
+    expect(game.isWinner(player1), true);
+  });
+
 
   test('play random/random game', (){
     var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
     var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
     var game = Connect4Game(player1, player2);
     var outcome = game.play();
-    print(game.board);
+    print(game.showBoard());
     print(outcome);
   });
 
-  test('play foresight1/random game', (){
-    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
-    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
-    var game = Connect4Game(player1, player2);
-    var outcome = game.play();
-    print(game.board);
-    print(outcome);
-  });
+
+
+
+//  test('play foresight1/random game', (){
+//    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
+//    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+//    var game = Connect4Game(player1, player2);
+//    var outcome = game.play();
+//    print(game.board);
+//    print(outcome);
+//  });
 
 
 }
 
 
-compareStrategies() {
-  var n = 1000;
-  var outcomes = [];
-  for (var i=0; i<n; i++) {
-    //var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
-    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
-    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
-    var game = Connect4Game(player1, player2);
-    outcomes.add(game.play());
-  }
-  var res = count(outcomes);
-  res.forEach((k,v) => print('$k: $v'));
-}
+//compareStrategies() {
+//  var n = 1000;
+//  var outcomes = [];
+//  for (var i=0; i<n; i++) {
+//    //var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'A');
+//    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
+//    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+//    var game = Connect4Game(player1, player2);
+//    outcomes.add(game.play());
+//  }
+//  var res = count(outcomes);
+//  res.forEach((k,v) => print('$k: $v'));
+//}
 
 
 main() {
