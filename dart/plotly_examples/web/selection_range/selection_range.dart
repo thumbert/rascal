@@ -1,8 +1,6 @@
 import 'package:plotly/plotly.dart';
 
 import 'dart:math';
-import 'dart:js';
-import 'dart:js_util';
 
 Map getTrace() {
   var x = <DateTime>[];
@@ -30,13 +28,6 @@ main() {
 
   var plot = new Plot.id('myDiv2', data, layout);
 
-//  plot.onClick.listen((event) {
-//    print('click: $event');
-//  });
-//  plot.onHover.listen((event) {
-//    print('hover: $event');
-//  });
-
   plot.on('plotly_relayout').listen((data) {
     print(data);
     var start = DateTime.parse(data["xaxis.range[0]"]);  
@@ -45,20 +36,5 @@ main() {
     print(end);
     print(start.runtimeType);
   });
-
-
-
-
-
-//  plot
-//      .on("plotly_beforeplot")
-//      .listen((event) => print("plotly_beforeplot: $event"));
-//  plot
-//      .on("plotly_afterplot")
-//      .listen((event) => print("plotly_afterplot: $event"));
-//  plot
-//      .on("plotly_beforeexport")
-//      .listen((event) => print("plotly_beforeexport: $event"));
-
 
 }
