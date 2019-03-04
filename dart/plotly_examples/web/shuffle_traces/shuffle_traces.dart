@@ -43,11 +43,17 @@ List<Map> getTraces() {
 main() {
   var data = getTraces();
 
-  var layout = {'title': 'Click button to change trace order',
+  var layout = {'title': 'Use the mouse wheel to shuffle traces',
     'height': 800, 'width': 960};
 
   var plot = Plot.id('chart-div', data, layout);
 
+  var div = querySelector('#chart-div');
+  div.onMouseWheel.listen((e) {
+    plot.moveTraces([0,1,2], [2,1,0]);
+  });
+
+  
   var button = querySelector('#shuffle');
   button.onClick.listen((e) {
     plot.moveTraces([0,1,2], [2,1,0]);
