@@ -230,53 +230,110 @@ List<String> getCountries() {
 }
 
 class Autocomplete {
-  InputElement input;
+
+  DivElement wrapper;
+  InputElement _input;
   List<String> values;
 
   String _value;
 
-  DivElement _a, _b;
+  DivElement _al;  // autocomplete-list
+  int _currentFocus;
 
-  Autocomplete(this.input, this.values) {
-    var currentFocus;
+  Autocomplete(this.wrapper, this.values) {
+    _input = InputElement(type: 'text')
+      ..name = 'myCountry'
+      ..id = '${wrapper.id}-input'
+      ..placeholder = 'Country';
 
-    input.addEventListener('input', (e) {
-      _value = input.value;
+    // a div element that will hold all the items
+    _al = DivElement()
+      ..setAttribute('id', '${_input.id}autocomplete-list')
+      ..setAttribute('class', 'autocomplete-items');
+
+
+    _input.onInput.listen((e) {
+      _value = _input.value;
       _closeAllLists();
-      currentFocus = -1;
+      _currentFocus = -1;
 
-      // a div element that will hold all the items
-      _a = DivElement()
-        ..setAttribute('id', '${input.id}autocomplete-list')
-        ..setAttribute('class', 'autocomplete-items');
-      input.children.add(_a);
+      print('in the onInput event');
 
       for (var value in values
           .where((e) => e.toUpperCase().startsWith(_value.toUpperCase()))) {
-        _b = DivElement();
+        var _b = DivElement();
         _b.innerHtml = '<strong>${value.substring(0, _value.length)}</strong>';
         _b.innerHtml += value.substring(_value.length);
         _b.innerHtml += '<input type="hidden" value="${value}">';
         _b.addEventListener('click', (e) {
-          input.value = input.children.first.nodeValue;
+          _input.value = _input.children.first.nodeValue;
           _closeAllLists();
         });
-
-        _a.children.add(_b);
+        _al.children.add(_b);
       }
     });
 
 
+    _input.onKeyDown.listen((e) {
+      print('here');
+      if (_al == null) return;
+      var _xs = _al.children.cast<DivElement>();
+      if (e.keyCode == 40) {
+        // if arrow DOWN is pressed
+        _currentFocus++;
+        _addActive(_xs);
+      } else if (e.keyCode == 38) {
+        // if arrow UP is pressed
+        _currentFocus--;
+        _addActive(_xs);
+      } else if (e.keyCode == 13) {
+        // if ENTER is pressed
+        e.preventDefault();
+        if (_currentFocus > -1 && _xs.isNotEmpty)
+          _xs[_currentFocus].click();
+      }
+    });
 
+    _input.onClick.listen((e) {
+      _closeAllLists();
+    });
+
+    wrapper.children.add(_input);
+    wrapper.children.add(_al);
   }
 
-  _closeAllLists() {}
+  void _addActive(List<DivElement> xs) {
+    _removeActive(xs);
+    if (_currentFocus >= xs.length) _currentFocus = 0;
+    if (_currentFocus < 0) _currentFocus = xs.length - 1;
+    xs[_currentFocus].classes.add('autocomplete-active');
+  }
+
+  void _removeActive(List<DivElement> xs) {
+    for (var i=0; i<xs.length; i++) {
+      xs[i].classes.remove('autocomplete-active');
+    }
+  }
+
+  void _closeAllLists() {
+    _al.children.clear();
+  }
+
 }
 
 main() {
   var countries = getCountries();
 
-  var input = querySelector('#myInput');
+  var wrapper = querySelector('#wrapper-ac');
 
-  Autocomplete(input, countries);
+  Autocomplete(wrapper, countries);
+
 }
+
+
+
+
+
+
+
+
