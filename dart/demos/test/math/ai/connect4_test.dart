@@ -39,6 +39,37 @@ tests() {
     expect(game.nextRow(1), 0);
   });
 
+  test('next row almost filled', () {
+    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'Adrian');
+    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'Lara');
+    var game = Connect4Game(player1, player2);
+    expect(game.nextRow(0), 0);
+    addChips(game, [0,0,0]);
+    expect(game.nextRow(0), 3);
+    expect(game.nextRow(1), 0);
+    addChips(game, [1,1,1,0,0]);
+    expect(game.nextRow(0), 5);
+    addChips(game, [0]);
+    expect(game.nextRow(0), 6);  // column 0 is now filled
+    expect(game.frontier().contains(0), false);
+  });
+
+  test('next chip for RandomStrategy', (){
+    var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'Adrian');
+    var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'Lara');
+    var game = Connect4Game(player1, player2);
+    addChips(game, [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2,3, 4, 6]);
+    var i = player2.strategy.nextMove(game);
+    expect(game.frontier().contains(i), true);
+    expect(game.nextRow(0), 6);
+    expect(game.nextRow(1), 6);
+    expect(game.nextRow(2), 4);
+    expect(game.nextRow(3), 1);
+    expect(game.nextRow(4), 1);
+    expect(game.nextRow(5), 0);
+    expect(game.nextRow(6), 1);
+  });
+
 
   test('is winning 4-vertical', (){
     var player1 = Player(Chip('red', 'R'), RandomStrategy(), name: 'Adrian');
@@ -106,14 +137,14 @@ tests() {
 
 
 playForesight1VsRandom() {
-  var n = 1;
+  var n = 100;
   var outcomes = [];
   for (var i=0; i<n; i++) {
-    var player1 = Player(Chip('red', 'R'), Foresight1Strategy(), name: 'A');
+    var player1 = Player(Chip('red', 'R'), Foresight2Strategy(), name: 'A');
     var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
     var game = Connect4Game(player1, player2);
-    game.play();
-    //outcomes.add(game.play());
+    //game.play();
+    outcomes.add(game.play());
   }
   var res = count(outcomes);
   res.forEach((k,v) => print('$k: $v'));
@@ -121,7 +152,7 @@ playForesight1VsRandom() {
 
 
 main() {
-  //tests();
+//  tests();
 
   playForesight1VsRandom();
 }

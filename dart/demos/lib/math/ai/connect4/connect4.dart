@@ -27,10 +27,21 @@ class Connect4Game {
   GameOutcome play() {
     for (int _move = 0; _move < nRows * nColumns; _move++) {
       int columnIndex = playerToMove.strategy.nextMove(this);
-      if (nextRow(columnIndex))
+      if (nextRow(columnIndex) == 6) {
+        print('player to move: $playerToMove');
+        print('number of chips in column 0 is ${nextRow(0)}');
+        print('number of chips in column 1 is ${nextRow(1)}');
+        print('number of chips in column 2 is ${nextRow(2)}');
+        print('number of chips in column 3 is ${nextRow(3)}');
+        print('number of chips in column 4 is ${nextRow(4)}');
+        print('number of chips in column 5 is ${nextRow(5)}');
+        print('number of chips in column 6 is ${nextRow(6)}');
+        print('number of chips in column $columnIndex is ${nextRow(columnIndex)}');
+        print(frontier());
+        print('here');
+      }
       
       addChip(columnIndex);
-      print(showBoard());
       var playerWhoMoved = lastPlayer();
 
       // check if you have a winner
@@ -42,13 +53,17 @@ class Connect4Game {
       }
     }
 
-    // filled the board and no winner?  It's a tie!
+    /// filled the board and no winner?  It's a tie!
     return GameOutcome.tie;
   }
 
   addChip(int columnIndex) {
-    if (!frontier().contains(columnIndex))
+    if (!frontier().contains(columnIndex)) {
+      print(playerToMove);
+      print(frontier());
+      print('trying to insert on column $columnIndex');
       throw ArgumentError('Frontier doesn\'t contain $columnIndex');
+    }
 
     var _rowInd = nextRow(columnIndex);
     moves.add(Tuple3(_rowInd, columnIndex, playerToMove));
@@ -83,6 +98,11 @@ class Connect4Game {
         .entries
         .where((e) => e.value == nRows)
         .map((e) => e.key);
+//    if (xs.isNotEmpty) {
+//      print(showBoard());
+//      print('columns ${xs} are filled');
+//    }
+
     return {0, 1, 2, 3, 4, 5, 6}..removeAll(xs);
   }
 

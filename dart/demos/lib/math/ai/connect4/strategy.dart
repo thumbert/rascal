@@ -18,16 +18,10 @@ class RandomStrategy implements Strategy {
     random = Random();
   }
 
-  // if the column is filled, pick another column
   int nextMove(Connect4Game game) {
-    bool isOk;
-    int columnIndex;
-    do {
-      columnIndex = random.nextInt(game.nColumns);
-      isOk = game.frontier().contains(columnIndex);
-    } while (!isOk);
-
-    return columnIndex;
+    var _frontier = game.frontier().toList();
+    var i = random.nextInt(_frontier.length);
+    return _frontier[i];
   }
 }
 
@@ -41,6 +35,39 @@ class Foresight1Strategy implements Strategy {
   }
 
   /// Check if you have 3 in a row, then add the 4th
+  /// (if possible).
+  /// If the column is filled, pick another column.
+  int nextMove(Connect4Game game) {
+    // check that one move wins the match for player
+    var frontier = game.frontier();
+    for (int j in frontier) {
+      game.addChip(j);
+      if (game.isWinner(game.lastPlayer())) {
+        /// found a winning move
+        game.moves.removeLast();
+        return j;
+      }
+      game.moves.removeLast();
+    }
+
+    // no winning move found, so choose randomly from the frontier
+    var _frontier = game.frontier().toList();
+    return _frontier[random.nextInt(_frontier.length)];
+  }
+}
+
+
+class Foresight2Strategy implements Strategy {
+  String name;
+  Random random;
+
+  /// Able to see if the opponent has 3 in a row and block him.
+  Foresight2Strategy() {
+    name = 'Foresight 2 strategy';
+    random = Random();
+  }
+
+  /// Check if you have 3 in a row, then add the 4th
   /// (if possible).  Also, check if the opponent has
   /// 3 in a row so you can block him.
   /// If the column is filled, pick another column.
@@ -49,18 +76,20 @@ class Foresight1Strategy implements Strategy {
     var frontier = game.frontier();
     for (int j in frontier) {
       game.addChip(j);
-      //print(game.showBoard());
       if (game.isWinner(game.lastPlayer())) {
         /// found a winning move
-        return j;
-      } else {
         game.moves.removeLast();
+        return j;
+      } else if (game.isWinner(game.otherPlayer(game.lastPlayer()))) {
+        /// need to block a winning move by the opponent
+        game.moves.removeLast();
+        return j;
       }
+      game.moves.removeLast();
     }
 
     // no winning move found, so choose randomly from the frontier
-    var _frontier = game.frontier().toList().cast<int>();
+    var _frontier = game.frontier().toList();
     return _frontier[random.nextInt(_frontier.length)];
-
   }
 }
