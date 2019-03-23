@@ -256,6 +256,7 @@ class Autocomplete {
       _value = _input.value;
       _closeAllLists();
       _currentFocus = -1;
+      if (_value == '') return;
 
       print('in the onInput event');
 
@@ -275,8 +276,7 @@ class Autocomplete {
 
 
     _input.onKeyDown.listen((e) {
-      print('here');
-      if (_al == null) return;
+      //if (_al == null) return;
       var _xs = _al.children.cast<DivElement>();
       if (e.keyCode == 40) {
         // if arrow DOWN is pressed
@@ -288,9 +288,12 @@ class Autocomplete {
         _addActive(_xs);
       } else if (e.keyCode == 13) {
         // if ENTER is pressed
-        e.preventDefault();
+        print('in enter');
+        //e.preventDefault();
         if (_currentFocus > -1 && _xs.isNotEmpty)
           _xs[_currentFocus].click();
+        print(_xs[_currentFocus].text);
+        _input.text = _xs[_currentFocus].text;
       }
     });
 
