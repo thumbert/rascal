@@ -24,7 +24,7 @@ class RandomStrategy implements Strategy {
     int columnIndex;
     do {
       columnIndex = random.nextInt(game.nColumns);
-      isOk = game.frontier.contains(columnIndex);
+      isOk = game.frontier().contains(columnIndex);
     } while (!isOk);
 
     return columnIndex;
@@ -46,27 +46,21 @@ class Foresight1Strategy implements Strategy {
   /// If the column is filled, pick another column.
   int nextMove(Connect4Game game) {
     // check that one move wins the match for player
-    for (int j in game.frontier) {
-      print(j);
+    var frontier = game.frontier();
+    for (int j in frontier) {
       game.addChip(j);
-      game.showBoard();
-      if (game.isWinner(game.playerToMove)) {
+      //print(game.showBoard());
+      if (game.isWinner(game.lastPlayer())) {
         /// found a winning move
         return j;
       } else {
-        game.removeLastChip();
-        game.showBoard();
+        game.moves.removeLast();
       }
     }
 
-    // no winning move, so choose randomly
-    bool isOk;
-    int columnIndex;
-    do {
-      columnIndex = random.nextInt(game.nColumns);
-      isOk = game.frontier.contains(columnIndex);
-    } while (!isOk);
+    // no winning move found, so choose randomly from the frontier
+    var _frontier = game.frontier().toList().cast<int>();
+    return _frontier[random.nextInt(_frontier.length)];
 
-    return columnIndex;
   }
 }
