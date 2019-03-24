@@ -131,8 +131,13 @@ tests() {
 //    var outcome = game.play();
 //    print(outcome);
   });
+}
 
-
+playMinmaxVsRandom() {
+  var player1 = Player(Chip('red', 'R'), MinmaxStrategy(4), name: 'A');
+  var player2 = Player(Chip('yellow', 'Y'), RandomStrategy(), name: 'B');
+  var game = Connect4Game(player1, player2);
+  game.play();
 }
 
 
@@ -154,5 +159,7 @@ playForesight1VsRandom() {
 main() {
 //  tests();
 
-  playForesight1VsRandom();
+//  playForesight1VsRandom();
+
+  playMinmaxVsRandom();
 }

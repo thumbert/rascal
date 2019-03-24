@@ -1,13 +1,91 @@
-
 import 'dart:math' show Random;
 import 'connect4.dart';
-
 
 /// A strategy is associated with a player.
 abstract class Strategy {
   String name;
+
   /// the location of the next chip
   int nextMove(Connect4Game game);
+}
+
+class MinmaxStrategy implements Strategy {
+  String name;
+  Random random;
+  int depth;
+
+  int _maxScore;
+
+  /// An implementation of the MinMax algorithm to level [depth].
+  MinmaxStrategy(this.depth) {
+    name = 'Minimax ${depth} strategy';
+    random = Random();
+    _maxScore = 10000;
+  }
+
+  int nextMove(Connect4Game game) {
+    return minmax(game)['column'];
+  }
+
+  Map<String, int> minmax(Connect4Game game) {
+    var bestMove = <String, int>{'utility': -50};
+    var _frontier = game.frontier().toList();
+    for (int i in _frontier) {
+      print('add chip in colum $i for player ${game.playerToMove}');
+      game.addChip(i);
+      var moveUtility = _minVal(game, 0);
+      if (moveUtility > bestMove['utility']) {
+        bestMove['utility'] = moveUtility;
+        bestMove['column'] = i;
+      }
+      game.moves.removeLast();
+    }
+    return bestMove;
+  }
+
+  int _minVal(Connect4Game game, int currentDepth) {
+    if (game.isOver())
+      return _score(game, currentDepth);
+    var _frontier = game.frontier().toList();
+    var _utility = _maxScore;
+    if (currentDepth > depth) return _utility;
+
+    for (int i in _frontier) {
+      print('add chip in colum $i for player ${game.playerToMove}');
+      game.addChip(i);
+      var moveUtility = _maxVal(game, currentDepth + 1);
+      if (moveUtility < _utility) _utility = moveUtility;
+      game.moves.removeLast();
+    }
+    return _utility;
+  }
+
+  int _maxVal(Connect4Game game, int currentDepth) {
+    if (game.isOver())
+      return _score(game, currentDepth);
+    var _frontier = game.frontier().toList();
+    var _utility = -_maxScore;
+    if (currentDepth > depth) return _utility;
+
+    for (int i in _frontier) {
+      print('add chip in colum $i for player ${game.playerToMove}');
+      game.addChip(i);
+      var moveUtility = _minVal(game, currentDepth + 1);
+      if (moveUtility > _utility) _utility = moveUtility;
+      game.moves.removeLast();
+    }
+    return _utility;
+  }
+
+  int _score(Connect4Game game, int currentDepth) {
+    var lastPlayer = game.lastPlayer();
+    if (game.isWinner(lastPlayer))
+      return _maxScore - currentDepth;
+    else if (game.isWinner(game.otherPlayer(lastPlayer)))
+      return currentDepth - _maxScore;
+    else
+      return 0;
+  }
 }
 
 class RandomStrategy implements Strategy {
@@ -55,7 +133,6 @@ class Foresight1Strategy implements Strategy {
     return _frontier[random.nextInt(_frontier.length)];
   }
 }
-
 
 class Foresight2Strategy implements Strategy {
   String name;

@@ -13,6 +13,8 @@ class Connect4Game {
   Player player1;
   Player player2;
 
+  Set<int> _columns;
+
   /// Keep the entire game history in this list.  Everything can be calculated
   /// from the list of moves.
   /// [row, column, player];
@@ -21,26 +23,14 @@ class Connect4Game {
   Connect4Game(this.player1, this.player2, {this.nColumns: 7, this.nRows: 6}) {
     player1 ??= Player(Chip('red', 'X'), RandomStrategy(), name: 'A');
     player2 ??= Player(Chip('yellow', 'O'), RandomStrategy(), name: 'B');
+
+    _columns = Set.from(List.generate(nColumns, (i) => i));
   }
 
   /// Play until a winner is found or the board is filled.
   GameOutcome play() {
     for (int _move = 0; _move < nRows * nColumns; _move++) {
-      int columnIndex = playerToMove.strategy.nextMove(this);
-      if (nextRow(columnIndex) == 6) {
-        print('player to move: $playerToMove');
-        print('number of chips in column 0 is ${nextRow(0)}');
-        print('number of chips in column 1 is ${nextRow(1)}');
-        print('number of chips in column 2 is ${nextRow(2)}');
-        print('number of chips in column 3 is ${nextRow(3)}');
-        print('number of chips in column 4 is ${nextRow(4)}');
-        print('number of chips in column 5 is ${nextRow(5)}');
-        print('number of chips in column 6 is ${nextRow(6)}');
-        print('number of chips in column $columnIndex is ${nextRow(columnIndex)}');
-        print(frontier());
-        print('here');
-      }
-      
+      var columnIndex = playerToMove.strategy.nextMove(this);
       addChip(columnIndex);
       var playerWhoMoved = lastPlayer();
 
@@ -57,11 +47,10 @@ class Connect4Game {
     return GameOutcome.tie;
   }
 
+  /// add a chip to the board
   addChip(int columnIndex) {
     if (!frontier().contains(columnIndex)) {
-      print(playerToMove);
-      print(frontier());
-      print('trying to insert on column $columnIndex');
+      // you should never be here
       throw ArgumentError('Frontier doesn\'t contain $columnIndex');
     }
 
@@ -73,6 +62,7 @@ class Connect4Game {
   int nextRow(int columnIndex) =>
       moves.where((e) => e.item2 == columnIndex).length;
 
+  /// Get the chip coordinates of a given player
   Set<Tuple2<int, int>> coordinates(Player player) {
     return moves
         .where((e) => e.item3 == player)
@@ -80,33 +70,41 @@ class Connect4Game {
         .toSet();
   }
 
-  /// who made the last move?
+  /// Get the player who made the last move.
   Player lastPlayer() {
     if (moves.isEmpty) return player1;
     return moves.last.item3;
   }
 
+  /// Get the player who has to move next.
   Player get playerToMove => [player1, player2][moves.length % 2];
 
   /// Given a player, return the other player
   Player otherPlayer(Player player) => player == player1 ? player2 : player1;
 
   /// Calculate the frontier which is the set of columns not filled yet.
+  /// These are the only columns that can accept at least one chip.
   Set<int> frontier() {
     // find the filled columns
     var xs = count(moves.map((e) => e.item2).toList())
         .entries
         .where((e) => e.value == nRows)
         .map((e) => e.key);
-//    if (xs.isNotEmpty) {
-//      print(showBoard());
-//      print('columns ${xs} are filled');
-//    }
-
-    return {0, 1, 2, 3, 4, 5, 6}..removeAll(xs);
+    return _columns..removeAll(xs);
   }
 
+  /// Check if a game is over
+  bool isOver() {
+    return moves.length == nRows * nColumns ||
+        isWinner(player1) ||
+        isWinner(player2);
+  }
+
+  /// Check if a player has won, given the current board configuration.
   bool isWinner(Player player) {
+    // no need to check if you have < 7 pieces on the board
+    if (moves.length < 7) return false;
+
     var coords = coordinates(player);
     if (_checkHorizontal(coords) ||
         _checkVertical(coords) ||
@@ -171,11 +169,11 @@ class Connect4Game {
 }
 
 class Player {
-  String name;
-  Chip chip;
-  Strategy strategy;
+  final String name;
+  final Chip chip;
+  final Strategy strategy;
 
-  Player(this.chip, this.strategy, {this.name}) {}
+  Player(this.chip, this.strategy, {this.name});
 
   @override
   String toString() {
