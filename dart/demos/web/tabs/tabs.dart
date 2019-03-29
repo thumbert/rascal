@@ -12,13 +12,14 @@ class Tabs {
   List<DivElement> _tabContentDivs;
 
   Tabs(this.wrapper, List<String> values, {String buttonWrapperClass: 'w3-bar w3-black'}) {
-    this.values = values;
-    _buttonWrapperClass = buttonWrapperClass;
     _wrapper = DivElement();
+    _buttonWrapperClass = buttonWrapperClass;
+    this.values = values;
     wrapper.children.add(_wrapper);
   }
 
   set values(List<String> xs) {
+    print('here');
     _values = List.from(xs);
 
     var _wId = wrapper.id;
