@@ -21,7 +21,8 @@ class EuropeanOption {
   
   /// Implement the Black-Scholes model for European option on a stock.
   EuropeanOption(this.type, this.strike, this.expirationDate, {
-    Date asOfDate, this.riskFreeRate, this.underlyingPrice, num volatility,
+    Date asOfDate, this.underlyingPrice, num volatility,
+    this.riskFreeRate,
   }) {
     if (volatility != null) this.volatility = volatility;
     if (asOfDate != null) this.asOfDate = asOfDate;
