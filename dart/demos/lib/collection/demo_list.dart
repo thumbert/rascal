@@ -59,7 +59,7 @@ void sorting() {
 sorting2() {
   
   // Sort with nulls
-  var natural = new Ordering.natural();  
+  var natural = Ordering.natural<num>();
   var ordering = natural.nullsLast;
   print(ordering.sorted([2, null, 3, 1])); 
 

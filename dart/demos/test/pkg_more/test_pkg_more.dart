@@ -8,7 +8,7 @@ test_permutations() {
   var x = permutations(['A', 'B', 'C']);
   test('permutations', (){
     expect(x.length, 6);
-    Iterator it = x.iterator;
+    var it = x.iterator;
     expect(it.moveNext(), true);
     expect(it.current, ['A', 'B', 'C']);
   });
@@ -26,7 +26,7 @@ test_orderings() {
 
     var byMonthExplicit = Ordering.explicit(["Jan", "Feb", "Mar", "Apr"]);
     test('list with nulls', () {
-      var natural = Ordering.natural();
+      var natural = Ordering.natural<num>();
       var ordering = natural.nullsLast;
       expect(ordering.sorted([2, null, 3, 1]),
           [1, 2, 3, null]);
@@ -46,7 +46,7 @@ test_orderings() {
     });
 
     test('sort by first element of list', (){
-      var byCode = Ordering.natural().onResultOf((obs) => obs[0]);
+      var byCode = Ordering.natural<String>().onResultOf((obs) => obs[0]);
       var res = byCode.sorted(data);
       expect(res, [
         ['BOS', 'Jan', 25],
@@ -57,7 +57,7 @@ test_orderings() {
     });
 
     test('sort by two variables: code & month', (){
-      var byCode = Ordering.natural().onResultOf((obs) => obs[0]);
+      var byCode = Ordering.natural<String>().onResultOf((obs) => obs[0]);
       var byMonth = byMonthExplicit.onResultOf((obs) => obs[1]);
       var byCodeMonth = byCode.compound(byMonth);
       var res = byCodeMonth.sorted(data);
@@ -71,8 +71,8 @@ test_orderings() {
     });
 
     test('order datetimes', (){
-      var dt = [new DateTime(2014), new DateTime(2010), new DateTime(2011)];
-      expect(Ordering.natural().sorted(dt), [
+      var dt = [DateTime(2014), DateTime(2010), DateTime(2011)];
+      expect(Ordering.natural<DateTime>().sorted(dt), [
         new DateTime(2010),
         new DateTime(2011),
         new DateTime(2014),
@@ -86,7 +86,7 @@ test_orderings() {
         {'station': 'B', 'value': 15},
         {'station': 'A', 'value': 7},
       ];
-      Ordering ord = new Ordering.natural()
+      var ord = Ordering.natural<num>()
           .nullsFirst
           .onResultOf<Map>((Map row) => row['value']);
       expect(ord.sorted(map1), [
@@ -105,7 +105,7 @@ test_orderings() {
         {'station': 'B', 'value': 6},
         {'station': 'A', 'value': 7},
       ];
-      var natural = new Ordering.natural();
+      var natural = Ordering.natural<String>();
       var byStation = natural
           .onResultOf<Map>((Map row) => row['station']);
       var byValue = natural

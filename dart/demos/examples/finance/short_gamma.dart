@@ -33,7 +33,7 @@ List<Map> mockHistoricalData(int seed) {
     ..volatility = 0.3
     ..interestRate = 0.01;
 
-  var days = new TimeIterable(start, end).toList();
+  var days = []; //new TimeIterable(start, end).toList();
 
   /// generate the underlying price (remember, daily volatility)
   var gbm = new GeometricBrownianMotion(30, 0, 0.02, seed);
@@ -149,7 +149,7 @@ class ShortGamma {
 
   /// run this algorithm from start to end
   void run(Date start, Date end) {
-    List<Date> days = new TimeIterable(start, end).toList();
+    List<Date> days = []; //new TimeIterable(start, end).toList();
     days.forEach((Date day) {
       DateTime dt = day.toDateTime();
       num delta = portfolio.delta(dt).first.item2;

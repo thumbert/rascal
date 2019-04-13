@@ -54,7 +54,7 @@ Future insertOneDay(InfluxDb db, Date day) async {
 /// Insert a range of days into influxdb
 /// return 0 for success
 Future<int> insertDayRange(InfluxDb db, Date start, Date end) async {
-  List<Date> range = new TimeIterable(start, end).toList();
+  List<Date> range = []; //new TimeIterable(start, end).toList();
   Iterable<Future> ins = range.map((day) {
     print('Inserting day $day');
     return insertOneDay(db, day);
