@@ -16,16 +16,19 @@ tests() {
         ..asOfDate = Date(2015, 1, 1)
         ..volatility = 0.25
         ..riskFreeRate = 0.03;
-      print(c1.value());
-      print(c1.delta());
-      print(c1.gamma());
+      expect(c1.value().toStringAsFixed(4), '2.9790');
+      expect(c1.delta().toStringAsFixed(4), '0.5280');
+      expect(c1.gamma().toStringAsFixed(4), '0.0555');
+      expect(c1.vega().toStringAsFixed(4), '0.1141');
+      expect(c1.theta().toStringAsFixed(4), '-0.0516');
+      expect(c1.rho().toStringAsFixed(4), '0.0004');
+      expect(c1.impliedVolatility(2.978962).toStringAsFixed(4), '0.2500');
 
-
-      var prices = List.generate(10, (i) => 95 + i );
-      prices.forEach((price) {
-        c1..underlyingPrice = price;
-        print(c1.value().toStringAsFixed(8));
-      });
+//      var prices = List.generate(10, (i) => 95 + i );
+//      prices.forEach((price) {
+//        c1..underlyingPrice = price;
+//        print(c1.value().toStringAsFixed(8));
+//      });
     });
   });
 

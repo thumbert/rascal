@@ -1,7 +1,7 @@
 library finance.european_option;
 
-
 import 'dart:math';
+import 'package:dama/analysis/solver/bisection_solver.dart';
 import 'package:date/date.dart';
 import 'package:elec/risk_system.dart';
 import 'package:dama/special/erf.dart';
@@ -18,10 +18,15 @@ class EuropeanOption {
   num underlyingPrice;
   num _volatility;
   num _tExp;
-  
+
   /// Implement the Black-Scholes model for European option on a stock.
-  EuropeanOption(this.type, this.strike, this.expirationDate, {
-    Date asOfDate, this.underlyingPrice, num volatility,
+  EuropeanOption(
+    this.type,
+    this.strike,
+    this.expirationDate, {
+    Date asOfDate,
+    this.underlyingPrice,
+    num volatility,
     this.riskFreeRate,
   }) {
     if (volatility != null) this.volatility = volatility;
@@ -41,7 +46,6 @@ class EuropeanOption {
     _volatility = value;
   }
 
-
   /// Calculate the value of this option.  Values for the [asOfDate], [underlyingPrice],
   /// [_volatility], and [riskFreeRate] can be set directly in the object.
   ///
@@ -54,11 +58,11 @@ class EuropeanOption {
           res = max(underlyingPrice - strike, 0);
         } else {
           res = underlyingPrice *
-              _nd1(
-                  _tExp, _volatility, underlyingPrice, strike, riskFreeRate) -
+                  _nd1(_tExp, _volatility, underlyingPrice, strike,
+                      riskFreeRate) -
               strike *
-                  _nd2(
-                      _tExp, _volatility, underlyingPrice, strike, riskFreeRate) *
+                  _nd2(_tExp, _volatility, underlyingPrice, strike,
+                      riskFreeRate) *
                   exp(-riskFreeRate * _tExp);
         }
         break;
@@ -67,10 +71,10 @@ class EuropeanOption {
           res = max(strike - underlyingPrice, 0);
         } else {
           res = strike *
-              (1 -
-                  _nd2(_tExp, _volatility, underlyingPrice, strike,
-                      riskFreeRate)) *
-              exp(-riskFreeRate * _tExp) -
+                  (1 -
+                      _nd2(_tExp, _volatility, underlyingPrice, strike,
+                          riskFreeRate)) *
+                  exp(-riskFreeRate * _tExp) -
               underlyingPrice *
                   (1 -
                       _nd1(_tExp, _volatility, underlyingPrice, strike,
@@ -98,25 +102,21 @@ class EuropeanOption {
     return res;
   }
 
-  void _validate() {
-    if (underlyingPrice == null) throw 'Underlying price has not been set';
-    if (riskFreeRate == null) throw 'Interest rate has not been set';
-    if (asOfDate == null) throw 'Need to set the as of date';
-    if (_volatility == null) throw 'Volatility is not set';
-  }
-
   /// Calculate the gamma of the option (second derivative with respect to
   /// the underlying price.)
   double gamma() {
     double aux = _volatility * underlyingPrice * sqrt(_tExp);
-    return _dNd1(_tExp, _volatility, underlyingPrice, strike, riskFreeRate) / aux;
+    return _dNd1(_tExp, _volatility, underlyingPrice, strike, riskFreeRate) /
+        aux;
   }
 
   /// Calculate the theta of the option (sensitivity with respect to time.)
+  /// for 1 day change in time to expiration
   double theta() {
-    var _tExp = _timeToExpiration(asOfDate, expirationDate);
-    var t1 =
-        -_volatility * underlyingPrice * _dNd1(_tExp, _volatility, underlyingPrice, strike, riskFreeRate) / (2 * sqrt(_tExp));
+    var t1 = -_volatility *
+        underlyingPrice *
+        _dNd1(_tExp, _volatility, underlyingPrice, strike, riskFreeRate) /
+        (2 * sqrt(_tExp));
     double res;
     switch (type) {
       case CallPut.call:
@@ -131,36 +131,62 @@ class EuropeanOption {
             riskFreeRate *
                 strike *
                 exp(-riskFreeRate * _tExp) *
-                Phi(-_nd2(_tExp, _volatility, underlyingPrice, strike, riskFreeRate));
+                Phi(-_nd2(
+                    _tExp, _volatility, underlyingPrice, strike, riskFreeRate));
         break;
     }
-    return res;
+    return res / 365.25;
   }
 
   /// Calculate the vega of the option (sensitivity with respect to volatility.)
+  /// for 1% move in the volatility
   double vega() {
-    var _tExp = _timeToExpiration(asOfDate, expirationDate);
-    return underlyingPrice * sqrt(_tExp) * _dNd1(_tExp, _volatility, underlyingPrice, strike, riskFreeRate);
+    return 0.01 *
+        underlyingPrice *
+        sqrt(_tExp) *
+        _dNd1(_tExp, _volatility, underlyingPrice, strike, riskFreeRate);
   }
 
   /// Calculate the sensitivity of the option with respect to interest rate
+  /// for 1 basis point move in the risk free rate.
   double rho() {
     double res;
     switch (type) {
       case CallPut.call:
-        res = strike *
+        res = 0.0001 * strike *
             _tExp *
             exp(-riskFreeRate * _tExp) *
             _nd2(_tExp, _volatility, underlyingPrice, strike, riskFreeRate);
         break;
       case CallPut.put:
-        res = strike *
+        res = 0.0001 * strike *
             _tExp *
             exp(-riskFreeRate * _tExp) *
-            Phi(-_nd2(_tExp, _volatility, underlyingPrice, strike, riskFreeRate));
+            Phi(-_nd2(
+                _tExp, _volatility, underlyingPrice, strike, riskFreeRate));
         break;
     }
     return res;
+  }
+
+  /// Calculate the implied volatility of this option given an option price
+  double impliedVolatility(num price) {
+    var f = (num v) {
+      var opt = EuropeanOption(type, strike, expirationDate)
+        ..volatility = v
+        ..riskFreeRate = riskFreeRate
+        ..underlyingPrice = underlyingPrice
+        ..asOfDate = _asOfDate;
+      return opt.value() - price;
+    };
+    return bisectionSolver(f, 0.00001, 1000);
+  }
+
+  void _validate() {
+    if (underlyingPrice == null) throw 'Underlying price has not been set';
+    if (riskFreeRate == null) throw 'Interest rate has not been set';
+    if (asOfDate == null) throw 'Need to set the as of date';
+    if (_volatility == null) throw 'Volatility is not set';
   }
 }
 
@@ -171,13 +197,13 @@ double _d1(num _tExp, num volatility, num underlyingPrice, num strike,
     d1 = double.infinity;
   else
     d1 = (log(underlyingPrice / strike) +
-        (interestRate + 0.5 * volatility * volatility) * _tExp) /
+            (interestRate + 0.5 * volatility * volatility) * _tExp) /
         (volatility * sqrt(_tExp));
   return d1;
 }
 
 double _nd1(num _tExp, num volatility, num underlyingPrice, num strike,
-    num interestRate) =>
+        num interestRate) =>
     Phi(_d1(_tExp, volatility, underlyingPrice, strike, interestRate));
 double _d2(num _tExp, num volatility, num underlyingPrice, num strike,
     num interestRate) {
@@ -186,14 +212,14 @@ double _d2(num _tExp, num volatility, num underlyingPrice, num strike,
     d2 = double.infinity;
   else
     d2 = (log(underlyingPrice / strike) +
-        (interestRate + 0.5 * volatility * volatility) * _tExp) /
-        (volatility * sqrt(_tExp)) -
+                (interestRate + 0.5 * volatility * volatility) * _tExp) /
+            (volatility * sqrt(_tExp)) -
         volatility * sqrt(_tExp);
   return d2;
 }
 
 double _nd2(num _tExp, num volatility, num underlyingPrice, num strike,
-    num interestRate) =>
+        num interestRate) =>
     Phi(_d2(_tExp, volatility, underlyingPrice, strike, interestRate));
 double _dNd1(num _tExp, num volatility, num underlyingPrice, num strike,
     num interestRate) {
@@ -204,5 +230,3 @@ double _dNd1(num _tExp, num volatility, num underlyingPrice, num strike,
 num _timeToExpiration(Date asOfDate, Date expirationDate) {
   return max(0, expirationDate.end.difference(asOfDate.end).inDays / 365.25);
 }
-
-
