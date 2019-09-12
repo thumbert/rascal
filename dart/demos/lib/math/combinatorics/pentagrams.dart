@@ -349,7 +349,7 @@ class Matrix<A> {
       return false;
     
     for (int i=0; i<nrow*ncol; i++) {
-      if (data[i] != that.data[i])
+      if (data[i] != that.rowData[i])
         return false;
     }
     
