@@ -1,6 +1,9 @@
 import 'package:plotly/plotly.dart';
 
 import 'dart:math';
+import 'package:timezone/browser.dart';
+import 'package:date/date.dart';
+
 
 Map getTrace() {
   var x = <DateTime>[];
@@ -20,13 +23,17 @@ Map getTrace() {
 }
 
 
-main() {
+main() async {
+  await initializeTimeZone();
+
+  var start = Date(2014, 1, 1);
+  var end = Date.today();
 
   var data = [getTrace()];
 
   var layout = {'title': 'Line and Scatter Plot', 'height': 800, 'width': 960};
 
-  var plot = new Plot.id('myDiv2', data, layout);
+  var plot = Plot.id('myDiv2', data, layout);
 
   plot.on('plotly_relayout').listen((data) {
     print(data);

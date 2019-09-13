@@ -1,12 +1,14 @@
 
 import 'dart:html';
-import 'package:elec_server/src/ui/autocomplete.dart';
+import 'package:elec_server/src/ui/type_ahead.dart';
 
 
+/// This is a list that you can add and remove elements.
+/// Not working ...
 class ConstructedList {
 
   Element wrapper;
-  Autocomplete _autocomplete;
+  TypeAhead _autocomplete;
   List<String> _values;
   DivElement _wrapper;
   ButtonElement _addButton;
@@ -19,7 +21,7 @@ class ConstructedList {
 
     var _wrapperAc = DivElement();
     _wrapperAc.setAttribute('style', 'float:left;');
-    _autocomplete = Autocomplete(_wrapperAc, values, placeholder: placeholder);
+    _autocomplete = TypeAhead(_wrapperAc, values, placeholder: placeholder);
     _wrapper.children.add(_wrapperAc);
 
 
