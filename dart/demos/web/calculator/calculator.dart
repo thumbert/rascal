@@ -23,6 +23,7 @@ class Calculator {
     setDefaultData();
 
     _makeTable();
+    _addShortcuts();
   }
 
   void setDefaultData() {
@@ -61,12 +62,10 @@ class Calculator {
       }
     }
 
-//    if (wrapper != null) {
-//      /// if you already have a table, remove it before you add it back to the dom
-//      if (wrapper.children.length > 0) wrapper.children = [];
-//    }
     wrapper.append(_table);
+  }
 
+  _addShortcuts() {
     window.onKeyUp.listen((e){
       if (e.altKey && e.keyCode == 82) {
         print('here');
@@ -76,10 +75,9 @@ class Calculator {
       } else if (e.keyCode == 9) {
         print('pressed Tab');
       }
-
     });
-
   }
+
 }
 
 
