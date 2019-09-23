@@ -14,6 +14,9 @@ class Calculator {
   Map<String,dynamic> options;
 
   TableElement _table;
+  Element _thead;
+  Element _tbody;
+
   List<Element> _tableHeaders;
   List<String> _columnNames;
 
@@ -41,6 +44,8 @@ class Calculator {
   }
 
   _makeTable() {
+    wrapper.classes.add('dws_content');
+
     _tableHeaders = List<Element>(_columnNames.length);
     _table = TableElement();
     _table.createTHead();
