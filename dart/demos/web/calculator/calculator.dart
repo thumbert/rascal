@@ -16,6 +16,7 @@ class Calculator {
   TableElement _table;
   Element _thead;
   Element _tbody;
+  DivElement _textArea;
 
   List<Element> _tableHeaders;
   List<String> _columnNames;
@@ -44,13 +45,19 @@ class Calculator {
   }
 
   _makeTable() {
-    wrapper.classes.add('dws_content');
+    wrapper.classes.add('dws-content');
+
+    _textArea = DivElement()
+      ..className = 'dws-textarea'
+      ..id = 'dws-textarea';
+
 
     _tableHeaders = List<Element>(_columnNames.length);
     _table = TableElement();
+    _table.classes.add('dws');
     _table.createTHead();
 
-    TableRowElement headerRow = _table.tHead.insertRow(0);
+    var headerRow = _table.tHead.insertRow(0);
     for (int i = 0; i < _columnNames.length; i++) {
       _tableHeaders[i] = (Element.th()
         ..text = _columnNames[i]);
