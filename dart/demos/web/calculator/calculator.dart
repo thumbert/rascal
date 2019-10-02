@@ -3,6 +3,26 @@ import 'package:timezone/browser.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:date/date.dart';
 
+enum CellType {numeric, text}
+
+class CalculatorOptions {
+  Map<int,ColumnOptions> columns;
+}
+
+class ColumnOptions {
+  String type;
+  int width;
+  int height;
+  String alignment;
+  bool readOnly;
+  List source;
+  ColumnOptions({this.type: 'text', this.width: 50,
+    this.alignment: 'center'}) {
+    source = [];
+  }
+}
+
+
 class Calculator {
   Element wrapper;
   tz.Location location;
@@ -11,7 +31,7 @@ class Calculator {
   Month endMonth;
   List<Map<String,dynamic>> rowData;
 
-  Map<String,dynamic> options;
+  CalculatorOptions options;
 
   TableElement _table;
   Element _thead;
@@ -20,10 +40,11 @@ class Calculator {
 
   List<Element> _tableHeaders;
   List<String> _columnNames;
+  List<List<Element>> _records;
+
 
   /// A toy electricity calculator.
   Calculator(this.wrapper, {this.options}) {
-    options ??= <String,dynamic>{};
     setDefaultData();
 
     _makeTable();
@@ -76,6 +97,24 @@ class Calculator {
 
     wrapper.append(_table);
   }
+
+  /// Return the html td element
+  Element createCell(int i, int j, dynamic value) {
+    var td = document.createElement('td')
+      ..setAttribute('data-x', i.toString())
+      ..setAttribute('data-y', j.toString());
+
+    var colAlign = options.columns[i].alignment ?? 'center';
+    td.style.textAlign = colAlign;
+
+    return td;
+  }
+
+  /// Return the html tr row element
+  Element createRow() {
+    // TODO: line 731
+  }
+
 
   _addShortcuts() {
     window.onKeyUp.listen((e){
