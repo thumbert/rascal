@@ -52,10 +52,10 @@ tests() async {
       {'day': '2015-02-01', 'id': 'A', 'value': 5},
       {'day': '2015-02-02', 'id': 'A', 'value': 6},
       {'day': '2015-02-01', 'id': 'B', 'value': 7},
-      {'day': '2015-02-02', 'id': 'B', 'value': 8},
+      {'day': '2015-02-07', 'id': 'B', 'value': 8},
     ];
-    Db db = new Db('mongodb://127.0.0.1/test');
-    DbCollection coll = db.collection("timeseries");
+    var db = Db('mongodb://127.0.0.1/test');
+    var coll = db.collection("timeseries");
     setUp(() async {
       await db.open();
       await coll.drop();
@@ -64,26 +64,24 @@ tests() async {
     tearDown(() async {
       await db.close();
     });
-    test('aggregate the values by month and id', () async {
-      List pipeline = [];
-      var project = {
-        '\$project': {
-          'id': 1,
-          'value': 1,
-          'month': {
-            '\$substr': ['\$day', 0, 7]
-          },
-        }
-      };
-      var group = {
-        '\$group': {
-          '_id': {'month': '\$month', 'id': '\$id'},
-          'avgValue': {'\$avg': '\$value'}
-        }
-      };
-      pipeline.add(project);
-      pipeline.add(group);
-      /// simple aggregate doesn't work!
+    test('calculate average values by month and id', () async {
+      var pipeline = [
+        {
+          '\$project': {
+            'id': 1,
+            'value': 1,
+            'month': {
+              '\$substr': ['\$day', 0, 7]
+            },
+          }
+        },
+        {
+          '\$group': {
+            '_id': {'month': '\$month', 'id': '\$id'},
+            'avgValue': {'\$avg': '\$value'}
+          }
+        },
+      ];
       var res = await coll.aggregateToStream(pipeline).toList();
       expect(res, [
         {
@@ -103,6 +101,27 @@ tests() async {
           'avgValue': 1.5
         },
       ]);
+    });
+    test('get last document with date < asOfDate for a given id', () async {
+      /// so for id: B, if asOfDate = '2015-02-06' return
+      /// {'day': '2015-02-01', 'id': 'B', 'value': 7},
+      /// This is useful to have for a marks database.
+      var pipeline = [
+        {
+          '\$match': {
+            'id': {'\$eq': 'B'},
+            'day': {'\$lte': '2015-02-06'},
+          }
+        },
+        {
+          '\$sort': {'day': -1},
+        },
+        {
+          '\$limit': 1,
+        },
+      ];
+      var aux = await coll.aggregateToStream(pipeline).toList();
+      expect(aux.first['day'], '2015-02-01');
     });
   });
 }
