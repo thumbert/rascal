@@ -29,7 +29,7 @@ dependencies:
   http: '>=0.12.0 <0.13.0'
   intl: ">=0.15.7 <0.16.0"
   js: '>=0.6.0 <0.7.0'
-  mongo_dart: '>=0.3.6 <1.0.0'
+  mongo_dart: ^0.4.0
   more: '>=1.12.0 <2.0.0'
   petitparser: '>=2.0.0 <3.0.0'
   plotly:
@@ -38,7 +38,7 @@ dependencies:
   quiver: '>=2.0.0 <3.0.0'
   stagexl: 1.4.0+2
 #  spreadsheet_decoder: '^0.3.1'
-  timezone: '>=0.5.5 < 1.0.0'
+  timezone: '>=0.5.5 <1.0.0'
   table:
     git:
       url: git://github.com/thumbert/table.git

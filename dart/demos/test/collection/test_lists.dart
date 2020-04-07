@@ -3,6 +3,8 @@ library test_lists;
 import 'dart:collection';
 import 'dart:math' show min;
 
+import 'package:test/test.dart';
+
 class Person {
   String name;
   int age;
@@ -21,7 +23,6 @@ class MyCustomList<E> extends Object with ListMixin<E> {
 
 }
 
-
 /// Merge [a] and [b] until [a] is fully consumed. Then add 42.
 Iterable<int> combine(Iterable<int> a, Iterable<int> b) sync* {
   var aIterator = a.iterator;
@@ -35,19 +36,18 @@ Iterable<int> combine(Iterable<int> a, Iterable<int> b) sync* {
   yield 42;
 }
 
-
-main() {
+void examples() {
   List x = [new Person("Andrei", 50),
-            new Person("Laura",  10), 
-            new Person("Gaga",   27)];
-  
+    new Person("Laura",  10),
+    new Person("Gaga",   27)];
+
   x.removeWhere((p) => p.age < 20);
   print(x);
-  
+
   MyCustomList y = new MyCustomList();
   y.addAll([new Person("Andrei", 50),
-            new Person("Laura",  10), 
-            new Person("Gaga",   27)]);
+    new Person("Laura",  10),
+    new Person("Gaga",   27)]);
   y.removeWhere((p) => p.age < 20);
   print(y);
 
@@ -67,3 +67,56 @@ main() {
   print(xx.first['value'] == 'AA');  // true
 
 }
+
+void tests() {
+  group('Sorting of Lists', () {
+    var xs = [
+      {'id': 'A', 'value': -500},
+      {'id': 'B', 'value':  500},
+      {'id': 'C', 'value': -1000},
+      {'id': 'C', 'value':  2000},
+    ];
+    test('sort ascending', () {
+      var ys = xs..sort((a,b) => (a['value'] as num).compareTo(b['value'] as num));
+      expect(ys, [
+        {'id': 'C', 'value': -1000},
+        {'id': 'A', 'value': -500},
+        {'id': 'B', 'value':  500},
+        {'id': 'C', 'value':  2000},
+      ]);
+    });
+    test('sort descending', () {
+      var ys = xs..sort((a,b) => -(a['value'] as num).compareTo(b['value'] as num));
+      expect(ys, [
+        {'id': 'C', 'value':  2000},
+        {'id': 'B', 'value':  500},
+        {'id': 'A', 'value': -500},
+        {'id': 'C', 'value': -1000},
+      ]);
+    });
+    test('sort descending by absolute value', () {
+      var ys = xs..sort((a,b) {
+        var as = (a['value'] as num).abs();
+        var bs = (b['value'] as num).abs();
+        return -as.compareTo(bs);
+      });
+      ys.forEach(print);
+      expect(ys, [
+        {'id': 'C', 'value':  2000},
+        {'id': 'B', 'value':  500},
+        {'id': 'A', 'value': -500},
+        {'id': 'C', 'value': -1000},
+      ]);
+    });
+
+
+  });
+}
+
+
+void main() {
+
+  tests();
+
+}
+
