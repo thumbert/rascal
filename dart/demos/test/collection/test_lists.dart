@@ -2,7 +2,10 @@ library test_lists;
 
 import 'dart:collection';
 import 'dart:math' show min;
+import 'package:date/date.dart';
+import 'package:timeseries/timeseries.dart';
 
+//import 'package:demos/collection/custom_iterator.dart';
 import 'package:test/test.dart';
 
 class Person {
@@ -116,7 +119,21 @@ void tests() {
 
 void main() {
 
-  tests();
+  // chain where
+  var x = List.generate(24, (i) => i);
+  var index = Date(2020, 1, 1).hours();
+  var ts = TimeSeries.from(index, x);
+  var ys = ts;
+
+  var xs = ys.where((e) => e.value % 2 == 0);
+  xs = xs.where((e) => e.value > 10);
+  xs.forEach(print);
+
+
+
+
+
+  //tests();
 
 }
 

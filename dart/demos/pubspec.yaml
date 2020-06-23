@@ -1,6 +1,6 @@
 name: demos
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.8.0 <3.0.0'
 dependencies:
   args: '>=1.5.0 <2.0.0'
   archive: '>=2.0.0 <3.0.0'
@@ -42,6 +42,9 @@ dependencies:
   table:
     git:
       url: git://github.com/thumbert/table.git
+  timeseries:
+    git:
+      url: git://github.com/thumbert/timeseries.git
   trotter: '>=1.0.0 <2.0.0'
   tuple: '^1.0.2'
 
