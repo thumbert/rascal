@@ -12,18 +12,18 @@ dependencies:
     git:
       url: git://github.com/thumbert/dama.git
 #  dart_to_js_script_rewriter: ^1.0.1
-  date:
-    git:
-      url: git://github.com/thumbert/date.git
+#  date:
+#    git:
+#      url: git://github.com/thumbert/date.git
 #  dygraphs_dart:
 #      git:
 #        url: git://github.com/thumbert/dygraphs_dart.git
-  elec:
-        git:
-          url: git://github.com/thumbert/elec.git
-  elec_server:
-        git:
-          url: git://github.com/thumbert/elec-server.git
+#  elec:
+#        git:
+#          url: git://github.com/thumbert/elec.git
+#  elec_server:
+#        git:
+#          url: git://github.com/thumbert/elec-server.git
   grpc: '>=1.0.0 <2.0.0'
   html: 0.13.3+3
   http: '>=0.12.0 <0.13.0'
@@ -31,7 +31,7 @@ dependencies:
   js: '>=0.6.0 <0.7.0'
   mongo_dart: ^0.4.0
   more: '>=1.12.0 <2.0.0'
-  petitparser: '>=2.0.0 <3.0.0'
+  petitparser: '>=3.0.4 <4.0.0'
   plotly:
     git:
       url: git://github.com/thumbert/plotly.git
@@ -42,9 +42,9 @@ dependencies:
   table:
     git:
       url: git://github.com/thumbert/table.git
-  timeseries:
-    git:
-      url: git://github.com/thumbert/timeseries.git
+#  timeseries:
+#    git:
+#      url: git://github.com/thumbert/timeseries.git
   trotter: '>=1.0.0 <2.0.0'
   tuple: '^1.0.2'
 
