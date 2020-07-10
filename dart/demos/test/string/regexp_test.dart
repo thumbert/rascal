@@ -81,9 +81,9 @@ extractHref(){
 
 /// Replace digits in string
 replaceDigits() {
-  var str = 'left:19%;right:40%;';
-  /// replace the 19 with 31
-  var reg = RegExp(r'left:(\d+)%;');
+  var str = 'left:19.3%;right:40%;';
+  /// replace the 19.3 with 31
+  var reg = RegExp(r'left:(\d+(.\d+)?)%;');
   print(reg.hasMatch(str));
   var matches = reg.allMatches(str);
   var match = matches.elementAt(0);
