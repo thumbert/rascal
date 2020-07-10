@@ -12,9 +12,9 @@ dependencies:
     git:
       url: git://github.com/thumbert/dama.git
 #  dart_to_js_script_rewriter: ^1.0.1
-#  date:
-#    git:
-#      url: git://github.com/thumbert/date.git
+  date:
+    git:
+      url: git://github.com/thumbert/date.git
 #  dygraphs_dart:
 #      git:
 #        url: git://github.com/thumbert/dygraphs_dart.git
@@ -31,7 +31,7 @@ dependencies:
   js: '>=0.6.0 <0.7.0'
   mongo_dart: ^0.4.0
   more: '>=1.12.0 <2.0.0'
-  petitparser: '>=3.0.4 <4.0.0'
+#  petitparser: '>=3.0.4 <4.0.0'
   plotly:
     git:
       url: git://github.com/thumbert/plotly.git

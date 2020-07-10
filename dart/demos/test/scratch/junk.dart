@@ -1,7 +1,9 @@
 library scratch.junk;
 
-main() {
-  
+import 'package:date/date.dart';
+import 'package:intl/intl.dart';
+
+tests() {
   num x = 7*0.8;
   print(x.round());
 
@@ -24,5 +26,10 @@ main() {
   var hero = _initialHeroes.firstWhere((h) => h['id']==18);
   hero['name'] = 'Plasma';
   print(_initialHeroes);
+}
 
+main() {
+//  var m = Month.parse('202005', fmt: DateFormat('yyyyMM'));
+  var m = Month(int.parse('2020'), int.parse('05'));
+  print(m);
 }

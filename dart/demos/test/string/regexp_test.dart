@@ -77,15 +77,28 @@ extractHref(){
 //      i++;
 //    }
 //  });
+}
 
-
-
+/// Replace digits in string
+replaceDigits() {
+  var str = 'left:19%;right:40%;';
+  /// replace the 19 with 31
+  var reg = RegExp(r'left:(\d+)%;');
+  print(reg.hasMatch(str));
+  var matches = reg.allMatches(str);
+  var match = matches.elementAt(0);
+//  print(match.groupCount);
+//  print(match.group(0));
+//  print(match.group(1));
+  var str3 = str.replaceFirst(match.group(1), '31');
+  print(str3);  // left:31%;right:40%;
 }
 
 
 
 main() {
+  replaceDigits();
 
-  extractHref();
+  //extractHref();
 
 }
