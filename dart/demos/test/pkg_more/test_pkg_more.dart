@@ -1,5 +1,6 @@
 library test_pkg_more;
 
+import 'package:more/cache.dart';
 import 'package:test/test.dart';
 import 'package:more/iterable.dart';
 import 'package:more/ordering.dart';
@@ -125,8 +126,27 @@ test_orderings() {
 
 }
 
-main() {
-  test_permutations();
+testCache() async {
+  /// define an LRU cache
+  String loader(int key) => '$key';
+  var cache = Cache<int,String>.lru(loader: loader);
+  /// set a value by hand
+  cache.set(1, 'A');
+  print(await cache.get(1));  // returns 'A'
+  /// because key: 2 is not in the cache, use the loader to put it in first.
+  print(await cache.get(2));  // returns '2'
 
-  test_orderings();
+  cache.invalidate(1);
+  print(await cache.size());
+}
+
+
+main() {
+  testCache();
+
+//  test_permutations();
+//
+//  test_orderings();
+
+
 }
