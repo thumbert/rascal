@@ -30,6 +30,9 @@ tests() {
 
 main() {
 //  var m = Month.parse('202005', fmt: DateFormat('yyyyMM'));
-  var m = Month(int.parse('2020'), int.parse('05'));
-  print(m);
+  var fmt =
+      NumberFormat.simpleCurrency(decimalDigits: 0, name: '');
+  print(fmt.format(123456.23));
+  print(fmt.format(-123456.23));
+
 }

@@ -6,6 +6,15 @@ import 'package:date/date.dart';
 import 'package:elec/risk_system.dart';
 import 'package:dama/special/erf.dart';
 
+/// Calculate daily volatility from the monthly and cash volatilities.
+num dailyVolatility(
+    num monthlyVolatility, num cashVolatility, num timeToExpiration) {
+  var tMid = 15 / 365;
+  var varianceM = monthlyVolatility * monthlyVolatility * timeToExpiration;
+  var varianceC = cashVolatility * cashVolatility * tMid;
+  return sqrt((varianceM + varianceC) / (timeToExpiration + tMid));
+}
+
 class EuropeanOption {
   // instrument info
   final CallPut type;
@@ -153,13 +162,15 @@ class EuropeanOption {
     double res;
     switch (type) {
       case CallPut.call:
-        res = 0.0001 * strike *
+        res = 0.0001 *
+            strike *
             _tExp *
             exp(-riskFreeRate * _tExp) *
             _nd2(_tExp, _volatility, underlyingPrice, strike, riskFreeRate);
         break;
       case CallPut.put:
-        res = 0.0001 * strike *
+        res = 0.0001 *
+            strike *
             _tExp *
             exp(-riskFreeRate * _tExp) *
             Phi(-_nd2(

@@ -18,16 +18,16 @@ dependencies:
 #  dygraphs_dart:
 #      git:
 #        url: git://github.com/thumbert/dygraphs_dart.git
-#  elec:
-#        git:
-#          url: git://github.com/thumbert/elec.git
-#  elec_server:
-#        git:
-#          url: git://github.com/thumbert/elec-server.git
+  elec:
+        git:
+          url: git://github.com/thumbert/elec.git
+  elec_server:
+        git:
+          url: git://github.com/thumbert/elec-server.git
   grpc: '>=1.0.0 <2.0.0'
   html: 0.13.3+3
   http: '>=0.12.0 <0.13.0'
-  intl: ">=0.15.7 <0.16.0"
+  intl: ">=0.16.0 <1.0.0"
   js: '>=0.6.0 <0.7.0'
   mongo_dart: ^0.4.0
   more: '>=1.12.0 <2.0.0'
@@ -36,7 +36,7 @@ dependencies:
     git:
       url: git://github.com/thumbert/plotly.git
   quiver: '>=2.0.0 <3.0.0'
-  stagexl: 1.4.0+2
+#  stagexl: 1.4.0+2
 #  spreadsheet_decoder: '^0.3.1'
   timezone: '>=0.5.5 <1.0.0'
   table:
