@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Maya</title>
+    <meta charset="utf-8">
+    <link href="content/custom.css" type="text/css" rel="stylesheet">
+  </head>
+  <body>
+  <textarea id="source"></textarea>
+<!--    <script src="https://remarkjs.com/downloads/remark-latest.min.js">-->
+    <script src="remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+    	sourceUrl: 'content/maya.md',
+        countIncrementalSlides: false,
+        slideNumberFormat: '%current%', 
+       highlightLines: true,
+      });
+    </script>
+  </body>
