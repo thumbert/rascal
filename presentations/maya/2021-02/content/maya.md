@@ -2,7 +2,7 @@ class: center, middle
 name: title
 count: false
 
-.maya[Maya]
+.purple[.maya[Maya]]
 
 A modern commodity pricing interface
 
@@ -58,20 +58,27 @@ What works?
 ---
 class: center, middle
 
-# Show me the demo!
+# .purple[Show me the demo!]
 
 ---
 # Implementation details
 
+* Open source software, can be integrated into our stack easily
 * Implemented as a .purple[Flutter] frontend with a .purple[MongoDb] backend
 * A .purple[Dart] server and packages implement the business logic   
 * Both the server and MongoDb run from my PC (*not sustainable*)
+.center[![image](content/dart_and_flutter2.png)]
+.center[.p60[![image](content/mongodb.png)]]
+  
 
-Design decisions 
+---
+# Design decisions
+
 * Using a new curve hierarchy (really?!)
 * Prices are stored in a different format for fast access (~20 ms for 3 buckets)
 * Same for volatility surfaces and hourly shape curves    
 * Monthly marks expand into daily marks automatically
+* No need to mark curves that don't change daily (e.g. basis curves)
 
 
 
