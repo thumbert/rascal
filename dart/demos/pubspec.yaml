@@ -18,12 +18,12 @@ dependencies:
 #  dygraphs_dart:
 #      git:
 #        url: git://github.com/thumbert/dygraphs_dart.git
-  elec:
-        git:
-          url: git://github.com/thumbert/elec.git
-  elec_server:
-        git:
-          url: git://github.com/thumbert/elec-server.git
+#  elec:
+#        git:
+#          url: git://github.com/thumbert/elec.git
+#  elec_server:
+#        git:
+#          url: git://github.com/thumbert/elec-server.git
   grpc: '>=1.0.0 <2.0.0'
   html: 0.13.3+3
   http: '>=0.12.0 <0.13.0'
