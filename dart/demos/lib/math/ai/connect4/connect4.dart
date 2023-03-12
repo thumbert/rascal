@@ -9,14 +9,14 @@ import 'chip.dart';
 enum GameOutcome { winnerPlayer1, winnerPlayer2, tie }
 
 class Connect4Game {
-  Player player1;
-  Player player2;
-  Board board;
+  late Player player1;
+  late Player player2;
+  late Board board;
 
-  Connect4Game(this.player1, this.player2, {this.board}) {
-    player1 ??= Player(Chip('X'), RandomStrategy(), name: 'A');
-    player2 ??= Player(Chip('O'), RandomStrategy(), name: 'B');
-    board ??= Board(chip1: player1.chip, chip2: player2.chip);
+  Connect4Game(Player? player1, Player? player2, {Board? board}) {
+    this.player1 = player1 ?? Player(Chip('X'), RandomStrategy(), name: 'A');
+    this.player2 = player2 ?? Player(Chip('O'), RandomStrategy(), name: 'B');
+    this.board = board ?? Board(chip1: this.player1.chip, chip2: this.player2.chip);
   }
 
   /// Play until a winner is found or the board is filled.

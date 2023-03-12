@@ -9,7 +9,7 @@ void main() {
   print("Welcome to a Connect4 game");
   print("\nWhat is your name?");
   var name = stdin.readLineSync();
-  if (name.length == 0) {
+  if (name!.length == 0) {
     print('OK, I\'ll call you Puny the Donkey!');
     name = 'Puny the Donkey';
   } else {
@@ -19,11 +19,11 @@ void main() {
       '\nChoose the computer level: [0] (random), 1 (aware), 2 (foresight), 3 (devilish)');
   print('From your name, you should choose level 0.  Ha-ha-ha');
   var levelInp = stdin.readLineSync();
-  int level;
+  int? level;
   if (levelInp == '') {
     level = 0;
   } else {
-    level = int.tryParse(levelInp);
+    level = int.tryParse(levelInp ?? '');
   }
   if (level == null) {
     print('Wrong input!  Play nice next time, jerk!');
@@ -47,15 +47,15 @@ void main() {
 
   Player player1, player2;
   print('\nDo you want to place the first chip? [Y]/N');
-  var yesNo = stdin.readLineSync();
+  var yesNo = stdin.readLineSync() ?? 'N';
   if (yesNo == '' || yesNo.toLowerCase() == 'y') {
     player1 = Player(Chip('X'), InputStrategy(), name: name);
-    player2 = Player(Chip('O'), roBottyStrategy[level], name: 'Ro Botty');
+    player2 = Player(Chip('O'), roBottyStrategy[level]!, name: 'Ro Botty');
     print('$name playing with chips: ${player1.chip.printChar}');
     print('Ro Botty playing with chips: ${player2.chip.printChar}');
     print('$name to start');
   } else if (yesNo.toLowerCase() == 'n') {
-    player1 = Player(Chip('X'), roBottyStrategy[level], name: 'Ro Botty');
+    player1 = Player(Chip('X'), roBottyStrategy[level]!, name: 'Ro Botty');
     player2 = Player(Chip('O'), InputStrategy(), name: name);
     print('$name playing with chips: ${player2.chip.printChar}');
     print('Ro Botty playing with chips: ${player1.chip.printChar}');

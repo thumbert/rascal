@@ -9,7 +9,7 @@ import 'dart:async';
 import 'dart:convert';
 
 void main() {
-  HttpServer.bind(InternetAddress.LOOPBACK_IP_V4, 4041)
+  HttpServer.bind(InternetAddress.loopbackIPv4, 4041)
     .then(listenForRequests)
     .catchError((e) => print(e.toString()));
 }

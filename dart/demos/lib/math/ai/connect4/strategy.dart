@@ -6,7 +6,7 @@ import 'connect4.dart';
 
 /// A strategy is associated with a player.
 abstract class Strategy {
-  String name;
+  late String name;
 
   /// the location of the next chip
   int nextMove(Connect4Game game);
@@ -101,7 +101,7 @@ class InputStrategy implements Strategy {
     var frontier = game.board.indexOfUnfilledColumns();
     print('\nOn which column you drop your chip? One of: ${frontier.join(', ')}');
     var aux = stdin.readLineSync();
-    var column = int.parse(aux);
+    var column = int.tryParse(aux!);
     if (column == null) {
       print('Wrong input!  Play nice next time, jerk!');
       exit(0);
@@ -117,8 +117,8 @@ class InputStrategy implements Strategy {
 }
 
 class RandomStrategy implements Strategy {
-  String name;
-  Random random;
+  late String name;
+  late Random random;
   RandomStrategy() {
     name = 'Random strategy';
     random = Random();
@@ -131,8 +131,8 @@ class RandomStrategy implements Strategy {
 }
 
 class Foresight1Strategy implements Strategy {
-  String name;
-  Random random;
+  late String name;
+  late Random random;
 
   Foresight1Strategy() {
     name = 'Foresight 1 strategy';
@@ -157,8 +157,8 @@ class Foresight1Strategy implements Strategy {
 }
 
 class Foresight2Strategy implements Strategy {
-  String name;
-  Random random;
+  late String name;
+  late Random random;
 
   /// Able to see if the opponent has 3 in a row and block him.
   Foresight2Strategy() {

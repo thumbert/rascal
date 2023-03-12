@@ -14,8 +14,8 @@ class Board {
   int chipsCount = 0;
 
   /// Columns, then rows
-  List<List<Chip>> _board;
-  Chip _nextChip;
+  late List<List<Chip>> _board;
+  late Chip _nextChip;
 
   Board(
       {this.columns = 7,
@@ -77,7 +77,7 @@ class Board {
 
   /// Add one chip to the board to column [column].  Check if it's a legal
   /// move. [column] is an integer from 0 to [columns-1].
-  void add(int column, [Chip chip]) {
+  void add(int column, [Chip? chip]) {
     chip ??= nextChip;
     if (_board[column].length < rows) {
       _board[column].add(chip);

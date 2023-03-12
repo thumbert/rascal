@@ -7,7 +7,7 @@ class Player {
   final Chip chip;
   final Strategy strategy;
 
-  Player(this.chip, this.strategy, {this.name});
+  Player(this.chip, this.strategy, {required this.name});
 
   @override
   String toString() {
