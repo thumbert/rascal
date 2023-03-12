@@ -1,0 +1,78 @@
+class: center, middle
+name: title
+count: false
+
+.maya[.purple[Flutter?]] 
+
+![image](data:image/png;base64,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)
+
+A UI framework for the masses
+
+.footnotesize[3 February 2022]
+
+.small[.grey[Adrian A. Dr&abreve;gulescu]]
+---
+# Why we need UIs?
+
+* I shouldn't have to convince you that you need a UI.red[*] 
+* Matlab UIs were cool in early 2000's but have not aged well
+
+But .purple[why] ... 
+* A good UI is an effective tool for reporting/exploring
+* A model doesn't really exist if people can't see it or interact with it
+
+Now the whining ...
+* We're not UI designers and coding a UI is hard
+* I'm too busy to be building a UI in the first place
+
+.footnote[.red[*] Excel is great but it doesn't count as a proper UI]
+---
+# What is Flutter?
+
+* An open-source *framework* for developing apps by Google
+* **Multi-platform** apps (mobile, web, desktop) from a single codebase
+
+.purple[Pros]
+* Fast
+* Comprehensive (plenty of widgets)
+* Excellent documentation
+* Adopted by Google as an official [Material](https://m3.material.io) platform (together with Web and Android)
+
+Where's the catch?  There always is a catch!
+---
+# Some challenges
+
+* Flutter uses [Dart](https://dart.dev) as the programing language.  Huh?
+* You need to learn Dart.  You can get operational in 2 weeks
+* Not supported by IT (need to find a way to get it on your machine)
+
+I've focused on building Flutter Web applications because it solves the update/distribution problem
+* Can connect to Shooju for data
+* Run a separate MongoDb for other data
+* To access other data from a traditional Db, you would need to 
+  run a http server to provide this data
+
+Currently, I serve the web app from my PC ![image](content/img.png)
+
+
+---
+class: center, middle
+
+# .purple[Show me some code!]
+
+
+---
+# Next steps?
+
+* If I piqued your interest, install Flutter on your machine and try 
+  the smallest project
+* To learn, read the documentation, watch hours of YouTube tutorials
+* I can provide help, code, and share my experience
+* Overall, Flutter scores well on  
+  * being approachable, 
+  * generating a beautiful result, 
+  * performance, 
+  * good engineering, 
+  * code readability, quality, evolution
+  * tooling, testing
+  

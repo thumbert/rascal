@@ -3,6 +3,7 @@ environment:
   sdk: '>=2.18.0 <3.0.0'
 
 dependencies:
+  collection: ^1.15.0
   csv: ^5.0.0
   date:
     git: https://github.com/thumbert/date.git
@@ -21,7 +22,6 @@ dependencies:
   trotter: ^2.0.0
   tuple: ^2.0.0
   xml: ^6.1.0
-  collection: ^1.15.0
 
   #  args: '>=1.5.0 <2.0.0'
 #  archive: '>=2.0.0 <3.0.0'
@@ -45,13 +45,6 @@ dependencies:
 #  elec_server:
 #        git:
 #          url: git://github.com/thumbert/elec-server.git
-#  grpc: '>=1.0.0 <2.0.0'
-#  html: 0.13.3+3
-#  http: '>=0.12.0 <0.13.0'
-#  intl: ">=0.16.0 <1.0.0"
-#  js: '>=0.6.0 <0.7.0'
-#  mongo_dart: ^0.4.0
-#  more: '>=1.12.0 <2.0.0'
 #  petitparser: '>=3.0.4 <4.0.0'
 #  plotly:
 #    git:
