@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+<div id="tester"></div>
+<script>
+    TESTER = document.getElementById('tester');
+    layout = {
+      margin: { t: 80 },
+      yaxis: {
+        title: 'IQ',
+        side: 'right',
+      },
+    };
+    Plotly.newPlot( TESTER, [{
+      x: [1, 2, 3, 4, 5],
+      y: [1, 2, 4, 8, 16] }], layout);
+</script>
+</body>
+</html>
