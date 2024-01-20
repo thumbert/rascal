@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+			rel="stylesheet"
+			data-name="vs/editor/editor.main"
+			href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.css"
+		/>
+
+    <style>
+      @font-face {
+        font-family: "codicon",
+        src: url("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/base/browser/ui/codicons/codicon.ttf") format("truetype")
+      }
+    </style>
+    <title>Monaco</title>
+  </head>
+  <body>
+    <h2>Monaco Editor Sync Loading Sample</h2>
+    <div id="code" style="width: 800px; height: 600px; border: 1px solid grey"></div>
+
+    <script>
+      var require = { paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs" } };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.nls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.js"></script>
+
+    <script>
+      var editor = monaco.editor.create(document.getElementById("code"), {
+        value:  ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
+        language: "javascript",
+        additionalCssClassName: "code"
+      });
+    </script>
+
+  </body>
+</html>

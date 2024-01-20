@@ -10,6 +10,8 @@
   <script>
     let chart = document.getElementById('tester');
     let layout = {
+      width: 700,
+      height: 550,
       margin: { t: 80 },
       xaxis: {
         title: 'Hour',
@@ -1461,8 +1463,9 @@
     "date":"2020-05-01",
     "mode":"lines",
     "name":"2020-05-01",
-    "marker":{
-      "color":"#b0b0b0"
+    "line":{
+      "color":"#663399",
+      "width": 4,
     },
     "xaxis":"x1",
     "yaxis":"y1",
@@ -1474,22 +1477,30 @@
     // On hover, change the color of the trace to orange
     chart.on('plotly_hover', function(data) {
       let traceNumber = data.points[0].curveNumber;
-      traces[traceNumber]['line'] = {'color': '#ff9900', 'width': 4};
-      let trace = traces[traceNumber];
-      // remove this trace from the array of traces
-      traces.splice(traceNumber, 1);
-      // add it to the end so it sits on top of all other traces
-      traces.push(trace);
-      // use Plotly.react vs Plotly.restyle because it gives me access to the traces
-      Plotly.react(chart, traces, layout);
+      if (traceNumber < traces.length - 2) {
+        traces[traceNumber]['line'] = {'color': '#ff9900', 'width': 4};
+        let trace = traces[traceNumber];
+        // remove this trace from the array of traces
+        traces.splice(traceNumber, 1);
+        // add it to the end so it sits on top of all other traces
+        // traces.push(trace);
+        traces.splice(traces.length-2, 0, trace);
+        // use Plotly.react vs Plotly.restyle because it gives me access to the traces
+        Plotly.react(chart, traces, layout);
+      }
     });
     // On unhover, revert back to the original color and width
     chart.on('plotly_unhover', function(data){
       let traceNumber = data.points[0].curveNumber;
-      // have to revert both the original hover line and the last added line, otherwise will leave a mark
-      traces[traceNumber]['line'] = {'color': '#b0b0b0', 'width': 1};
-      traces[traces.length-1]['line'] = {'color': '#b0b0b0', 'width': 1};
-      Plotly.react(chart, traces, layout);
+      if (traceNumber < traces.length - 2) {
+        // have to revert both the original hover line and the last added line, otherwise will leave a mark
+        let i = 0;
+        while (i < traces.length - 1) {
+          traces[i]['line'] = {'color': '#b0b0b0', 'width': 2};
+          i++;
+        }
+        Plotly.react(chart, traces, layout);
+      }
     });
   </script>
 </body>

@@ -1,0 +1,9 @@
+[book]
+authors = ["thumbert"]
+language = "en"
+multilingual = false
+src = "src"
+title = "A measure of solar penetration in electricity demand"
+
+[output.html]
+mathjax-support=true
