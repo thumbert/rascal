@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+<div id="tester"></div>
+<script>
+    TESTER = document.getElementById('tester');
+    let layout = {
+      'width': 700,
+      'height': 700,
+    };
+    let data = [
+      {
+        'x': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
+        'y': [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3],
+        'z': [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 2, 1, 0, 0, 3, 2],
+        'type': 'mesh3d',
+      }
+    ];
+    Plotly.newPlot( TESTER, data, layout);
+</script>
+</body>
+</html>
