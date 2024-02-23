@@ -29,7 +29,7 @@ main() {
           break;
           
         default:
-          request.response.statusCode = HttpStatus.METHOD_NOT_ALLOWED;
+          request.response.statusCode = HttpStatus.methodNotAllowed;
       };
       request.response.close();      
     });

@@ -1,16 +1,16 @@
-library test_permutations;
+// library test_permutations;
 
-import 'package:more/iterable.dart';
+// import 'package:more/iterable.dart';
 
 
-main() {
+// main() {
   
-  var x = permutations(['A', 'B', 'C']);
+//   var x = permutations(['A', 'B', 'C']);
   
-  print(x.length);
-  
-  
-  //print(x);
+//   print(x.length);
   
   
-}
+//   //print(x);
+  
+  
+// }

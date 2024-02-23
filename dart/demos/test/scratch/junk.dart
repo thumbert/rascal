@@ -1,6 +1,5 @@
 library scratch.junk;
 
-import 'package:date/date.dart';
 import 'package:intl/intl.dart';
 
 tests() {

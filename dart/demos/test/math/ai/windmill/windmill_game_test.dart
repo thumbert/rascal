@@ -1,5 +1,4 @@
-
-
+import 'dart:math';
 
 import 'package:demos/math/ai/windmill/winmill_game.dart';
 import 'package:test/test.dart';
@@ -16,66 +15,75 @@ void tests() {
     expect(game.hasLastPlayerWon(), true);
   });
   test('Check winning move', () {
-    expect(WindmillGame([1, 19, 22, 16, 4]).gameStatus(), GameStatus.over); // Player 1: [1, 4, 22]
-    expect(WindmillGame([1, 19, 7, 22, 16, 18, 20, 21, 23, 16]).gameStatus(), GameStatus.over);  // Player 2: [16, 19, 22]
+    expect(WindmillGame([1, 19, 22, 16, 4]).gameStatus(),
+        GameStatus.over); // Player 1: [1, 4, 22]
+    expect(WindmillGame([1, 19, 7, 22, 16, 18, 20, 21, 23, 16]).gameStatus(),
+        GameStatus.over); // Player 2: [16, 19, 22]
   });
   test('Tie', () {
     var game = WindmillGame.fromMoves(
-      [1,  0,  3, 18, 4,  9, 10, 8, 13, 17, 23, 19],
-      [15, 2, 21,  5, 6, 12, 11, 7, 16, 14, 20, 22],
+      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 23, 19],
+      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20, 22],
     );
     expect(game.gameStatus(), GameStatus.over);
-    expect(game.hasLastPlayerWon(), false);  // it's a tie!
+    expect(game.hasLastPlayerWon(), false); // it's a tie!
   });
 
   test('End game -2 stones', () {
     var game = WindmillGame.fromMoves(
-        [1,  0,  3, 18, 4,  9, 10, 8, 13, 17, 20],
-        [15, 2, 21,  5, 6, 12, 11, 7, 16, 14, 22],
+      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 20],
+      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 22],
     );
     var strategy = MiniMax(game: game, maxDepth: 4);
-    expect(strategy.getNextMove(), 19);  // Player one wins with either 19, or 23
+    expect(strategy.getNextMove(), 19); // Player one wins with either 19, or 23
   });
 
   test('End game -4 stones', () {
     var game = WindmillGame.fromMoves(
-        [1,  0,  3, 18, 4,  9, 10, 8, 13, 17],
-        [15, 2, 21,  5, 6, 12, 11, 7, 16, 14],
+      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17],
+      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14],
     );
     var strategy = MiniMax(game: game, maxDepth: 6);
-    expect(strategy.getNextMove(), 22);  // Player 1 wins with 22!
+    expect(strategy.getNextMove(), 22); // Player 1 wins with 22!
   });
 
   test('End game -5 stones', () {
     var game = WindmillGame.fromMoves(
-        [1,  0,  3, 18, 4,  9, 10, 8, 13, 17],
-        [15, 2, 21,  5, 6, 12, 11, 7, 16,   ],
+      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17],
+      [
+        15,
+        2,
+        21,
+        5,
+        6,
+        12,
+        11,
+        7,
+        16,
+      ],
     );
     var strategy = MiniMax(game: game, maxDepth: 6);
-    expect(strategy.getNextMove(), 23);  // Player 2 wins with 23!
+    expect(strategy.getNextMove(), 23); // Player 2 wins with 23!
   });
 
   test('End game -6 stones', () {
     var game = WindmillGame.fromMoves(
-        [23, 0,  3, 18, 4,  9, 10, 8, 13],
-        [15, 2, 21,  5, 6, 12, 11, 7, 16],
+      [23, 0, 3, 18, 4, 9, 10, 8, 13],
+      [15, 2, 21, 5, 6, 12, 11, 7, 16],
     );
     var strategy = MiniMax(game: game, maxDepth: 6);
-    expect(strategy.getNextMove(), 17);  // Player 1 blocks Player 2 from winning
+    expect(strategy.getNextMove(), 17); // Player 1 blocks Player 2 from winning
   });
 
   test('End game -7 stones', () {
     var game = WindmillGame.fromMoves(
-      [14, 0,  3, 18, 4,  9, 10, 8, 13],
-      [15, 1, 21,  5, 6, 12, 11, 7],
+      [14, 0, 3, 18, 4, 9, 10, 8, 13],
+      [15, 1, 21, 5, 6, 12, 11, 7],
     );
     var strategy = MiniMax(game: game, maxDepth: 10);
-    expect(strategy.getNextMove(), 17);  // ?? not unique, so pick something!
+    expect(strategy.getNextMove(), 17); // ?? not unique, so pick something!
     /// TODO: continue here ...
   }, solo: true);
-
-
-
 
   // test('End game -7 stones', () {
   //   var game = WindmillGame.fromMoves(
@@ -85,10 +93,6 @@ void tests() {
   //   var strategy = MiniMax(game: game, maxDepth: 6);
   //   expect(strategy.getNextMove(), 23);  // Player 2 wins with 23!
   // }, solo: true);
-
-
-
-
 
   //
   // test('Player one to win-in-one, depth=2', () {
@@ -133,8 +137,6 @@ void tests() {
   //   expect(strategy.getNextMove(), 21);
   // });
 
-
-
   // test('Block win-in-one by player one, maxDepth=3', () {
   //   var strategy = MiniMax(game: WindmillGame([1, 15, 0, 2, 3]), maxDepth: 3);
   //   expect(strategy.getNextMove(), 21);
@@ -166,8 +168,42 @@ void tests() {
   // });
 }
 
+speedTest() {
+  // generate 10,000 random positions
+  var rand = Random();
+  var positions = <List<int>>[];
+  final sw = Stopwatch()..start();
+  while (positions.length < 10000) {
+    var i1 = rand.nextInt(24);
+    var i2 = rand.nextInt(24);
+    var i3 = rand.nextInt(24);
+    if ({i1, i2, i3}.length == 3) {
+      var xs = [i1, i2, i3];
+      xs.sort();
+      positions.add(xs);
+    }
+  }
+  sw.stop();
+  print(sw.elapsedMilliseconds);
+
+  sw.reset();
+  final game = WindmillGame(<int>[]);
+  sw.start();
+  var count = 0;
+  for (var ps in positions) {
+    if (game.isWinningPosition(ps[0], ps[1], ps[2])) {
+      count += 1;
+    }
+  }
+  sw.stop();
+  print(sw.elapsedMilliseconds);
+  /// takes 5ms to check 10,000 positions!  Pretty good. 
+  print(count);
+}
+
 void main() {
-  tests();
+  // tests();
+  speedTest();
 }
 
 

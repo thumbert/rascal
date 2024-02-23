@@ -30,7 +30,7 @@ List<String> takeUntil(DiscreteDistribution dist, List<String> pattern) {
 /// Pattern THH appears with probability 1/8 and has length 3,
 /// Patterns TTHH, HTHH appear with probability 2/16 and have length 4, etc.
 ///
-sumSeries({int nTerms: 1000}) {
+sumSeries({int nTerms = 1000}) {
   List<num> res = [1/2, 3/8];
   int f1 = 1;
   int f2 = 1;

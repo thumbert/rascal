@@ -8,7 +8,7 @@ enum QuoteFrequency { daily, weekly, monthly }
 
 Future<List<Map>> downloadStockPrices(
     String ticker, DateTime startDt, DateTime endDt,
-    {QuoteFrequency freq: QuoteFrequency.daily}) async {
+    {QuoteFrequency freq= QuoteFrequency.daily}) async {
 
   // http://real-chart.finance.yahoo.com/table.csv?s=AAPL&d=7&e=25&f=2015&g=d&a=11&b=12&c=1980&ignore=.csv
   Map freqMap = {

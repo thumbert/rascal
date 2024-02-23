@@ -1,9 +1,6 @@
 library test.finance.black_scholes_test;
 
 
-import 'package:elec/risk_system.dart';
-import 'package:demos/finance/black_scholes.dart';
-import 'package:test/test.dart';
 
 
 //tests() {

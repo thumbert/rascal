@@ -35,7 +35,8 @@ class _GameOver extends GameStatus {
 class TicTacToeGame {
   TicTacToeGame(this.moves);
 
-  /// A list of moves made in this game, starting with Player.one.
+  /// A list of moves made in this game.
+  /// Player.one starts the game.
   /// The list is empty list if game is starting.
   /// The list can't be bigger than 9 elements. The indexing is from top left
   /// by row, e.g. [1,1] is index 0, [1,2] is index 1, ... [2,1] is index 3, etc.
@@ -97,11 +98,14 @@ class TicTacToeGame {
     return value;
   }
 
-  /// Return the set of possible moves for the next player
+  /// Return the set of possible moves for the next player.
+  /// Can I make this faster???
+  /// 
   Set<int> actions() {
     return {0, 1, 2, 3, 4, 5, 6, 7, 8}.difference(moves.toSet());
   }
 
+  /// 
   num utility() {
     var expr = lastPlayer == Player.one ? 1/moves.length : -1/moves.length;
     if (moves.length != 9) {

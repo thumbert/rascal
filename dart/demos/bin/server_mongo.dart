@@ -19,7 +19,7 @@ listenForRequests(HttpServer _server) {
     if (request.method == 'GET') {
       handleGet(request);
     } else {
-      request.response.statusCode = HttpStatus.METHOD_NOT_ALLOWED;
+      request.response.statusCode = HttpStatus.methodNotAllowed;
       request.response.write("Unsupported request: ${request.method}.");
       request.response.close();
     }
@@ -63,7 +63,7 @@ void handleGet(HttpRequest request) {
   from_mongo().then((data) {
     print("writing data ...");
     //data.forEach((e) => print(e));
-    request.response.statusCode = HttpStatus.OK;
+    request.response.statusCode = HttpStatus.ok;
     request.response.write(new JsonEncoder().convert(data)); // write a json string
     request.response.close();
   });

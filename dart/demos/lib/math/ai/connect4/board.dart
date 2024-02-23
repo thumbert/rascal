@@ -138,9 +138,6 @@ class Board {
 
   /// What chip needs to be added next to the board.
   Chip get nextChip {
-    if (_nextChip == null) {
-      chipsCount % 2 == 0 ? _nextChip = chip1 : _nextChip = chip2;
-    }
     return _nextChip;
   }
 

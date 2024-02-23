@@ -6,7 +6,7 @@
 
 
 class Urn {
-  List<String> contents;
+  late List<String> contents;
   List<String> extracted = [];
 
   int get size => contents.length;
@@ -42,7 +42,7 @@ class Urn {
   
 }
 
-void probExtractOnePair(int N, {int simulations: 10000}) {
+void probExtractOnePair(int N, {int simulations =  10000}) {
   List<int> res = new List.generate(simulations, (int i) {
     Urn urn = new Urn(N);
     urn.extract(2);

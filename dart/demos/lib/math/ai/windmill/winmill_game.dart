@@ -75,7 +75,6 @@ class MiniMax extends Strategy {
   /// Artificial Intelligence, ed.3, page 172
   int _minimax() {
     var actions = game.actions().toList();
-    // actions = [23];
     var scores = <num>[];
     for (var i = 0; i < actions.length; i++) {
       var newMoves = [...game.moves, actions[i]];
@@ -89,6 +88,7 @@ class MiniMax extends Strategy {
     } else {
       value = scores.max;
     }
+
     /// Pick the node that has matches the value.  Sometimes, there are
     /// several nodes with the same value (the algo doesn't know what to do.)
     /// Then, pick a node on a diagonal.
@@ -96,7 +96,8 @@ class MiniMax extends Strategy {
         .whereIndexed((index, e) => e == value)
         .mapIndexed((index, e) => index)
         .toList();
-    if (indexes.length == 1) return actions[indexes.first];
+    if (indexes.length == 1)
+      return actions[indexes.first];
     else {
       /// pick a random node one from a diagonal
       var diag = indexes.where((e) => WindmillGame.isDiagonalNode(e)).toList();
@@ -255,6 +256,9 @@ class WindmillGame extends Game {
   Player get nextPlayer => moves.length % 2 == 0 ? Player.one : Player.two;
 
   /// The arguments p0, p1, p2 need to be ordered, and >=0, <=23.
+  /// Although it does a linear scan, it can check 10,000 positions in 5ms.
+  /// Not particularly expensive.
+  ///
   bool isWinningPosition(int p0, int p1, int p2) {
     var wp = _winningPositions.firstWhere(
         (e) => e[0] == p0 && e[1] == p1 && e[2] == p2,
@@ -266,7 +270,20 @@ class WindmillGame extends Game {
   /// Check if a node is on the diagonal
   static bool isDiagonalNode(int i) => _diagonals.contains(i);
 
-  static final _diagonals = const {3, 4, 5, 9, 10, 11, 15, 16, 17, 21, 22, 23};
+  static const _diagonals = const <int>{
+    3,
+    4,
+    5,
+    9,
+    10,
+    11,
+    15,
+    16,
+    17,
+    21,
+    22,
+    23
+  };
 
   final _winningPositions = const [
     [0, 1, 2],
@@ -291,6 +308,30 @@ class WindmillGame extends Game {
     [21, 22, 23],
   ];
 
-  final _allMoves = List.generate(24, (i) => i).toSet();
+  static const _allMoves = const <int>{
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  };
 }
-

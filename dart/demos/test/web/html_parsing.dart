@@ -2,7 +2,6 @@ library html_parsing;
 
 import 'dart:io';
 import 'package:html/parser.dart';
-import 'package:html/dom.dart';
 
 /// I've pasted the html div with the jpg links into a file.
 /// Extract the jpg pictures from the html document
