@@ -1,89 +1,189 @@
-import 'dart:math';
 
-import 'package:demos/math/ai/windmill/winmill_game.dart';
+import 'package:demos/math/ai/windmill/winmill_game2.dart';
 import 'package:test/test.dart';
 
 void tests() {
-  test('Is winning position', () {
-    var game = WindmillGame(<int>[]);
-    expect(game.isWinningPosition(2, 3, 5), false);
-    expect(game.isWinningPosition(9, 12, 15), true);
-    expect(game.isWinningPosition(17, 20, 23), true);
+  test('Print board', () {
+    var state = NonTerminalState(
+      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 23, 19],
+     [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20, 22]);
+    expect(state.board(), """
+O-----------X-----------O
+|  X--------O--------X  |
+|  |  X-----O-----X  |  |
+|  |  |           |  |  |
+|  |  |           |  |  |
+O  X  O           X  X  O
+|  |  |           |  |  |
+|  |  |           |  |  |
+|  |  O-----X-----O  |  |
+|  O--------X--------O  |
+X-----------O-----------X
+""");
   });
+  
+
   test('Has last player won?', () {
-    var game = WindmillGame([1, 19, 22, 0, 4]);
-    expect(game.hasLastPlayerWon(), true);
+    var state = NonTerminalState([1, 22], [19, 0]);
+    var newState = state.result(4);
+    expect(newState is TerminalState, true);
   });
   test('Check winning move', () {
-    expect(WindmillGame([1, 19, 22, 16, 4]).gameStatus(),
-        GameStatus.over); // Player 1: [1, 4, 22]
-    expect(WindmillGame([1, 19, 7, 22, 16, 18, 20, 21, 23, 16]).gameStatus(),
-        GameStatus.over); // Player 2: [16, 19, 22]
+    var state = NonTerminalState([1, 7, 16, 20, 23], [19, 22, 18, 21]);
+    var newState = state.result(16);
+    expect(newState is TerminalState, true);
   });
-  test('Tie', () {
-    var game = WindmillGame.fromMoves(
+  test('Check tie', () {
+    var state = NonTerminalState(
       [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 23, 19],
-      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20, 22],
-    );
-    expect(game.gameStatus(), GameStatus.over);
-    expect(game.hasLastPlayerWon(), false); // it's a tie!
+     [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20]);
+    expect(state.actions(), {22});
+    var newState = state.result(22);
+    expect(newState is TerminalState, true);
+    expect((newState as TerminalState).utility(Player.one), 0.5);
+    expect(newState.utility(Player.two), 0.5);
   });
 
-  test('End game -2 stones', () {
-    var game = WindmillGame.fromMoves(
-      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 20],
-      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 22],
-    );
-    var strategy = MiniMax(game: game, maxDepth: 4);
-    expect(strategy.getNextMove(), 19); // Player one wins with either 19, or 23
+  test('Check Player.two wins with last move', () {
+    var state = NonTerminalState(
+      [1, 0, 3, 18, 4, 9, 10, 8, 15, 17, 23, 19],
+     [22, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20]);
+    expect(state.actions(), {13});
+    var newState = state.result(13);
+    expect(newState is TerminalState, true);  // Player.two wins with [12, 13, 14]
+    print(newState);
+    expect((newState as TerminalState).utility(Player.one), -1.0);
+    expect(newState.utility(Player.two), 1.0);
   });
 
-  test('End game -4 stones', () {
-    var game = WindmillGame.fromMoves(
-      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17],
-      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14],
-    );
-    var strategy = MiniMax(game: game, maxDepth: 6);
-    expect(strategy.getNextMove(), 22); // Player 1 wins with 22!
-  });
+}
 
-  test('End game -5 stones', () {
-    var game = WindmillGame.fromMoves(
-      [1, 0, 3, 18, 4, 9, 10, 8, 13, 17],
-      [
-        15,
-        2,
-        21,
-        5,
-        6,
-        12,
-        11,
-        7,
-        16,
-      ],
-    );
-    var strategy = MiniMax(game: game, maxDepth: 6);
-    expect(strategy.getNextMove(), 23); // Player 2 wins with 23!
-  });
+// speedTest() {
+//   // generate 10,000 random positions
+//   var rand = Random();
+//   var positions = <List<int>>[];
+//   final sw = Stopwatch()..start();
+//   while (positions.length < 10000) {
+//     var i1 = rand.nextInt(24);
+//     var i2 = rand.nextInt(24);
+//     var i3 = rand.nextInt(24);
+//     if ({i1, i2, i3}.length == 3) {
+//       var xs = [i1, i2, i3];
+//       xs.sort();
+//       positions.add(xs);
+//     }
+//   }
+//   sw.stop();
+//   print(sw.elapsedMilliseconds);
+//   sw.reset();
+//   final game = WindmillGame(<int>[]);
+//   sw.start();
+//   var count = 0;
+//   for (var ps in positions) {
+//     if (game.isWinningPosition(ps[0], ps[1], ps[2])) {
+//       count += 1;
+//     }
+//   }
+//   sw.stop();
+//   print(sw.elapsedMilliseconds);
+//   /// takes 5ms to check 10,000 positions!  Pretty good. 
+//   print(count);
+// }
 
-  test('End game -6 stones', () {
-    var game = WindmillGame.fromMoves(
-      [23, 0, 3, 18, 4, 9, 10, 8, 13],
-      [15, 2, 21, 5, 6, 12, 11, 7, 16],
-    );
-    var strategy = MiniMax(game: game, maxDepth: 6);
-    expect(strategy.getNextMove(), 17); // Player 1 blocks Player 2 from winning
-  });
+void play() {
+  // TODO: make sure minmax strategy checks if it can win 
+  // with next move.  If it does, take it!
 
-  test('End game -7 stones', () {
-    var game = WindmillGame.fromMoves(
-      [14, 0, 3, 18, 4, 9, 10, 8, 13],
-      [15, 1, 21, 5, 6, 12, 11, 7],
-    );
-    var strategy = MiniMax(game: game, maxDepth: 10);
-    expect(strategy.getNextMove(), 17); // ?? not unique, so pick something!
-    /// TODO: continue here ...
-  }, solo: true);
+  var p1 = PlayerOne(RandomStrategy());
+  // var p2 = PlayerTwo(RandomStrategy());
+  var p2 = PlayerTwo(MinMaxStrategy());
+  var initialState = NonTerminalState(<Move>[], <Move>[]);
+
+  var game = Game(p1, p2, initialState);
+  final end = game.play();
+  print(end);
+  print('utility player1: ${end.utility(Player.one)}');
+  print('utility player2: ${end.utility(Player.two)}');
+}
+
+
+void main() {
+  // tests();
+  // speedTest();
+  play();
+
+}
+
+
+
+
+
+
+
+  // test('Tie', () {
+  //   var game = WindmillGame.fromMoves(
+  //     [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 23, 19],
+  //     [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20, 22],
+  //   );
+  //   expect(game.gameStatus(), GameStatus.over);
+  //   expect(game.hasLastPlayerWon(), false); // it's a tie!
+  // });
+
+  // test('End game -2 stones', () {
+  //   var game = WindmillGame.fromMoves(
+  //     [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 20],
+  //     [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 22],
+  //   );
+  //   var strategy = MiniMax(game: game, maxDepth: 4);
+  //   expect(strategy.getNextMove(), 19); // Player one wins with either 19, or 23
+  // });
+
+  // test('End game -4 stones', () {
+  //   var game = WindmillGame.fromMoves(
+  //     [1, 0, 3, 18, 4, 9, 10, 8, 13, 17],
+  //     [15, 2, 21, 5, 6, 12, 11, 7, 16, 14],
+  //   );
+  //   var strategy = MiniMax(game: game, maxDepth: 6);
+  //   expect(strategy.getNextMove(), 22); // Player 1 wins with 22!
+  // });
+
+  // test('End game -5 stones', () {
+  //   var game = WindmillGame.fromMoves(
+  //     [1, 0, 3, 18, 4, 9, 10, 8, 13, 17],
+  //     [
+  //       15,
+  //       2,
+  //       21,
+  //       5,
+  //       6,
+  //       12,
+  //       11,
+  //       7,
+  //       16,
+  //     ],
+  //   );
+  //   var strategy = MiniMax(game: game, maxDepth: 6);
+  //   expect(strategy.getNextMove(), 23); // Player 2 wins with 23!
+  // });
+
+  // test('End game -6 stones', () {
+  //   var game = WindmillGame.fromMoves(
+  //     [23, 0, 3, 18, 4, 9, 10, 8, 13],
+  //     [15, 2, 21, 5, 6, 12, 11, 7, 16],
+  //   );
+  //   var strategy = MiniMax(game: game, maxDepth: 6);
+  //   expect(strategy.getNextMove(), 17); // Player 1 blocks Player 2 from winning
+  // });
+
+  // test('End game -7 stones', () {
+  //   var game = WindmillGame.fromMoves(
+  //     [14, 0, 3, 18, 4, 9, 10, 8, 13],
+  //     [15, 1, 21, 5, 6, 12, 11, 7],
+  //   );
+  //   var strategy = MiniMax(game: game, maxDepth: 10);
+  //   expect(strategy.getNextMove(), 17); // ?? not unique, so pick something!
+  //   /// TODO: continue here ...
+  // }, solo: true);
 
   // test('End game -7 stones', () {
   //   var game = WindmillGame.fromMoves(
@@ -166,50 +266,3 @@ void tests() {
   //   }
   //   print('Game over.  ${strategy.game.lastPlayer} won!');
   // });
-}
-
-speedTest() {
-  // generate 10,000 random positions
-  var rand = Random();
-  var positions = <List<int>>[];
-  final sw = Stopwatch()..start();
-  while (positions.length < 10000) {
-    var i1 = rand.nextInt(24);
-    var i2 = rand.nextInt(24);
-    var i3 = rand.nextInt(24);
-    if ({i1, i2, i3}.length == 3) {
-      var xs = [i1, i2, i3];
-      xs.sort();
-      positions.add(xs);
-    }
-  }
-  sw.stop();
-  print(sw.elapsedMilliseconds);
-
-  sw.reset();
-  final game = WindmillGame(<int>[]);
-  sw.start();
-  var count = 0;
-  for (var ps in positions) {
-    if (game.isWinningPosition(ps[0], ps[1], ps[2])) {
-      count += 1;
-    }
-  }
-  sw.stop();
-  print(sw.elapsedMilliseconds);
-  /// takes 5ms to check 10,000 positions!  Pretty good. 
-  print(count);
-}
-
-void main() {
-  // tests();
-  speedTest();
-}
-
-
-// game.moves.add(1);
-// expect(game.getPossibleMoves().length, 23);
-// game.moves.add(19);
-// expect(game.getPossibleMoves().length, 22);
-// expect(game.getLastPlayer(), Player.two);
-// expect(game.getNextPlayer(), Player.one);
