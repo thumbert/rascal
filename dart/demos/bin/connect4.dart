@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:demos/math/ai/connect4/chip.dart';
-import 'package:demos/math/ai/connect4/connect4.dart';
-import 'package:demos/math/ai/connect4/player.dart';
-import 'package:demos/math/ai/connect4/strategy.dart';
+import 'package:demos/math/ai/connect4/old/chip.dart';
+import 'package:demos/math/ai/connect4/old/connect4.dart';
+import 'package:demos/math/ai/connect4/old/player.dart';
+import 'package:demos/math/ai/connect4/old/strategy.dart';
 
 void main() {
   print("Welcome to a Connect4 game");

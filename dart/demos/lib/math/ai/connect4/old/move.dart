@@ -1,5 +1,5 @@
-import 'package:demos/math/ai/connect4/board.dart';
-import 'package:demos/math/ai/connect4/chip.dart';
+import 'package:demos/math/ai/connect4/old/board.dart';
+import 'package:demos/math/ai/connect4/old/chip.dart';
 import 'package:tuple/tuple.dart';
 
 class Move {

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:math' show Random;
-import 'package:demos/math/ai/connect4/move.dart';
+import 'package:demos/math/ai/connect4/old/move.dart';
 
 import 'connect4.dart';
 

@@ -1,7 +1,7 @@
 library math.ai.connect4;
 
-import 'package:demos/math/ai/connect4/board.dart';
-import 'package:demos/math/ai/connect4/move.dart';
+import 'package:demos/math/ai/connect4/old/board.dart';
+import 'package:demos/math/ai/connect4/old/move.dart';
 import 'strategy.dart';
 import 'player.dart';
 import 'chip.dart';
