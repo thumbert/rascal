@@ -111,6 +111,7 @@ void play() {
 main() {
   // tests();
   play();
+  '🔴🟡';
 
   // Amazing writeup
   // http://blog.gamesolver.org/solving-connect-four/02-test-protocol/
