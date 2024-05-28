@@ -8,6 +8,33 @@ import 'package:trotter/trotter.dart';
 
 typedef Move = int;
 
+const allMoves = <int>{
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23
+};
+
 enum Player { one, two }
 
 sealed class Players {
@@ -146,6 +173,7 @@ class MinMaxStrategy extends Object with Strategy {
   Move nextMove(State state) {
     currentPlayer = state.nextPlayer;
     var actions = state.actions().toList();
+
 
     num depth = 0.0;
     var values = actions.map((move) {
@@ -306,6 +334,29 @@ sealed class State {
     }
     return state;
   }
+
+  final allWinningPositions = const [
+    [0, 1, 2],
+    [0, 3, 21],
+    [1, 4, 22],
+    [2, 5, 23],
+    [3, 4, 5],
+    [3, 6, 9],
+    [4, 7, 10],
+    [5, 8, 11],
+    [6, 7, 8],
+    [9, 10, 11],
+    [9, 12, 15],
+    [10, 13, 16],
+    [11, 14, 17],
+    [12, 13, 14],
+    [15, 16, 17],
+    [15, 18, 21],
+    [16, 19, 22],
+    [17, 20, 23],
+    [18, 19, 20],
+    [21, 22, 23],
+  ];
 }
 
 class TerminalState extends State {
