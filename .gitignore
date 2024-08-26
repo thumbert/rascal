@@ -55,3 +55,8 @@ R/finance/vix/external/
 *.js_
 *.js.deps
 *.js.map
+
+// No target folders for Rust
+rust/rex/target/
+
+
