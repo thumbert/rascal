@@ -49,6 +49,7 @@ dart/chartxl/build
 // external dependencies should not be added
 R/finance/vix/external/
 
+rust/rex/target
 
 // Avoid committing generated JavaScript files
 *.dart.js

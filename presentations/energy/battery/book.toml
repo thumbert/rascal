@@ -1,0 +1,13 @@
+[book]
+authors = ["thumbert"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Battery"
+
+[output.html]
+additional-css = ["assets/isone/table.css", "assets/isone/custom.css"]
+
+# See https://github.com/lambdalisue/rs-mdbook-alerts
+# allows for GitHub Flavored Markdown Alerts
+[preprocessor.alerts]

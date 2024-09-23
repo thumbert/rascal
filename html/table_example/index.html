@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Table template</title>
+    <link href="minimal-table.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1>Table with double headers</h1>
+    <table>
+      <caption><b>Table</b>: Count the days with the best 4 hour blocks for charging and discharging by term.  
+        For each term, the best 3 choices of charging and discharging starts are shown together with the 
+        corresponding number of days in term.  'Best' is defined such that the highest price spread is 
+        achieved between the discharging and charging hours, whith the constraint that charging hours must 
+        occur before discharging. 
+      </caption>
+      <tr>
+        <th> </th>
+        <th colspan="2" style="background-color: #ffb3b3;">Charging</th>
+        <th colspan="2" style="background-color: #9fdfbf;">Discharging</th>
+      </tr>
+
+      <tr>
+        <th>Term</th>
+        <th>Hour</th>
+        <th>Count</th>
+        <th>Hour</th>
+        <th>Count</th>
+      </tr>
+      <tr>
+        <td>Dec20-Feb21</td>
+        <td>1</td>
+        <td>22</td>
+        <td>17</td>
+        <td>20</td>
+      </tr>
+      <tr>
+        <td>Dec20-Feb21</td>
+        <td>0</td>
+        <td>20</td>
+        <td>16</td>
+        <td>18</td>
+      </tr>
+      <tr>
+        <td>Dec20-Feb21</td>
+        <td>2</td>
+        <td>10</td>
+        <td>15</td>
+        <td>9</td>
+      </tr>
+      <!--  -->
+      <tr>
+        <td>Mar21-May21</td>
+        <td>1</td>
+        <td>22</td>
+        <td>17</td>
+        <td>20</td>
+      </tr>
+      <tr>
+        <td>Mar21-May21</td>
+        <td>0</td>
+        <td>20</td>
+        <td>16</td>
+        <td>18</td>
+      </tr>
+      <tr>
+        <td>Mar21-May21</td>
+        <td>2</td>
+        <td>10</td>
+        <td>15</td>
+        <td>9</td>
+      </tr>
+
+
+    </table>
+
+
+
+
+    <h1>Simple table</h1>
+
+    <table>
+      <tr>
+        <td>Hi, I'm your first cell.</td>
+        <td>I'm your second cell.</td>
+        <td>I'm your third cell.</td>
+        <td>I'm your fourth cell.</td>
+      </tr>
+      <tr>
+        <td>Second row, first cell.</td>
+        <td>Cell 2.</td>
+        <td>Cell 3.</td>
+        <td>Cell 4.</td>
+      </tr>
+    </table>
+
+
+
+  </body>
+</html>
+

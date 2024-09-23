@@ -1,0 +1,36 @@
+.best-blocks-table {
+    table {
+        border-collapse: collapse;
+        border: 2px solid rgb(200,200,200);
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+    }
+      
+    td, th {
+        border: 1px solid rgb(190,190,190);
+        padding: 6px 20px;
+    }
+    
+    th {
+        background-color: rgb(235,235,235);
+    }
+    
+    td {
+        text-align: center;
+    }
+    
+    /* tr, td {
+        /* background-color: rgb(255, 255, 255); */
+        /* background-color: none; */
+    /* } */ 
+
+    tr:nth-child(6n+0),tr:nth-child(6n+1),tr:nth-child(6n+2) td {
+        background-color: rgb(255,243,230);
+    }
+      
+    caption {
+        padding: 6px;
+        text-align: left;
+    }    
+}  
+  

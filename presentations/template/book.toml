@@ -1,0 +1,10 @@
+[book]
+authors = ["thumbert"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Book template"
+
+
+[output.html]
+mathjax-support=true
