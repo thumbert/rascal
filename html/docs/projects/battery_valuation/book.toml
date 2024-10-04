@@ -3,10 +3,12 @@ authors = ["thumbert"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Battery"
+title = "Battery valuation"
 
 [output.html]
 additional-css = ["assets/isone/table.css", "assets/isone/custom.css"]
+no-section-label = true
+mathjax-support = true
 
 # See https://github.com/lambdalisue/rs-mdbook-alerts
 # allows for GitHub Flavored Markdown Alerts

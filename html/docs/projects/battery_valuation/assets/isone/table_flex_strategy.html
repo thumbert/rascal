@@ -1,0 +1,29 @@
+<div class="table-wrapper">
+      <table style="width: 650px;">
+            <caption><b>Table</b>: Schematic of the decision tree for the <b>flex strategy</b>.
+            </caption>
+            <thead>
+                  <tr>
+                        <th>DA</th>
+                        <th>RT</th>
+                  </tr>      
+            </thead>
+            <tbody>
+                  <tr>
+                        <td>Charging hour</td>
+                        <td>Follow DA dispatch, i.e. if the battery is not full, then charge; else do nothing.</td>
+                  </tr>
+                  <tr>
+                        <td>Discharging hour</td>
+                        <td>Follow DA dispatch, i.e. if the battery is not empty, then discharge; else do nothing.</td>
+                  </tr>
+                  <tr>
+                        <td>No commitment hour</td>
+                        <td>If \(P_{RT} > (1 + f) \overline P_{DA}^d\) and the battery is full, then discharge; else 
+                              if \(P_{RT} < (1 - f) \overline P_{DA}^d\) and the battery is not fully charged, then charge; else 
+                              do nothing.</td>
+                  </tr>      
+            </tbody>
+      </table>
+      
+</div>
