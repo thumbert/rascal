@@ -56,3 +56,8 @@ rust/rex/target
 *.js_
 *.js.deps
 *.js.map
+
+// No target folders for Rust
+rust/rex/target/
+
+

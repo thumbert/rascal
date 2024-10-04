@@ -43,6 +43,8 @@ fn main() -> Result<(), jiff::Error> {
     let epoch_zero = Date::ZERO.saturating_add(719528.days());
     assert_eq!(date(1970, 1, 1), epoch_zero);
 
+    let start = date(2024, 1, 3);
+    println!("{:?} = {}", start.weekday(), start.weekday().to_monday_zero_offset());
 
 
     Ok(())
