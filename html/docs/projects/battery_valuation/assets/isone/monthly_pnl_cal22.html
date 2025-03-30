@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.plot.ly/plotly-2.26.0.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <div id="monthly_pnl_cal22"></div>
+  <script>
+  	let monthly_pnl_cal22 = document.getElementById("monthly_pnl_cal22");
+	  Plotly.newPlot( monthly_pnl_cal22, [{"x":["2022-01-01","2022-02-01","2022-03-01","2022-04-01","2022-05-01","2022-06-01","2022-07-01","2022-08-01","2022-09-01","2022-10-01","2022-11-01","2022-12-01"],"y":[340624.58823529433,291182.0588235293,50248.47058823527,185385.94117647063,249965.0588235294,160312.23529411753,512640.0000000002,433231.3529411765,154771.2352941176,200071.5882352941,188354.52941176458,486759.41176470596],"name":"DA fixed","line":{"color":"#2ca02c"}}], {"title":"Cal 22","width":800,"height":650,"yaxis":{"title":"Monthly PnL, $/kW-month"}}, {"displaylogo":false,"responsive":true} );
+  </script>
+</body>
+</html>

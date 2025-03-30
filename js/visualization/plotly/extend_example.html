@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+<div id="tester"></div>
+<script>
+    chartDiv = document.getElementById('tester');
+    traces = [
+    {
+      'x': [1, 2, 3, 4],
+      'y': [10, 15, 13, 17],
+      'mode': 'markers'
+    },
+    {
+      'x': [2, 3, 4, 5],
+      'y': [16, 5, 11, 10],
+      'mode': 'lines'
+    },
+    {
+      'x': [1, 2, 3, 4],
+      'y': [12, 9, 15, 12],
+      'mode': 'lines+markers'
+    }
+  ];
+
+  const layout = {
+    'title': 'Line and Scatter Plot',
+    'hovermode': 'closest', // this is needed to select the points
+    'height': 500, 'width': 700,
+  };
+
+    Plotly.newPlot( chartDiv, traces, layout);
+
+    Plotly.extendTraces(chartDiv, {'x': [[5]], 'y': [[11]]}, [0], 8);
+</script>
+</body>
+</html>

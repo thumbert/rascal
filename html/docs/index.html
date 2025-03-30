@@ -46,8 +46,10 @@
                 <li><a href="#dam-binding-constraints">DAM binding constraints</a></li>
                 <li><a href="#epa-emission-data">EPA emission data</a></li>
                 <li><a href="#forward-marks">Forward marks</a></li>
+                <li><a href="#hq-hydro-data">HQ hydro data</a></li>
                 <li><a href="#masked-da-demand-bids">Masked DA demand bids</a></li>
                 <li><a href="#masked-da-energy-offers">Masked DA energy offers</a></li>
+                <li><a href="#nrc-unit-status">NRC unit status</a></li>
                 <li><a href="#ptid-table">Ptid table</a></li>
                 <li><a href="#ncpc-pool">Pool NCPC costs</a></li>
                 <li><a href="#rt-daily-prices">RT daily prices by bucket</a></li>
@@ -224,6 +226,18 @@
                 </ul>
             </div>
 
+            <div id="hq-hydro-data">
+                <h4>Hydro Quebec hydrological data</h4>
+                <ul>
+                    <li>
+                        Get daily water level data for some or all facilities between a start/end date.  If no station ids are given, return all of them. 
+                        Original data is hourly.  Perform a daily average, and round the result to two decimals before returning. 
+                        <div><a href="http://localhost:8111/hq/water_level/daily/start/2024-12-04/end/2024-12-08?station_ids=1-2951,1-9698">hq/water_level/daily/start/2024-12-04/end/2024-12-08?station_ids=1-2951,1-9698</a></div>
+                        <div><a href="http://localhost:8111/hq/water_level/daily/start/2024-12-04/end/2024-12-08">hq/water_level/daily/start/2024-12-04/end/2024-12-08</a></div>
+                    </li>
+                </ul>
+            </div>
+
             <div id="masked-da-demand-bids">
                 <h4>Masked DA demand bids</h4>
                 <ul>
@@ -285,6 +299,28 @@
                     <li>
                         Get all the ownership of an asset IDs between a start and end day
                         <div><a href="http://localhost:8080/da_energy_offers/v1/ownership/assetId/902793/start/20170101/end/20170102">da_energy_offers/v1/assets/participantId/902793/start/20170101/end/20170102</a></div>
+                    </li>
+                </ul>
+            </div>
+            <div id="nrc-unit-status">
+                <h4>NRC unit status</h4>
+                Data from <a href="https://www.nrc.gov/reading-rm/doc-collections/event-status/reactor-status/index.html">https://www.nrc.gov/reading-rm/doc-collections/event-status/reactor-status/index.html</a>.
+                <ul>
+                    <li>
+                        Get all the generator names in the database.   
+                        <div><a href="http://localhost:8111/nrc/generator_status/unit_names">nrc/generator_status/unit_names</a></div>
+                    </li>
+                    <li>
+                        Get the generator status between a start and end date.   
+                        <br>The url query string has the following components:
+                        <ul style="list-style-type:circle;">
+                            <li>
+                                unit-names filter (optional) a comma separated list of unit names, e.g. `unit-names=Calvert Cliffs1,Byron 1`.  Note
+                                  that the unit names need to match exactly the names in the database.
+                            </li>
+                        </ul>
+                        <div><a href="http://localhost:8111/nrc/generator_status/start/2025-01-01/end/2025-01-04">nrc/generator_status/start/2025-01-01/end/2025-01-04</a></div>
+                        <div><a href="http://localhost:8111/nrc/generator_status/start/2025-01-01/end/2025-01-04?unit_names=Calvert Cliffs 1,Byron 1">nrc/generator_status/start/2025-01-01/end/2025-01-04?unit_names=Calvert Cliffs 1,Byron 1</a></div>
                     </li>
                 </ul>
             </div>
