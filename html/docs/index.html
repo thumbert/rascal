@@ -29,9 +29,14 @@
                     <div><a href="http://127.0.0.1:9000/docs/projects/hourly_shape/index.html">Hourly shape</a></div>
                 </li>
             </ul>
+
+            <h2>Admin</h2>
+            <ul>
+                <li>
+                    <div><a href="http://127.0.0.1:9000/docs/jobs/index.html">Job management</a></div>
+                </li>
+            </ul>
         </div>
-
-
 
         <div>
             <h2>API</h2>
@@ -47,8 +52,8 @@
                 <li><a href="#epa-emission-data">EPA emission data</a></li>
                 <li><a href="#forward-marks">Forward marks</a></li>
                 <li><a href="#hq-hydro-data">HQ hydro data</a></li>
-                <li><a href="#masked-da-demand-bids">Masked DA demand bids</a></li>
-                <li><a href="#masked-da-energy-offers">Masked DA energy offers</a></li>
+                <li><a href="#masked-da-demand-bids">ISONE masked DA demand bids</a></li>
+                <li><a href="#masked-energy-offers">ISONE masked DA energy offers</a></li>
                 <li><a href="#nrc-unit-status">NRC unit status</a></li>
                 <li><a href="#ptid-table">Ptid table</a></li>
                 <li><a href="#ncpc-pool">Pool NCPC costs</a></li>
@@ -264,41 +269,26 @@
                     </li>
                 </ul>
             </div>
-            <div id="masked-da-energy-offers">
-                <h4>Masked DA energy offers</h4>
+            <div id="masked-energy-offers">
+                <h4>ISONE masked energy offers both DA and RT markets</h4>
                 <ul>
                     <li>
-                        Get stack for a given date and hour ending.  For the extra hour in the fall, enter '02X' same as the ISONE.
-                        Only the offers of the units that are available are returned, sorted by price.
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/stack/date/20170701/hourending/16">da_energy_offers/v1/date/stack/20170701/hourending/16</a></div>
+                        Get all the generation offers between a start/end date.
+                        <br>The url query string has the following components:
+                        <ul style="list-style-type:circle;">
+                            <li>
+                                <b>masked_asset_ids</b> filter (optional) a comma separated list of ids, e.g. <span style="font-family: monospace;">masked_asset_ids=77459</span>.  
+                            </li>
+                        </ul>
+                        <div><a href="http://localhost:8111/isone/energy_offers/da/start/2024-11-01/end/2024-11-03">isone/energy_offers/da/start/2024-11-01/end/2024-11-03</a></div>
+                        <div><a href="http://localhost:8111/isone/energy_offers/rt/start/2024-11-01/end/2024-11-03">isone/energy_offers/rt/start/2024-11-01/end/2024-11-03</a></div>
+                        <div><a href="http://localhost:8111/isone/energy_offers/da/start/2024-11-01/end/2024-11-03?masked_asset_ids=77459">isone/energy_offers/da/start/2024-11-01/end/2024-11-03?masked_asset_ids=77459</a></div>
                     </li>
                     <li>
-                        Get all the generation offers for a given date and hour ending.  For the extra hour in the fall, enter '02X' same as the ISONE.
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/date/20170701/hourending/16">da_energy_offers/v1/date/20170701/hourending/16</a></div>
-                    </li>
-                    <li>
-                        Get all the daily data for all the generators for a day
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/daily_data/day/20170701">da_energy_offers/v1/daily_data/day/20170701</a></div>
-                    </li>
-                    <li>
-                        Get the energy offers for one asset ID between a start and end date
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/assetId/41406/start/20170701/end/20171001">da_energy_offers/v1/assetId/41406/start/20170701/end/20171001</a></div>
-                    </li>
-                    <li>
-                        Get one daily variable for all the generators between a start and end date, in this example the 'Economic Maximum'
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/daily/variable/Maximum Daily Energy/start/20170701/end/20171001">da_energy_offers/v1/daily/variable/Maximum Daily Energy/start/20170701/end/20171001</a></div>
-                    </li>
-                    <li>
-                        Get all the asset IDs and masked participant IDs for one day
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/assets/day/20170701">da_energy_offers/v1/assets/day/20170701</a></div>
-                    </li>
-                    <li>
-                        Get all the asset IDs of one masked participant IDs between a start and end day
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/assets/participantId/902793/start/20170101/end/20170102">da_energy_offers/v1/assets/participantId/902793/start/20170101/end/20170102</a></div>
-                    </li>
-                    <li>
-                        Get all the ownership of an asset IDs between a start and end day
-                        <div><a href="http://localhost:8080/da_energy_offers/v1/ownership/assetId/902793/start/20170101/end/20170102">da_energy_offers/v1/assets/participantId/902793/start/20170101/end/20170102</a></div>
+                        Get the stack for a comma separated list of timestamps.  A timestamp is the number of seconds since the epoch.  
+                        For example, 1709269200 is 2024-03-01 00:00:00-05:00[America/New_York].  
+                        Only the offers of the units that are available are returned, sorted by price.  
+                        <div><a href="http://localhost:8111/isone/energy_offers/da/stack/timestamps/1709269200">isone/energy_offers/da/stack/timestamps/1709269200</a></div>
                     </li>
                 </ul>
             </div>

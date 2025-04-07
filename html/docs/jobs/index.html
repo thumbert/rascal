@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trigger Rust Job</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        /* display: flex; */
+        /* justify-content: center;
+        align-items: center; */
+        height: 100vh;
+        background-color: #f0f0f0;
+      }
+      .container {
+        width: 1000px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        padding: 8px 16px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #6200ee;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #4200a1;
+      }
+      .button_link {
+        display: inline-block;
+        padding: 8px 16px;
+        font-size: 16px;
+        color: #6200ee;
+        background: none;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .button_link:hover {
+        background-color: rgba(98, 0, 238, 0.08);
+      }
+
+      .card {
+        display: inline-block;
+        padding: 16px;
+        margin: 16px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        border: 1px solid #e0e0e0;
+      }
+
+      .card-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+        color: #6200ee;
+      }
+
+      .card-content {
+        font-size: 14px;
+        color: #333;
+      }
+
+      .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 8px solid rgba(0, 0, 0, 0.1);
+        border-left-color: #000;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        /* position: absolute; */
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        /* align-items: left; */
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .container-job {
+        display: grid;
+        margin: 8px auto;
+        row-gap: 8px;
+        grid-template-columns: auto 100px 100px 50px;
+        align-self: center;
+        justify-self: center;
+        align-items: start;
+      }
+      .column1 {
+        text-align: start;
+        align-self: center;
+        padding-left: 16px;
+      }
+      dialog {
+        border: none;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        background-color: #ffffff;
+        max-width: 1000px;
+        width: 100%;
+      }
+
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+      }
+      
+      h2 {
+        margin-top: 0;
+        font-size: 24px;
+        font-weight: 500;
+        color: #333333;
+      }
+
+      p {
+        font-size: 16px;
+        color: #666666;
+      }
+      .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .actions button {
+            background-color: #6200ee;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .actions button:hover {
+            background-color: #3700b3;
+        }
+
+        .actions button + button {
+            margin-left: 10px;
+            background-color: #03dac5;
+        }
+
+        .actions button + button:hover {
+            background-color: #018786;
+        }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Job management console</h1>
+      <div style="height: 16px"></div>
+      <div id="all-jobs"></div>
+
+      <!-- Show the log -->
+      <div style="height: 100px"></div>
+      <p id="response" style="width: 660px"></p>
+
+      <dialog id="myDialog">
+        <h2>Job log</h2>
+        <div id="logContainer" style="width: 900px;"></div>
+        <div class="actions"></div>
+            <button id="cancelDialogBtn">Cancel</button>
+        </div>
+      </dialog>
+    </div>
+
+    <script>
+      const jobs = [
+        {"name": "update-hq-hydro-data", "description": "Update HQ hydro data"},
+        {"name": "update-isone-sevenday-solar-forecast-archive", "description": "Update ISONE seven day solar forecast archive"},
+      ];
+      const allJobsContainer = document.getElementById("all-jobs");
+        for (var i=0; i<jobs.length; i++) {
+            const job = jobs[i];
+            const jobName = job.name;
+            const jobDescription = job.description;
+            const container = document.createElement("div");
+            container.className = "container-job";
+            container.innerHTML = `
+                <div class="column1">${jobDescription}</div>
+                <button onclick="triggerJob('${jobName}')">Run</button>
+                <button class="button_link" id="openDialogBtn" onclick="getLog('${jobName}')">Log</button>
+                <div class="spinner" style="margin: auto" id="spinner-${jobName}"></div>
+            `;
+            allJobsContainer.appendChild(container);
+        }
+
+
+      const cancelDialogBtn = document.getElementById('cancelDialogBtn');
+
+      async function triggerJob(jobName) {
+        showSpinner(jobName);
+        try {
+          const response = await fetch(
+            `http://localhost:8111/admin/jobs/run/${jobName}`,
+            {
+              method: "POST",
+            }
+          );
+          const data = await response.text();
+          const jsObject = JSON.parse(data);
+        } catch (error) {
+          return;
+        } finally {
+          hideSpinner(jobName);
+        }
+      }
+
+      async function getLog(jobName) {
+        try {
+          const response = await fetch(
+            `http://localhost:8111/admin/jobs/log/${jobName}`,
+            {
+              method: "POST",
+            }
+          );
+          const data = await response.text();
+        //   console.log(data);
+          document.getElementById("logContainer").innerText = data;
+          dialog.showModal();
+        } catch (error) {
+          document.getElementById("logContainer").innerText = "Error: " + error;
+          dialog.showModal();
+          return;
+        }
+      }
+
+      function showSpinner(jobName) {
+        document.getElementById(`spinner-${jobName}`).style.display = "block";
+      }
+
+      function hideSpinner(jobName) {
+        document.getElementById(`spinner-${jobName}`).style.display = "none";
+      }
+
+      const dialog = document.getElementById("myDialog");
+      cancelDialogBtn.addEventListener('click', () => {
+            dialog.close();
+        });
+
+    //   window.addEventListener("click", (e) => {
+    //     console.log(e.target.id);
+    //     if (e.target.id == "myDialog" ) {
+    //     //   console.log("click captured...");
+    //       dialog.close();
+    //     }
+    //   });
+    </script>
+  </body>
+</html>
