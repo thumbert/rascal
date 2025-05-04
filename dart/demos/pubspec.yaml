@@ -4,7 +4,7 @@ environment:
 
 dependencies:
   collection: ^1.15.0
-  csv: ^5.0.0
+  csv: ^6.0.0
   date:
     git: https://github.com/thumbert/date.git
   dama:
@@ -13,7 +13,7 @@ dependencies:
   #   git: https://github.com/thumbert/elec.git
   # elec_server:
   #   git: https://github.com/thumbert/elec-server.git
-  intl: ^0.18.1
+  intl: ^0.19.0
   more: ^4.0.1
   mongo_dart: ^0.9.1
   quiver: ^3.0.1
