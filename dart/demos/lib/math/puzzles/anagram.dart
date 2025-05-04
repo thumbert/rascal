@@ -1,22 +1,9 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart' as collection;
-import 'package:trotter/trotter.dart';
-import 'package:more/more.dart';
 
-/// This is a solver for the Frase puzzle from forbes.com
-/// Given a set of letters, the goal is to find a phrase that can be formed
-/// using those letters.  You are given the shape of the phrase, but not
-/// the letters.
-///
-/// For example, given the letters:
-///   {'M': 3, 'E': 2, 'T': 3, 'O': 2, 'I': 2, 'R': 1, 'F': 1}
-/// Construct a phrase with words of length: [4, 4, 2, 4] which uses
-/// all the letters exactly once.
-///
-///
-class Frase {
-  Frase({required this.inputWords, required this.solutionShape}) {
+class Anagram {
+  Anagram({required this.inputWords, required this.solutionShape}) {
     var letters = <String, int>{};
     for (var word in inputWords) {
       for (var letter in word.split('')) {
@@ -28,17 +15,22 @@ class Frase {
         solutionShape.fold(0, (a, b) => a + b));
   }
 
-  final List<String> inputWords;
-  final List<int> solutionShape;
+  List<String> inputWords;
+  // How many words and what length should each word be?
+  List<int> solutionShape;
   late final Map<String, int> letters;
 
-  // the puzzle solution (can be multiple)
+  // Possible candidate words
+  late final Map<int, List<String>> filteredWords;
 
-  List<List<String>> solve() {
+  /// Generate a list of words that can be formed from the letters in the
+  /// input words.
+  List<String> generate(int threshold) {
     // Create a list of all the words that match the shape
-    var allWords = readWordListFrequency();
+    var allWords = readWordListFrequency(threshold);
     var filtered = filterWords(allWords.keys.toList(),
         wordLengths: solutionShape, letterFrequencies: letters);
+    // Remove the input words from the list
     filtered.removeWhere((e) => inputWords.contains(e));
     // Sort the valid words by frequency
     filtered.sort((a, b) {
@@ -46,54 +38,42 @@ class Frase {
       var bFreq = allWords[b] ?? 0;
       return bFreq.compareTo(aFreq);
     });
+    filteredWords = collection.groupBy(filtered, (e) => e.length);
 
-    var solutions = <List<String>>[];
-    // Construct all possible solutions by generating sets of words with correct
-    // word lengths.
-    // var wordLengthCount = collection
-    //     .groupBy(solutionShape, (e) => e)
-    //     .map((k, v) => MapEntry(k, v.length));
-    // var allCombinations = wordLengthCount.map((k, v) => MapEntry(
-    //     k, Combinations(v, filtered.where((e) => e.length == k).toList())));
+    var index = 0;
+    var partialSolutions =
+        (filteredWords[solutionShape[0]] ?? []).map((e) => [e]).toList();
+    var solutions = getNextValidWords(index + 1, partialSolutions);
 
-    // var xs = allCombinations.values.map((e) => e()).toList();
-    // for (var e in xs[0]) {
-    //   for (var f in xs[1]) {
-    //     var proposed = [...e, ...f];
-    //     // print(proposed);
-    //     // need to make sure that the proposed words are in the shape needed!
-    //     if (checkSolution(proposed)) {
-    //       print('Found a solution: $proposed');
-    //       solutions.add(proposed);
-    //     }
-    //   }
-    // }
+    return solutions.map((e) => e.join(' ')).toList();
+  }
 
-    // for (var x in xs) {
-    //   var proposed = <String>[];
-    //   for (var choice in x) {
-    //     proposed.addAll(choice);
-    //   }
-    //   print(proposed);
-    //   if (checkSolution(proposed)) {
-    //     print('Found a solution: $proposed');
-    //     solutions.add(proposed);
-    //   }
-    // }
-
-    // brute force
-    var combinations = Combinations(solutionShape.length, filtered);
-    print('Checking ${combinations.length} possible combinations ...');
-    for (final proposed in combinations()) {
-      // print(proposed);
-      if (checkSolution(proposed)) {
-        print('Found a solution: $proposed');
-        solutions.add(proposed);
-        // break;
-      }
+  /// Index is the index of the word in the solution
+  List<List<String>> getNextValidWords(
+      int index, List<List<String>> partialSolutions) {
+    if (index == solutionShape.length) {
+      return partialSolutions.where((e) => checkSolution(e)).toList();
     }
 
-    return solutions;
+    /// Get the new list of words with the correct length
+    var newWords = filteredWords[solutionShape[index]] ?? [];
+    if (newWords.isEmpty) {
+      return [];
+    }
+
+    /// Do all the filtering you can to trim the new list further.
+    var propagatingSolutions = <List<String>>[];
+    for (var newWord in newWords) {
+      for (var partialSolution in partialSolutions) {
+        if (checkLetterConsistency([...partialSolution, newWord])) {
+          propagatingSolutions.add([...partialSolution, newWord]);
+        }
+      }
+    }
+    print(
+        'Found ${propagatingSolutions.length} partial solutions for depth: $index');
+    // print(propagatingSolutions.join('\n'));
+    return getNextValidWords(index + 1, propagatingSolutions);
   }
 
   bool checkSolution(List<String> words) {
@@ -114,6 +94,27 @@ class Frase {
       }
     }
     return const collection.MapEquality().equals(letters, this.letters);
+  }
+
+  /// Check that the letters of the [candidateWords] are consistent with the
+  /// input words of the anagram.
+  ///
+  bool checkLetterConsistency(List<String> candidateWords) {
+    var letters = <String, int>{};
+    for (var word in candidateWords) {
+      for (var letter in word.split('')) {
+        letters[letter] = (letters[letter] ?? 0) + 1;
+      }
+    }
+    for (var entry in letters.entries) {
+      if (this.letters[entry.key] == null) {
+        return false;
+      }
+      if (entry.value > (this.letters[entry.key] ?? 0)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /// Filter a word list according to several criteria
@@ -162,26 +163,16 @@ class Frase {
     return filtered;
   }
 
-  List<String> readWordList() {
-    // final file =
-    //     File('/home/adrian/Downloads/Archive/Words/wordlist_10000.txt');
-    final file = File('/home/adrian/Downloads/Archive/Words/words_alpha.txt');
-    final lines = file.readAsLinesSync();
-    final words = <String>[];
-    for (var line in lines) {
-      final word = line.trim();
-      words.add(word);
-    }
-    return words;
-  }
-
-  Map<String, int> readWordListFrequency() {
+  Map<String, int> readWordListFrequency(int threshold) {
     final file = File('/home/adrian/Downloads/Archive/Words/unigram_freq.csv');
     final lines = file.readAsLinesSync();
     final words = <String, int>{};
     for (var line in lines.skip(1)) {
       final xs = line.trim().split(',');
-      words[xs[0]] = int.parse(xs[1]);
+      final count = int.parse(xs[1]);
+      if (count > threshold) {
+        words[xs[0]] = int.parse(xs[1]);
+      }
     }
     return words;
   }
