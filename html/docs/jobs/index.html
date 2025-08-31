@@ -14,7 +14,7 @@
         background-color: #f0f0f0;
       }
       .container {
-        width: 1000px;
+        width: 700px;
         background: #fff;
         padding: 20px;
         border-radius: 10px;
@@ -166,13 +166,18 @@
             background-color: #018786;
         }
 
+      /* Highlight table rows on mouse over */
+      #all-jobs tbody tr:hover {
+        background-color: #f0f0f0; /* Light gray background */
+        cursor: pointer; /* Change cursor to pointer */
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>Job management console</h1>
       <div style="height: 16px"></div>
-      <div id="all-jobs"></div>
+      <!-- <div id="all-jobs"></div> -->
 
       <!-- Show the log -->
       <div style="height: 100px"></div>
@@ -182,29 +187,44 @@
         <h2>Job log</h2>
         <div id="logContainer" style="width: 900px;"></div>
         <div class="actions"></div>
-            <button id="cancelDialogBtn">Cancel</button>
-        </div>
+        <button id="cancelDialogBtn">Cancel</button>
       </dialog>
+
+      <table id="all-jobs" style="width: 100%; border-collapse: collapse;">
+        <!-- <thead>
+          <tr>
+            <th>Job Name</th>
+            <th></th>
+            <th></th>
+          </tr> -->
+        </thead>
+        <tbody>
+          <!-- Rows will be dynamically added here -->
+        </tbody>
+      </table>
+
+      <script type="module">
+        const jobNames = await getJobs(); 
+        const allJobsContainer = document.querySelector("#all-jobs tbody");
+        for (var i = 0; i < jobNames.length; i++) {
+          var arg = jobNames[i].replace(/_/g, "-");
+          arg = arg.replace("\.sh", "");
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${jobNames[i]}</td>
+            <td>
+              <button onclick="triggerJob('${arg}')">Run</button>
+              <button class="button_link" id="openDialogBtn" onclick="getLog('${arg}')">Log</button>
+            </td>
+            <td>
+              <div class="spinner" style="margin: auto" id="spinner-${arg}"></div>
+            </td>
+          `;
+          allJobsContainer.appendChild(row);
+        }
+      </script>
     </div>
 
-    <script type="module">
-      const jobNames = await getJobs(); 
-      const allJobsContainer = document.getElementById("all-jobs");
-        for (var i=0; i<jobNames.length; i++) {
-            var arg = jobNames[i].replace(/_/g, "-");
-            arg = arg.replace("\.sh", "");
-            // console.log(arg);
-            const container = document.createElement("div");
-            container.className = "container-job";
-            container.innerHTML = `
-                <div class="column1">${jobNames[i]}</div>
-                <button onclick="triggerJob('${arg}')">Run</button>
-                <button class="button_link" id="openDialogBtn" onclick="getLog('${arg}')">Log</button>
-                <div class="spinner" style="margin: auto" id="spinner-${arg}"></div>
-            `;
-            allJobsContainer.appendChild(container);
-        }
-    </script>
     <script>
         const cancelDialogBtn = document.getElementById('cancelDialogBtn');
 

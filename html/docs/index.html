@@ -259,12 +259,35 @@
           </ul>
         </div>
         <div id="dam-hourly-prices">
+          <h4>IESO DAM hourly prices</h4>
+          Data is available from 2025-06-01.
+          <ul>
+            <li>
+              Get hourly prices between a start/end date.<br>
+              The url query string has the following components:
+              <ul style="list-style-type: circle">
+                <li>
+                  <b>locations</b> filter (optional) a comma separated list of locations, e.g.
+                  <span style="font-family: monospace">locations=TORONTO,WEST</span>.  If not specified, all nodes are returned (a lot of data.)
+                </li>
+                <li>
+                  <b>components</b> filter (optional) a comma separated list of LMP components (lmp, mcc, mlc), e.g. 
+                  <span style="font-family: monospace">components=lmp,mcc</span>.  If not specified, all three components are returned.
+                </li>
+              </ul>
+              <div>
+                <a
+                  href="http://localhost:8111/ieso/dalmp/hourly/start/2025-07-01/end/2025-07-03?locations=TORONTO,WEST&components=lmp"
+                  >ieso/dalmp/hourly/start/2025-07-01/end/2025-07-03?locations=TORONTO,WEST&components=lmp</a>
+              </div>
+            </li>
+          </ul>
           <h4>ISONE DAM hourly prices</h4>
           Data is available from 2021-01-01.
           <ul>
             <li>
-              Get hourly prices between a start/end date. f
-              <br />The url query string has the following components:
+              Get hourly prices between a start/end date.<br>
+              The url query string has the following components:
               <ul style="list-style-type: circle">
                 <li>
                   <b>ptids</b> filter (optional) a comma separated
