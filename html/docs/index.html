@@ -44,6 +44,14 @@
           <li>
             <div>
               <a
+                href="http://127.0.0.1:9000/docs/projects/canadian_generation/index.html"
+                >Canadian generation</a
+              >
+            </div>
+          </li>
+          <li>
+            <div>
+              <a
                 href="http://127.0.0.1:9000/docs/projects/hourly_shape/index.html"
                 >Hourly shape</a
               >
@@ -106,7 +114,7 @@
             <a href="#masked-energy-offers">ISONE masked DA energy offers</a>
           </li>
           <li><a href="#nrc-unit-status">NRC unit status</a></li>
-          <li><a href="#ptid-table">Ptid table</a></li>
+          <li><a href="#ptid-table">Ptid table (IESO, ISONE, NYISO)</a></li>
           <li><a href="#ncpc-pool">Pool NCPC costs</a></li>
           <li><a href="#rt-daily-prices">RT daily prices by bucket</a></li>
           <li><a href="#rt-hourly-prices">RT hourly prices</a></li>
@@ -231,7 +239,34 @@
           </ul>
         </div>
         <div id="dam-daily-prices">
-          <h4>DAM daily prices by bucket</h4>
+          <h3>DAM daily prices by bucket</h3>
+          <h4>IESO DAM daily prices</h4>
+          Data is available from 2025-06-01.  Both area(Ontario), zones(hubs) and nodes.  Currently only the ATC bucket is 
+          supported.
+          <ul>
+            <li>
+              Get daily prices between a start/end date for a given bucket.<br>
+              The url query string has the following components:
+              <ul style="list-style-type: circle">
+                <li>
+                  <b>locations</b> filter (optional) a comma separated list of locations, e.g.
+                  <span style="font-family: monospace">locations=TORONTO,GREENFIELD-LT.G1</span>.  If not specified, all nodes are returned (a lot of data.)
+                </li>
+                <li>
+                  <b>components</b> filter (optional) a comma separated list of LMP components (lmp, mcc, mlc), e.g. 
+                  <span style="font-family: monospace">components=lmp,mcc</span>.  If not specified, all three components are returned.
+                </li>
+              </ul>
+              <div>
+                <a
+                  href="http://localhost:8111/ieso/dalmp/daily/bucket/atc/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp"
+                  >ieso/dalmp/daily/bucket/atc/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp</a>
+              </div>
+            </li>
+          </ul>
+
+
+          <h4>ISONE DAM daily prices</h4>
           <ul>
             <li>
               Calculate daily prices (average over the hourly prices) for of the
@@ -258,9 +293,12 @@
             </li>
           </ul>
         </div>
+
+
         <div id="dam-hourly-prices">
+          <h3>DAM hourly prices by bucket</h3>
           <h4>IESO DAM hourly prices</h4>
-          Data is available from 2025-06-01.
+          Data is available from 2025-06-01.  Both area(Ontario), zones(hubs) and nodes. 
           <ul>
             <li>
               Get hourly prices between a start/end date.<br>
@@ -268,7 +306,7 @@
               <ul style="list-style-type: circle">
                 <li>
                   <b>locations</b> filter (optional) a comma separated list of locations, e.g.
-                  <span style="font-family: monospace">locations=TORONTO,WEST</span>.  If not specified, all nodes are returned (a lot of data.)
+                  <span style="font-family: monospace">locations=TORONTO,GREENFIELD-LT.G1</span>.  If not specified, all nodes are returned (a lot of data.)
                 </li>
                 <li>
                   <b>components</b> filter (optional) a comma separated list of LMP components (lmp, mcc, mlc), e.g. 
@@ -277,11 +315,13 @@
               </ul>
               <div>
                 <a
-                  href="http://localhost:8111/ieso/dalmp/hourly/start/2025-07-01/end/2025-07-03?locations=TORONTO,WEST&components=lmp"
-                  >ieso/dalmp/hourly/start/2025-07-01/end/2025-07-03?locations=TORONTO,WEST&components=lmp</a>
+                  href="http://localhost:8111/ieso/dalmp/hourly/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp"
+                  >ieso/dalmp/hourly/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp</a>
               </div>
             </li>
           </ul>
+          
+          
           <h4>ISONE DAM hourly prices</h4>
           Data is available from 2021-01-01.
           <ul>

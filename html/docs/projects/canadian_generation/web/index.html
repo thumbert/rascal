@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Canadian Generation</title>
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet" type="text/css" href="assets/documentation.css" />
+
+  <script src="https://cdn.plot.ly/plotly-2.35.1.min.js" charset="utf-8"></script>
+  <script src="assets/hydro_generation_quebec.js" async></script>
+  <script src="assets/hydro_generation_12mth.js" async></script>
+</head>
+
+<body>
+  <h1 style="padding-left: 24px;">Historical generation by province</h1>
+  <div class="container">
+    <nav class="menu">
+      <a href="#" class="active" onclick="showContent(event, 'Quebec')">Quebec</a>
+      <a href="#" onclick="showContent(event, 'Ontario')">Ontario</a>
+    </nav>
+    <main class="content">
+      <div id="Quebec" class="content-section active">
+        <h3>Hydro generation</h3>
+          <div id="hydro_generation_quebec"></div>
+          <div style="height: 8px;"></div>
+          <div id="hydro_generation_12mth"></div>
+      </div>
+      <div id="Ontario" class="content-section">
+        <h3>Hydro generation</h3>
+          <div id="hydro_generation_ontario"></div>
+      </div>
+    </main>
+  </div>
+  <script>
+    function showContent(evt, id) {
+      evt.preventDefault();
+      document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
+      evt.target.classList.add('active');
+      document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+  </div>
+
+
+  <div style="height:24px"></div>
+  <div style="font-size: 12px;"><i>Report produced with /docs/canadian_generation/main.dart</i></div>
+</body>
+
+</html>
