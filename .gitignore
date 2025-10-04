@@ -60,4 +60,6 @@ rust/rex/target
 // No target folders for Rust
 rust/rex/target/
 
+.vscode/
+
 

@@ -1,0 +1,6 @@
+[book]
+authors = ["thumbert"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Solving The New York Times Pips Puzzle Programmatically"
