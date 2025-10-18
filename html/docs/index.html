@@ -251,55 +251,65 @@
           <h4>IESO DAM daily prices</h4>
           Data is available from 2025-06-01.  Both area(Ontario), zones(hubs) and nodes.  Currently only the ATC bucket is 
           supported.
+
+          <p>Get daily prices between a start/end date for a given bucket.<br>
+          The url query string has the following components:
           <ul>
             <li>
-              Get daily prices between a start/end date for a given bucket.<br>
-              The url query string has the following components:
-              <ul style="list-style-type: circle">
-                <li>
-                  <b>locations</b> filter (optional) a comma separated list of locations, e.g.
-                  <span style="font-family: monospace">locations=TORONTO,GREENFIELD-LT.G1</span>.  If not specified, all nodes are returned (a lot of data.)
-                </li>
-                <li>
-                  <b>components</b> filter (optional) a comma separated list of LMP components (lmp, mcc, mlc), e.g. 
-                  <span style="font-family: monospace">components=lmp,mcc</span>.  If not specified, all three components are returned.
-                </li>
-              </ul>
-              <div>
-                <a
-                  href="http://localhost:8111/ieso/dalmp/daily/bucket/atc/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp"
-                  >ieso/dalmp/daily/bucket/atc/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp</a>
-              </div>
+              <b>locations</b> filter (optional) a comma separated list of locations, e.g.
+              <span style="font-family: monospace">locations=TORONTO,GREENFIELD-LT.G1</span>.  If not specified, all nodes are returned (a lot of data.)
             </li>
-          </ul>
-
-
-          <h4>ISONE DAM daily prices</h4>
-          <ul>
             <li>
-              Calculate daily prices (average over the hourly prices) for of the
-              3 components (lmp, congestion, marginal_loss), by bucket (standard
-              bucket names are supported).
-              <div>
-                <a
-                  href="http://localhost:8080/dalmp/v1/daily/lmp/ptid/4000/start/20170101/end/20170105/bucket/5x16"
-                  >dalmp/daily/lmp/ptid/4000/start/20170101/end/20170105/bucket/5x16</a
-                >
-              </div>
-              <div>
-                <a
-                  href="http://localhost:8080/dalmp/v1/daily/congestion/ptid/4000/start/20170101/end/20170105/bucket/2x16H"
-                  >dalmp/daily/congestion/ptid/4000/start/20170101/end/20170105/bucket/2x16H</a
-                >
-              </div>
-              <div>
-                <a
-                  href="http://localhost:8080/dalmp/v1/daily/marginal_loss/ptid/4000/start/20170101/end/20170105/bucket/flat"
-                  >dalmp/daily/marginal_loss/ptid/4000/start/20170101/end/20170105/bucket/flat</a
-                >
-              </div>
+              <b>components</b> filter (optional) a comma separated list of LMP components (lmp, mcc, mlc), e.g. 
+              <span style="font-family: monospace">components=lmp,mcc</span>.  If not specified, all three components are returned.
             </li>
           </ul>
+          <div>
+            <a
+              href="http://localhost:8111/ieso/dalmp/daily/bucket/atc/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp"
+              >ieso/dalmp/daily/bucket/atc/start/2025-07-01/end/2025-07-03?locations=TORONTO,GREENFIELD-LT.G1&components=lmp</a>
+          </div>
+
+
+          <h4>ISONE DAM daily prices</h4>          
+          Calculate daily prices (average over the hourly prices) for of the
+          3 components (lmp, mcc, mcl), by bucket (standard bucket names are supported). Data available from Jan21 to present.
+
+          <p>The url query string has the following components:
+          <ul style="list-style-type: circle">
+            <li>
+              <b>ptids</b> filter (optional) a comma separated list of node ids, e.g.
+              <span style="font-family: monospace">ptids=4000,4001</span>.  If not specified, all nodes are returned (a lot of data!)
+            </li>
+            <li>
+              <b>buckets</b> filter (optional) a comma separated list of bucket names e.g. 
+              <span style="font-family: monospace">buckets=5x16,2x16H</span>.  Currently only the buckets 5x16, 2x16H, 7x8, offpeak 
+              and atc are supported.  If not specified, the atc bucket is returned.
+            </li>
+            <li>
+              <b>component</b> filter (optional) an LMP component name. e.g. 
+              <span style="font-family: monospace">component=lmp</span>.  Currently only the components lmp, mcc, mlc are supported.  
+              If not specified, the lmp component is returned.
+            </li>
+          </ul>
+          <div>
+            <a
+              href="http://localhost:8111/isone/prices/da/daily/start/2024-07-01/end/2024-07-15?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=lmp"
+              >isone/prices/da/daily/start/2024-07-01/end/2024-07-15?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=lmp</a
+            >
+          </div>
+          <div>
+            <a
+              href="http://localhost:8111/isone/prices/da/daily/mcc/start/2024-07-01/end/2024-07-15?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mcc"
+              >isone/prices/da/daily/start/2024-07-01/end/2024-07-15?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mcc</a
+            >
+          </div>
+          <div>
+            <a
+              href="http://localhost:8111/isone/prices/da/daily/mlc/start/2024-07-01/end/2024-07-15?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mlc"
+              >isone/prices/da/daily/start/2024-07-01/end/2024-07-15?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mlc</a
+            >
+          </div>
         </div>
 
 
@@ -354,8 +364,8 @@
               </ul>
               <div>
                 <a
-                  href="http://localhost:8111/isone/dalmp/hourly/start/2025-07-01/end/2025-07-14?ptids=4000,4001&components=lmp"
-                  >isone/dalmp/hourly/start/2025-07-01/end/2025-07-14?ptids=4000,4001&components=lmp</a
+                  href="http://localhost:8111/isone/prices/da/hourly/start/2025-07-01/end/2025-07-14?ptids=4000,4001&components=lmp"
+                  >isone/prices/da/hourly/start/2025-07-01/end/2025-07-14?ptids=4000,4001&components=lmp</a
                 >
               </div>
             </li>
@@ -364,33 +374,48 @@
 
 
         <div id="dam-monthly-prices">
-          <h4>DAM monthly prices by bucket</h4>
-          <ul>
+          <h4>ISONE DAM monthly prices by bucket</h4>
+          Calculate monthly prices (average over the hourly prices) for an LMP component (lmp, mcc, mcl), 
+          by bucket (standard bucket names are supported). Data available from Jan21 to present.
+
+          <p>The url query string has the following components:
+          <ul style="list-style-type: circle">
             <li>
-              Calculate monthly prices (average over the hourly prices) for of
-              the 3 components (lmp, congestion, marginal_loss), by bucket
-              (standard bucket names are supported).
-              <div>
-                <a
-                  href="http://localhost:8080/dalmp/v1/monthly/lmp/ptid/4000/start/201701/end/201708/bucket/5x16"
-                  >dalmp/monthly/lmp/ptid/4000/start/201701/end/201708/bucket/5x16</a
-                >
-              </div>
-              <div>
-                <a
-                  href="http://localhost:8080/dalmp/v1/monthly/congestion/ptid/4000/start/201701/end/201708/bucket/2x16H"
-                  >dalmp/monthly/congestion/ptid/4000/start/201701/end/201708/bucket/2x16H</a
-                >
-              </div>
-              <div>
-                <a
-                  href="http://localhost:8080/dalmp/v1/monthly/marginal_loss/ptid/4000/start/201701/end/201708/bucket/flat"
-                  >dalmp/monthly/marginal_loss/ptid/4000/start/201701/end/201708/bucket/flat</a
-                >
-              </div>
+              <b>ptids</b> filter (optional) a comma separated list of node ids, e.g.
+              <span style="font-family: monospace">ptids=4000,4001</span>.  If not specified, all nodes are returned (a lot of data!)
+            </li>
+            <li>
+              <b>buckets</b> filter (optional) a comma separated list of bucket names e.g. 
+              <span style="font-family: monospace">buckets=5x16,2x16H</span>.  Currently only the buckets 5x16, 2x16H, 7x8, offpeak 
+              and atc are supported.  If not specified, the atc bucket is returned.
+            </li>
+            <li>
+              <b>component</b> filter (optional) an LMP component name. e.g. 
+              <span style="font-family: monospace">component=lmp</span>.  Currently only the components lmp, mcc, mlc are supported.  
+              If not specified, the lmp component is returned.
             </li>
           </ul>
+          <div>
+            <a
+              href="http://localhost:8111/isone/prices/da/monthly/start/2024-01/end/2024-12?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=lmp"
+              >isone/prices/da/monthly/start/2024-01/end/2024-12?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=lmp</a
+            >
+          </div>
+          <div>
+            <a
+              href="http://localhost:8111/isone/prices/da/monthly/mcc/start/2024-01/end/2024-12?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mcc"
+              >isone/prices/da/monthly/start/2024-01/end/2024-12?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mcc</a
+            >
+          </div>
+          <div>
+            <a
+              href="http://localhost:8111/isone/prices/da/monthly/mlc/start/2024-01/end/2024-12?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mlc"
+              >isone/prices/da/monthly/start/2024-01/end/2024-12?ptids=4000,4001&buckets=5x16,2x16H,7x8&component=mlc</a
+            >
+          </div>
         </div>
+
+
         <div id="dam-binding-constraints">
           <h4>DAM binding constraints</h4>
           <ul>

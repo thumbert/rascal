@@ -1,9 +1,12 @@
-library test.finance.yahoo;
-
 import 'package:demos/finance/yahoo.dart';
+import 'package:timezone/data/latest_all.dart';
 
-
-main() {
-  downloadStockPrices('AAPL', new DateTime(2014), new DateTime(2015));
-
+Future<void> main() async {
+  initializeTimeZones();
+  var prices = await getStockPrices(
+    ticker: 'QQQ',
+    startDt: DateTime(2025, 1, 1),
+    endDt: DateTime(2025, 2, 1),
+  );
+  print(prices);
 }

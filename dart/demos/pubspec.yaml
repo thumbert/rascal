@@ -11,16 +11,16 @@ dependencies:
     git: https://github.com/thumbert/dama.git
   # elec:
   #   git: https://github.com/thumbert/elec.git
-  # elec_server:
-  #   git: https://github.com/thumbert/elec-server.git
+  elec_server:
+    git: https://github.com/thumbert/elec-server.git
   intl: ^0.19.0
   more: ^4.5.0
-  mongo_dart: ^0.9.1
+  mongo_dart: ^0.10.3
   quiver: ^3.0.1
   # table:
   #   git: https://github.com/thumbert/table.git
-  # timeseries:
-  #   git: https://github.com/thumbert/timeseries.git
+  timeseries:
+    git: https://github.com/thumbert/timeseries.git
   timezone: ^0.9.2
   trotter: ^2.2.0
   tuple: ^2.0.0
@@ -30,5 +30,5 @@ dependencies:
   html: any
   http: any
 dev_dependencies:
-  lints: ^5.1.1
+  lints: ^6.0.0
   test: ^1.21.4
