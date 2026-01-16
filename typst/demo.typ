@@ -25,7 +25,7 @@
     #v(-6pt)
     #align(right)[ #text(0.8em, fill: luma(250))[09:12] ]
   ]
-  #v(-36pt) #h(-6pt)
+  #v(-24pt)
   #block(
     radius: 999pt,
     inset: 4pt,
@@ -36,7 +36,6 @@
 
 
 // and the response...
-#v(-12pt)
 #align(right)[
   #block(
     fill: luma(230),
@@ -58,7 +57,7 @@
 ]
 
 // add a photo
-#image("assets/cassie.JPG", width: 100%)   
+#image("assets/cassie.JPG", width: 100%)
 
 #lorem(100)
 
