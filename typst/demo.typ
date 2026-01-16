@@ -36,6 +36,7 @@
 
 
 // and the response...
+#v(-12pt)
 #align(right)[
   #block(
     fill: luma(230),
