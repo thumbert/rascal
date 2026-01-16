@@ -1,7 +1,7 @@
 #set page(paper: "us-letter")
 #set page(columns: 2)
 #set text(font: "Noto Sans")
-#set columns(gutter: 12pt)
+#set columns(gutter: 24pt)
 #set page(margin: (top: 2cm, bottom: 2cm, left: 1.5cm, right: 1.5cm))
 
 #place(
@@ -9,8 +9,8 @@
   float: true,
   scope: "parent",
   text(1.4em, weight: "bold")[First steps],
+  clearance: 30pt,
 )
-#v(12pt)
 
 #text(fill: gray, baseline: 6pt)[Tuesday · November 11, 2024]
 #text(fill: white)[
@@ -59,3 +59,9 @@
 
 // add a photo
 #image("assets/cassie.JPG", width: 100%)   
+
+#lorem(100)
+
+#lorem(50)
+
+#lorem(30)
