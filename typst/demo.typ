@@ -8,9 +8,14 @@
   top + center,
   float: true,
   scope: "parent",
-  text(1.4em, weight: "bold")[First steps],
+  text(2.4em, weight: "bold")[First steps],
   clearance: 30pt,
+  dy: 100pt,
 )
+
+#set page(background: line(angle: 90deg, length: 87%, stroke: 0.2pt + luma(200)))
+#set page(numbering: "1")
+#counter(page).update(1)
 
 #text(fill: gray, baseline: 6pt)[Tuesday · November 11, 2024]
 #text(fill: white)[
