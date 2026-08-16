@@ -1,4 +1,3 @@
-
 import 'package:demos/math/ai/windmill/winmill_game2.dart';
 import 'package:test/test.dart';
 
@@ -6,7 +5,8 @@ void tests() {
   test('Print board', () {
     var state = NonTerminalState(
       [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 23, 19],
-     [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20, 22]);
+      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20, 22],
+    );
     expect(state.board(), """
 O-----------X-----------O
 |  X--------O--------X  |
@@ -21,24 +21,24 @@ O  X  O           X  X  O
 X-----------O-----------X
 """);
   });
-  
 
   test('Has last player won?', () {
     var state = NonTerminalState([1, 22], [19, 0]);
-    var newState = state.result(4);
+    var newState = state.placeStoneAt(4);
     expect(newState is TerminalState, true);
   });
   test('Check winning move', () {
     var state = NonTerminalState([1, 7, 16, 20, 23], [19, 22, 18, 21]);
-    var newState = state.result(16);
+    var newState = state.placeStoneAt(16);
     expect(newState is TerminalState, true);
   });
   test('Check tie', () {
     var state = NonTerminalState(
       [1, 0, 3, 18, 4, 9, 10, 8, 13, 17, 23, 19],
-     [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20]);
+      [15, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20],
+    );
     expect(state.actions(), {22});
-    var newState = state.result(22);
+    var newState = state.placeStoneAt(22);
     expect(newState is TerminalState, true);
     expect((newState as TerminalState).utility(Player.one), 0.5);
     expect(newState.utility(Player.two), 0.5);
@@ -47,15 +47,18 @@ X-----------O-----------X
   test('Check Player.two wins with last move', () {
     var state = NonTerminalState(
       [1, 0, 3, 18, 4, 9, 10, 8, 15, 17, 23, 19],
-     [22, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20]);
+      [22, 2, 21, 5, 6, 12, 11, 7, 16, 14, 20],
+    );
     expect(state.actions(), {13});
-    var newState = state.result(13);
-    expect(newState is TerminalState, true);  // Player.two wins with [12, 13, 14]
+    var newState = state.placeStoneAt(13);
+    expect(
+      newState is TerminalState,
+      true,
+    ); // Player.two wins with [12, 13, 14]
     print(newState);
     expect((newState as TerminalState).utility(Player.one), -1.0);
     expect(newState.utility(Player.two), 1.0);
   });
-
 }
 
 // speedTest() {
@@ -86,12 +89,12 @@ X-----------O-----------X
 //   }
 //   sw.stop();
 //   print(sw.elapsedMilliseconds);
-//   /// takes 5ms to check 10,000 positions!  Pretty good. 
+//   /// takes 5ms to check 10,000 positions!  Pretty good.
 //   print(count);
 // }
 
 void play() {
-  // TODO: make sure minmax strategy checks if it can win 
+  // TODO: make sure minmax strategy checks if it can win
   // with next move.  If it does, take it!
 
   var p1 = PlayerOne(RandomStrategy());
@@ -106,12 +109,10 @@ void play() {
   print('utility player2: ${end.utility(Player.two)}');
 }
 
-
 void main() {
   // tests();
   // speedTest();
   play();
-
 }
 
 

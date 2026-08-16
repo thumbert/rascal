@@ -5,12 +5,48 @@ import 'dart:math' as math;
 import 'package:dama/dama.dart';
 import 'package:trotter/trotter.dart';
 
+/// See https://en.wikipedia.org/wiki/Nine_men's_morris
+///
+/// Only implement stage 1 of the game right now.
+///
+
 typedef Move = int;
 
-const allMoves = <int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 
-  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+const allMoves = <int>{
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+};
 
-enum Player { one, two }
+enum Player {
+  one,
+  two;
+
+  String toString() => this == Player.one ? 'X' : 'O';
+}
+
+enum GameOutcome { winnerPlayer1, winnerPlayer2, tie }
 
 sealed class Players {}
 
@@ -26,19 +62,11 @@ final class PlayerTwo extends Players {
   final Strategy strategy;
 }
 
-sealed class TwoPlayerGame {
-  TwoPlayerGame(this.p1, this.p2);
+class Game {
+  Game(this.p1, this.p2, this.initialState);
+
   final PlayerOne p1;
   final PlayerTwo p2;
-}
-
-class Game extends TwoPlayerGame {
-  Game(
-    PlayerOne p1,
-    PlayerTwo p2,
-    this.initialState,
-  ) : super(p1, p2);
-
   final State initialState;
 
   /// play it to the end
@@ -51,7 +79,7 @@ class Game extends TwoPlayerGame {
       var nextMove = (state.nextPlayer == Player.one)
           ? p1.strategy.nextMove(state)
           : p2.strategy.nextMove(state);
-      state = state.result(nextMove);
+      state = state.placeStoneAt(nextMove);
     }
     return state as TerminalState;
   }
@@ -72,8 +100,8 @@ class RandomStrategy extends Object with Strategy {
 }
 
 /// Sophisticated, over-thinker, not fun to be around!
-/// Uses a depth argument > 0 to prolong the inevitable defeat (pretend that 
-/// you don't see the writing on the wall.) 
+/// Uses a depth argument > 0 to prolong the inevitable defeat (pretend that
+/// you don't see the writing on the wall.)
 class MinMaxStrategy extends Object with Strategy {
   static final rand = math.Random();
 
@@ -84,10 +112,10 @@ class MinMaxStrategy extends Object with Strategy {
     depth += 1.0;
     if (state is TerminalState) return state.utility(currentPlayer) + depth;
     num value = -999.0;
-    if (depth > 4) return value;  // bail out
+    if (depth > 4) return value; // bail out
     var aliveState = state as NonTerminalState;
     for (var move in aliveState.actions()) {
-      value = math.max(value, minValue(aliveState.result(move), depth));
+      value = math.max(value, minValue(aliveState.placeStoneAt(move), depth));
     }
     return value;
   }
@@ -96,10 +124,10 @@ class MinMaxStrategy extends Object with Strategy {
     depth += 1.0;
     if (state is TerminalState) return state.utility(state.lastPlayer) + depth;
     num value = 999.0;
-    if (depth > 4) return value;  // bail out
+    if (depth > 4) return value; // bail out
     var aliveState = state as NonTerminalState;
     for (var move in aliveState.actions()) {
-      value = math.min(value, maxValue(aliveState.result(move), depth));
+      value = math.min(value, maxValue(aliveState.placeStoneAt(move), depth));
     }
     return value;
   }
@@ -110,7 +138,7 @@ class MinMaxStrategy extends Object with Strategy {
     var actions = state.actions().toList();
     num depth = 0.0;
     var values = actions.map((move) {
-      var newState = (state as NonTerminalState).result(move);
+      var newState = (state as NonTerminalState).placeStoneAt(move);
       return minValue(newState, depth);
     }).toList();
     print(state);
@@ -118,8 +146,6 @@ class MinMaxStrategy extends Object with Strategy {
     return actions[values.indexOfMax()];
   }
 }
-
-enum GameOutcome { winnerPlayer1, winnerPlayer2, tie }
 
 sealed class State {
   /// The indexing of the moves list is as follows:
@@ -143,14 +169,17 @@ sealed class State {
   Player get nextPlayer =>
       (movesPlayer1.length == movesPlayer2.length) ? Player.one : Player.two;
 
-  /// Player.one is 'X', Player.two is 'O'.
+  /// Construct a string representation of the board, with X and O in the right
+  /// places and . for empty positions.
   String board() {
-    var out = [...boardE];
+    var out = [...emptyBoard];
     for (var m in movesPlayer1) {
-      out[bc[m]!.$1][bc[m]!.$2] = 'X';
+      out[boardCoordinates[m]!.$1][boardCoordinates[m]!.$2] = Player.one
+          .toString();
     }
     for (var m in movesPlayer2) {
-      out[bc[m]!.$1][bc[m]!.$2] = 'O';
+      out[boardCoordinates[m]!.$1][boardCoordinates[m]!.$2] = Player.two
+          .toString();
     }
     return out.map((row) => row.join()).join('\n');
   }
@@ -164,16 +193,18 @@ sealed class State {
   /// The arguments p0, p1, p2 need to be ordered, and >=0, <=8.
   bool _isWinningPosition(int p0, int p1, int p2) {
     var wp = allWinningPositions.firstWhere(
-        (e) => e[0] == p0 && e[1] == p1 && e[2] == p2,
-        orElse: () => <int>[]);
+      (e) => e[0] == p0 && e[1] == p1 && e[2] == p2,
+      orElse: () => <int>[],
+    );
     if (wp.isNotEmpty) return true;
     return false;
   }
 
   /// Check if this next move ends the game!
   bool isWinningMove(Move m) {
-    final existingMoves =
-        (nextPlayer == Player.one) ? movesPlayer1 : movesPlayer2;
+    final existingMoves = (nextPlayer == Player.one)
+        ? movesPlayer1
+        : movesPlayer2;
     if (existingMoves.length < 2) return false;
     // generate all combinations that include the last move by this player
     var combinations = Combinations(2, existingMoves);
@@ -219,7 +250,10 @@ class TerminalState extends State {
       // It could happen that the second player has won in the last move,
       // so construct the previous non-terminal move and check
       var lastMove = movesPlayer2.last;
-      var previous = NonTerminalState(movesPlayer1, movesPlayer2.sublist(0, 10));
+      var previous = NonTerminalState(
+        movesPlayer1,
+        movesPlayer2.sublist(0, 10),
+      );
       if (previous.isWinningMove(lastMove)) {
         return player == Player.two ? 1.0 : -1.0;
       } else {
@@ -247,7 +281,7 @@ class NonTerminalState extends State {
       allMoves.difference({...movesPlayer1, ...movesPlayer2});
 
   /// Transition model, how you move from one State to another
-  State result(Move m) {
+  State placeStoneAt(Move m) {
     var newMovesPlayer1 = [...movesPlayer1];
     var newMovesPlayer2 = [...movesPlayer2];
     if (nextPlayer == Player.one) {
@@ -269,7 +303,8 @@ class NonTerminalState extends State {
 }
 
 /// the empty board
-final boardE = """
+final emptyBoard =
+    """
 .-----------.-----------.
 |  .--------.--------.  |
 |  |  .-----.-----.  |  |
@@ -281,40 +316,42 @@ final boardE = """
 |  |  .-----.-----.  |  |
 |  .--------.--------.  |
 .-----------.-----------.
-""".split('\n').map((e) => e.split('')).toList();
+"""
+        .split('\n')
+        .map((e) => e.split(''))
+        .toList();
 
 /// Map a move to board coordinates.
-final bc = <Move,(int row, int col)>{
-  0: (5,18),
-  1: (5,21),
-  2: (5,24),
+final boardCoordinates = <Move, (int row, int col)>{
+  0: (5, 18),
+  1: (5, 21),
+  2: (5, 24),
   //
-  3: (2,18),
-  4: (1,21),
-  5: (0,24),
+  3: (2, 18),
+  4: (1, 21),
+  5: (0, 24),
   //
-  6: (2,12),
-  7: (1,12),
-  8: (0,12),
+  6: (2, 12),
+  7: (1, 12),
+  8: (0, 12),
   //
-  9: (2,6),
-  10: (1,3),
-  11: (0,0),
+  9: (2, 6),
+  10: (1, 3),
+  11: (0, 0),
   //
-  12: (5,6),
-  13: (5,3),
-  14: (5,0),
+  12: (5, 6),
+  13: (5, 3),
+  14: (5, 0),
   //
-  15: (8,6),
-  16: (9,3),
-  17: (10,0),
+  15: (8, 6),
+  16: (9, 3),
+  17: (10, 0),
   //
-  18: (8,12),
-  19: (9,12),
-  20: (10,12),
+  18: (8, 12),
+  19: (9, 12),
+  20: (10, 12),
   //
-  21: (8,18),
-  22: (9,21),
-  23: (10,24),
+  21: (8, 18),
+  22: (9, 21),
+  23: (10, 24),
 };
-
